@@ -3,7 +3,10 @@ __pycache__/
 .venv/
 venv/
 .env
-data/snapshots/
-docs/.notified-gw*
+.pytest_cache/
 .DS_Store
 .vscode/settings.json
+
+# Raw API snapshots: large, regenerated on every build. Remove this line once
+# you want to accumulate history for backtesting.
+data/snapshots/

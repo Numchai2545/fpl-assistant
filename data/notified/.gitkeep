@@ -1,0 +1,4 @@
+Reminder state. One file per reminder actually sent, so a scheduled run that
+fires again does not repeat an alert. This directory IS committed on purpose —
+on GitHub Actions the runner is fresh every time, so state that is not committed
+does not exist, and every run would alert again.

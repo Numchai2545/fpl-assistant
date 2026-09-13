@@ -14,7 +14,7 @@ from datetime import datetime, timezone
 
 import pandas as pd
 
-from . import features, model, optimize, report
+from . import calendar_feed, features, model, optimize, report
 from .config import load_config, selling_fee, verify_scoring
 from .fetch import (FPLClient, bank_and_value, deadline_utc, free_transfers,
                     next_gameweek, selling_prices)
@@ -125,6 +125,15 @@ def build(args) -> int:
     )
     path = report.render(ctx, cfg)
     log.info("dashboard written to %s", path)
+
+    ics = calendar_feed.write(
+        bootstrap["events"], cfg.site_dir,
+        site_url=cfg.get("notify", "site_url", default="") or "",
+        calendar_name=cfg.get("output", "title", default="FPL"),
+        remind_hours=[float(h) for h in cfg.get(
+            "notify", "remind_hours_before", default=[48, 24, 3])],
+    )
+    log.info("deadline calendar written to %s", ics)
     print(f"\n  {ctx['action']['headline']}\n  {ctx['action']['detail']}\n")
     print(f"  open: {path}")
     return 0

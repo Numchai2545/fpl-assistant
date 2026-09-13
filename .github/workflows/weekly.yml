@@ -1,14 +1,18 @@
 name: Build FPL dashboard
 
 # Runs in GitHub's cloud, so the dashboard is fresh whether or not your PC is on.
-# Three times a day is enough: the notifier itself decides when the alert is due,
-# and prices change once a day at 01:30 UK time.
+#
+# The schedule is deliberately dense in the 48 hours before a normal Saturday
+# deadline, because the requirement is that the data is READY at least 24 hours
+# before the deadline — not that a job ran at some point that week. Deadlines
+# move (midweek gameweeks, cup finals), so `notify` decides for itself whether a
+# reminder is due rather than trusting the cron to line up.
 on:
   schedule:
-    - cron: "30 2 * * *"    # 09:30 Bangkok — after the overnight price changes
-    - cron: "0 10 * * *"    # 17:00 Bangkok
-    - cron: "0 16 * * 4,5"  # 23:00 Bangkok Thu/Fri — the usual 24h-before window
-  workflow_dispatch:         # and a "Run workflow" button for whenever you want
+    - cron: "40 2 * * *"      # 09:40 Bangkok, daily — after overnight price changes
+    - cron: "0 13 * * *"      # 20:00 Bangkok, daily
+    - cron: "0 8,17 * * 3,4,5"  # 15:00 & 00:00 Bangkok, Wed-Fri — the 48h/24h window
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -35,15 +39,26 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      # The model is only as good as its arithmetic, and a wrong constant is
+      # silent. Never publish a dashboard from a tree whose tests fail.
+      - name: Run tests
+        env:
+          PYTHONPATH: src
+        run: python -m pytest tests/ -q
+
       - name: Build dashboard
         env:
           PYTHONPATH: src
+          PYTHONIOENCODING: utf-8
           FPL_TEAM_ID: ${{ vars.FPL_TEAM_ID }}
         run: python -m fplbot build -v
 
-      - name: Send deadline alert
+      # Reminder state lives in data/, which is committed, so a reminder that
+      # has already gone out is not sent again by the next scheduled run.
+      - name: Send deadline reminder
         env:
           PYTHONPATH: src
+          PYTHONIOENCODING: utf-8
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python -m fplbot notify
@@ -53,6 +68,6 @@ jobs:
         run: |
           git config user.name  "fpl-assistant"
           git config user.email "actions@users.noreply.github.com"
-          git add docs
+          git add docs data/notified
           git diff --staged --quiet || git commit -m "dashboard: $(date -u +'%Y-%m-%d %H:%M UTC')"
           git push

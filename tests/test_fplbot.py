@@ -438,3 +438,80 @@ class TestOptimiserBehaviour:
         real = optimize.solve(ep, players, squad, 0.0, 1, _cfg(), selling_price=discounted)
         assert real.budget < full.budget
         assert real.budget == pytest.approx(full.budget - 0.3 * len(squad), abs=0.05)
+
+
+# ------------------------------------------------------------------ calendar
+class TestCalendarFeed:
+    def _events(self, offsets_hours: list[float], finished_ids: set[int] | None = None):
+        from datetime import datetime, timedelta, timezone
+        now = datetime.now(timezone.utc)
+        finished_ids = finished_ids or set()
+        return [{
+            "id": i + 1,
+            "deadline_time": (now + timedelta(hours=h)).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "finished": (i + 1) in finished_ids,
+        } for i, h in enumerate(offsets_hours)]
+
+    def test_is_a_well_formed_calendar(self):
+        from fplbot import calendar_feed
+        ics = calendar_feed.build_ics(self._events([100.0]))
+        assert ics.startswith("BEGIN:VCALENDAR\r\n")
+        assert ics.rstrip().endswith("END:VCALENDAR")
+        assert ics.count("BEGIN:VEVENT") == ics.count("END:VEVENT") == 1
+        assert ics.count("BEGIN:VALARM") == ics.count("END:VALARM")
+
+    def test_uses_crlf_line_endings(self):
+        """RFC 5545 requires CRLF; a bare LF makes some clients reject the feed."""
+        from fplbot import calendar_feed
+        ics = calendar_feed.build_ics(self._events([100.0]))
+        assert "\r\n" in ics
+        assert not ics.replace("\r\n", "").__contains__("\n")
+
+    def test_skips_finished_and_past_gameweeks(self):
+        from fplbot import calendar_feed
+        events = self._events([-50.0, -2.0, 10.0, 200.0], finished_ids={1})
+        ics = calendar_feed.build_ics(events)
+        assert ics.count("BEGIN:VEVENT") == 2, "only the two future deadlines belong"
+
+    def test_one_alarm_per_reminder_stage(self):
+        from fplbot import calendar_feed
+        ics = calendar_feed.build_ics(self._events([100.0]), remind_hours=[48, 24, 3])
+        assert "TRIGGER:-PT2880M" in ics   # 48h
+        assert "TRIGGER:-PT1440M" in ics   # 24h
+        assert "TRIGGER:-PT180M" in ics    # 3h
+        assert ics.count("BEGIN:VALARM") == 3
+
+    def test_uid_is_stable_across_rebuilds(self):
+        """Subscribers must update the event, not accumulate duplicates."""
+        from fplbot import calendar_feed
+        events = self._events([100.0])
+        first = [l for l in calendar_feed.build_ics(events).split("\r\n") if l.startswith("UID:")]
+        second = [l for l in calendar_feed.build_ics(events).split("\r\n") if l.startswith("UID:")]
+        assert first == second and first
+
+    def test_thai_text_survives_line_folding(self):
+        """Folding counts octets, so it must not cut a Thai character in half."""
+        from fplbot import calendar_feed
+        ics = calendar_feed.build_ics(self._events([100.0]), site_url="https://example.com/fpl")
+        # Unfold the way a calendar client does: drop CRLF + one leading space.
+        unfolded = ics.replace("\r\n ", "")
+        assert "ปิดจัดตัว" in unfolded
+        assert "คนติดธงในตัวจริง" in unfolded
+        for line in ics.split("\r\n"):
+            assert len(line.encode("utf-8")) <= 75
+
+    def test_event_ends_at_the_deadline(self):
+        from fplbot import calendar_feed
+        ics = calendar_feed.build_ics(self._events([100.0]), duration_minutes=30)
+        start = next(l for l in ics.split("\r\n") if l.startswith("DTSTART:"))
+        end = next(l for l in ics.split("\r\n") if l.startswith("DTEND:"))
+        from datetime import datetime
+        fmt = "%Y%m%dT%H%M%SZ"
+        delta = (datetime.strptime(end[7:], fmt) - datetime.strptime(start[9:], fmt))
+        assert delta.total_seconds() == 30 * 60
+
+    def test_empty_season_still_produces_a_valid_feed(self):
+        from fplbot import calendar_feed
+        ics = calendar_feed.build_ics([])
+        assert "BEGIN:VCALENDAR" in ics and "END:VCALENDAR" in ics
+        assert "BEGIN:VEVENT" not in ics
