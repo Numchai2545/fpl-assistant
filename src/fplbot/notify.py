@@ -50,11 +50,11 @@ def compose(summary: dict, hours_left: float, stage: float | None = None,
     urgent = stage is not None and stage <= 6
     head = "🚨 ใกล้ปิดแล้ว" if urgent else "⚽ เตือนจัดตัว"
 
-    lines = [
-        f"{head} — *GW{summary['gw']}* ปิด{_fmt_left(hours_left)}",
-        f"_{summary.get('deadline_local', '')}_".rstrip("_ ") or "",
-        "",
-    ]
+    lines = [f"{head} — *GW{summary['gw']}* ปิด{_fmt_left(hours_left)}"]
+    when = (summary.get("deadline_local") or "").strip()
+    if when:
+        lines.append(f"_{when}_")
+    lines.append("")
 
     # Anything unavailable in the XI goes above the fold: this is the failure
     # that actually costs points when a deadline is missed.

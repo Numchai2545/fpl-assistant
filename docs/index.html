@@ -169,6 +169,18 @@ td.r,th.r{text-align:right;font-family:"IBM Plex Mono",monospace;font-variant-nu
 .tabs button[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:var(--surface)}
 .tabs button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
+
+/* calendar subscription: the one reminder that survives everything else */
+.subscribe{display:flex;flex-wrap:wrap;gap:14px 18px;align-items:center;background:var(--surface);
+  border:1px solid var(--rule);border-radius:8px;padding:16px 18px}
+.btn{display:inline-block;background:var(--accent);color:var(--surface);text-decoration:none;
+  font-family:"Bai Jamjuree",sans-serif;font-weight:600;font-size:14.5px;padding:10px 20px;
+  border-radius:6px;white-space:nowrap;flex:none}
+.btn:hover{filter:brightness(1.08)}
+.subscribe .how{font-size:12.5px;color:var(--ink-2);line-height:1.75;flex:1 1 240px}
+.subscribe .how b{color:var(--ink)}
+.feedurl{font-family:"IBM Plex Mono",monospace;font-size:11.5px;background:var(--surface-2);
+  padding:2px 6px;border-radius:4px;word-break:break-all;color:var(--ink-2)}
 footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:var(--ink-3);font-size:12px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -178,13 +190,13 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
 
 <header>
   <div class="brand">
-    <div class="eyebrow">Gameweek 5 &middot; built 13 Sep 2026, 19:09</div>
+    <div class="eyebrow">Gameweek 5 &middot; built อาทิตย์ 13 ก.ย. 2569, 19:13 น.</div>
     <h1>Gnum United — FPL Assistant</h1>
   </div>
   <div class="countdown ">
     <div class="lab">ปิดจัดตัวใน</div>
     <div class="val" id="cd" data-deadline="2026-09-18T17:30:00+00:00">5d 5h</div>
-    <div class="sub">Sat 19 Sep, 00:30 +07</div>
+    <div class="sub">เสาร์ 19 ก.ย. 2569, 00:30 น.</div>
   </div>
 </header>
 
@@ -1019,8 +1031,23 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
   </div>
 </section>
 
+<section>
+  <h2>กันลืม</h2>
+  <p class="sub">สมัครครั้งเดียว มือถือจะเตือนเองก่อนทุก deadline ที่เหลือของฤดูกาล แม้ระบบนี้จะล่ม</p>
+  <div class="subscribe">
+    <a class="btn" href="deadlines.ics" download>เพิ่มลงปฏิทิน</a>
+    <div class="how">
+      <b>iPhone</b> — แตะปุ่มนี้ แล้วกด &ldquo;เพิ่มทั้งหมด&rdquo; · เตือน 48, 24, 3 ชม. ก่อนปิด<br>
+      <b>Android</b> — Google Calendar &rsaquo; ปฏิทินอื่น &rsaquo; จาก URL แล้ววางลิงก์นี้
+    </div>
+  </div>
+  <p class="sub" style="margin-top:14px">
+    และกด &ldquo;เพิ่มไปยังหน้าจอโฮม&rdquo; จากเมนูแชร์ของเบราว์เซอร์ เพื่อเปิดหน้านี้ได้เหมือนแอป
+  </p>
+</section>
+
 <footer>
-  สร้างจาก Fantasy Premier League API เมื่อ 13 Sep 2026, 19:09 · ตัวเลขคาดการณ์เป็นค่าประมาณเชิงสถิติ ไม่ใช่คำทำนายผลจริง
+  สร้างจาก Fantasy Premier League API เมื่อ อาทิตย์ 13 ก.ย. 2569, 19:13 น. · ตัวเลขคาดการณ์เป็นค่าประมาณเชิงสถิติ ไม่ใช่คำทำนายผลจริง
   โมเดล v0.1.0 &middot; สถานะ solver: Optimal
 </footer>
 </div>

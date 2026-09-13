@@ -1,7 +1,7 @@
 {
-  "name": "Gnum United — FPL Assistant",
+  "name": "Gnum United — ผู้ช่วยจัดตัว FPL",
   "short_name": "FPL",
-  "description": "Expected points, captain picks and a six-gameweek transfer plan.",
+  "description": "แต้มที่คาดว่าจะได้ ตัวเลือกกัปตัน และแผนเปลี่ยนตัวล่วงหน้า",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
@@ -9,8 +9,25 @@
   "background_color": "#131018",
   "theme_color": "#6D28A8",
   "icons": [
-    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
-    { "src": "icon-180.png", "sizes": "180x180", "type": "image/png", "purpose": "any" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
-  ]
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-180.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "lang": "th",
+  "dir": "ltr"
 }

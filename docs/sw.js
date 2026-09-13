@@ -1,10 +1,17 @@
-// Cache the dashboard so it opens instantly from the home screen, even on a
-// train with no signal. Network-first so a fresh build always wins when online.
-const CACHE = 'fpl-assistant-v1';
-const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon.svg', './summary.json'];
+// Cache the dashboard so it opens instantly from the home screen, even with no
+// signal. Network-first, so a fresh build always wins when you are online.
+const CACHE = 'fpl-assistant-v2';
+const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon.svg',
+                './summary.json', './deadlines.ics'];
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting()));
+  e.waitUntil(
+    caches.open(CACHE)
+      // One missing file must not abort the whole install, which is what
+      // addAll() does — it rejects the entire batch on a single failure.
+      .then((c) => Promise.all(ASSETS.map((u) => c.add(u).catch(() => {}))))
+      .then(() => self.skipWaiting())
+  );
 });
 
 self.addEventListener('activate', (e) => {
@@ -16,14 +23,20 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
-  if (e.request.method !== 'GET') return;
+  const req = e.request;
+  if (req.method !== 'GET') return;
+  // Only same-origin responses are cacheable: putting an opaque cross-origin
+  // response (the Google Fonts files) throws and rejects unhandled.
+  const sameOrigin = new URL(req.url).origin === self.location.origin;
   e.respondWith(
-    fetch(e.request)
+    fetch(req)
       .then((res) => {
-        const copy = res.clone();
-        caches.open(CACHE).then((c) => c.put(e.request, copy));
+        if (sameOrigin && res.ok) {
+          const copy = res.clone();
+          caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {});
+        }
         return res;
       })
-      .catch(() => caches.match(e.request).then((hit) => hit || caches.match('./index.html')))
+      .catch(() => caches.match(req).then((hit) => hit || caches.match('./index.html')))
   );
 });

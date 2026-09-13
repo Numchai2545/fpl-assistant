@@ -12,20 +12,23 @@ scraping, no cost.
 ## Quick start
 
 ```bash
-git clone <your-repo-url> fpl-assistant
-cd fpl-assistant
-
 python -m venv .venv
 .venv\Scripts\activate          # Windows
 # source .venv/bin/activate     # macOS / Linux
 
 pip install -r requirements.txt
 set PYTHONPATH=src               # Windows;  export PYTHONPATH=src  elsewhere
+set PYTHONIOENCODING=utf-8       # Windows only: a cp1252 console cannot
+                                 # print Thai without this
 
 python -m fplbot build
 ```
 
-That writes `docs/index.html`. Open it in a browser.
+That writes `docs/index.html` (the dashboard, in Thai) and `docs/deadlines.ics`
+(the deadline calendar). Open the HTML in a browser.
+
+Run the tests with `python -m pytest tests/ -q` — 74 of them, about two
+seconds, no network needed.
 
 **No network to the FPL API?** Seed a frozen dataset first and work offline:
 
@@ -44,11 +47,12 @@ use it for development, never for an actual transfer decision.
 
 | Command | What it does |
 |---|---|
-| `python -m fplbot build` | Fetch, model, optimise, write the dashboard |
-| `python -m fplbot build --offline` | Rebuild from today's cached snapshot, no API calls |
+| `python -m fplbot build` | Fetch, model, optimise, write the dashboard and calendar |
+| `python -m fplbot build --offline` | Rebuild from the cached snapshot, no API calls |
 | `python -m fplbot check` | Print the next deadline and how far away it is |
-| `python -m fplbot notify` | Send the Telegram alert, if it is due |
+| `python -m fplbot notify` | Send a reminder, if one is due |
 | `python -m fplbot notify --force` | Send it regardless of timing (for testing) |
+| `python -m pytest tests/ -q` | Run the test suite |
 
 Add `-v` before the subcommand for debug logging: `python -m fplbot -v build`.
 
@@ -57,12 +61,13 @@ Add `-v` before the subcommand for debug logging: `python -m fplbot -v build`.
 ## How it works
 
 ```
-fetch.py      official FPL API  ->  data/snapshots/<date>/*.json
-features.py   raw JSON          ->  player rates, team strength, fixture schedule
-model.py      rates + fixtures  ->  expected points per player per gameweek
-optimize.py   EP matrix         ->  a six-gameweek transfer plan (integer program)
-report.py     the plan          ->  docs/index.html + docs/summary.json
-notify.py     summary.json      ->  Telegram message
+fetch.py         official FPL API  ->  data/snapshots/<date>/*.json
+features.py      raw JSON          ->  player rates, team strength, fixture schedule
+model.py         rates + fixtures  ->  expected points per player per gameweek
+optimize.py      EP matrix         ->  a six-gameweek transfer plan (integer program)
+report.py        the plan          ->  docs/index.html + docs/summary.json
+calendar_feed.py the fixture list  ->  docs/deadlines.ics
+notify.py        summary.json      ->  Telegram message
 ```
 
 ### The expected points model
@@ -132,10 +137,27 @@ Everything personal lives in `config.yaml`. The fields worth knowing:
 
 ## Getting it on your phone
 
-The dashboard is a **progressive web app**: a manifest, an icon and a service
-worker ship alongside it, so once it is on a URL you can use your browser's
-*Add to Home Screen* and it opens like an app, full screen, and still works with
-no signal.
+Two things, and the second matters more.
+
+### The calendar — this is what stops you forgetting
+
+`docs/deadlines.ics` carries every remaining deadline of the season with alarms
+at 48, 24 and 3 hours. Subscribe once and your phone fires them itself: offline,
+with no app installed, and whether or not this project built successfully that
+week. Every other channel here depends on something working at the right moment.
+That one does not.
+
+* **iPhone** — open the dashboard, tap *เพิ่มลงปฏิทิน*, then *Add All*.
+* **Android** — Google Calendar → Other calendars → From URL → paste
+  `<your-pages-url>/deadlines.ics`.
+
+Set `notify.site_url` in `config.yaml` and the URL is printed on the page for you.
+
+### The dashboard as an app
+
+It is a **progressive web app**: a manifest, an icon and a service worker ship
+alongside it, so once it is on a URL you can use your browser's *Add to Home
+Screen* and it opens like an app, full screen, and still works with no signal.
 
 That needs a URL, which means hosting. The recommended route also solves a bigger
 problem — your PC being asleep on a Friday night:
@@ -154,9 +176,11 @@ cloud on a schedule, commits the refreshed `docs/`, and Pages serves it.
    - Secrets → `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` (optional, see below)
 4. Open `https://<username>.github.io/<repo>/` on your phone → *Add to Home Screen*.
 
-The workflow runs three times a day, including late Thursday and Friday Bangkok
-time, which is the 24-hour window before a normal Saturday deadline. It costs
-nothing on a public repo.
+The schedule is deliberately dense in the 48 hours before a normal Saturday
+deadline, because the requirement is that the data is *ready* at least 24 hours
+ahead — not that a job ran at some point that week. It costs nothing on a public
+repo. The workflow runs the tests before publishing, so a failing test blocks the
+dashboard rather than shipping wrong numbers.
 
 ### Windows Task Scheduler (alternative, or as well)
 
@@ -174,8 +198,11 @@ works and costs nothing.
 3. Set `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` as environment variables (or as
    GitHub Actions secrets) and flip `notify.telegram.enabled` to `true`.
 
-The notifier will not spam you: it fires once per gameweek, inside the configured
-window, and records that it did.
+The notifier will not spam you: each reminder stage fires once per gameweek and
+records that it did, in `data/notified/`. That directory is committed on purpose
+— on a fresh CI runner, state that is not committed does not exist, and every
+scheduled run would alert again. The marker is written only after a send actually
+succeeds, so a failure is retried rather than silently swallowed.
 
 ---
 
@@ -184,22 +211,28 @@ window, and records that it did.
 The model is deliberately v0.1 — honest, readable, and not yet tuned. In rough
 order of how much each would improve the output:
 
-1. **Backtest and calibrate.** Run the model over 2024/25 and 2025/26 (the season
-   mirror on GitHub has complete per-gameweek history) and fit the pieces that are
-   currently hand-set: the bonus-point mapping, the xG/actual blend, the shrinkage
-   constant, the decay. Measure against FPL's own `ep_next` as the baseline to beat.
-2. **A real minutes model.** Playing time drives everything and is currently a
-   simple start rate. Pulling `element-summary` histories for a shortlist would give
-   a proper recent-minutes trend and catch rotation before it costs you a week.
-3. **Chip planning.** The optimiser knows the chip rules but does not yet decide
-   when to play them. Bench Boost and Triple Captain are worth solving for
-   explicitly once double gameweeks are on the calendar.
-4. **Correct selling prices.** The budget constraint uses market value; FPL gives
-   back only half of a price rise. The gap is usually small but it can make a plan
-   infeasible in practice.
-5. **Price-change forecasting.** `transfer_pressure` is already computed but only
+1. **A real minutes model.** Playing time drives everything and is still just
+   `starts / team_games`. Pulling `element-summary` histories for a shortlist would
+   give a proper recent-minutes trend and catch rotation before it costs a week.
+   This is the single highest-value thing left.
+2. **Backtest and calibrate.** Nothing here has been validated against outcomes.
+   Run the model over past seasons and fit the pieces that are currently hand-set:
+   the bonus-point mapping, the xG/actual blend, the shrinkage constant, the decay.
+   Measure against FPL's own `ep_next` as the baseline to beat.
+3. **Auto-substitution in the model.** A blanking or benched starter is rescued by
+   the bench in real FPL, which the optimiser does not know, so bench value is
+   systematically understated.
+4. **Chip planning.** The optimiser knows the chip rules but does not decide when
+   to play them. Bench Boost and Triple Captain are worth solving for explicitly
+   once double gameweeks are on the calendar.
+5. **Price-change forecasting.** `transfer_pressure` is computed but only
    displayed. Turning it into an expected value — buy tonight or lose 0.1m — is a
    small, high-value addition.
+
+**Done since v0.1:** correct selling prices (reconstructed from the public
+transfers endpoint, no login needed), scoring constants verified against the API
+on every build, a transfer-friction term so the plan stops churning the bench,
+and a 74-test suite.
 
 ---
 

@@ -30,6 +30,17 @@ def _env() -> Environment:
     )
 
 
+THAI_DAYS = ["จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์", "อาทิตย์"]
+THAI_MONTHS = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.",
+               "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."]
+
+
+def _thai_datetime(dt: datetime) -> str:
+    """Thai weekday and month, with the Buddhist-era year people actually use."""
+    return (f"{THAI_DAYS[dt.weekday()]} {dt.day} {THAI_MONTHS[dt.month - 1]} "
+            f"{dt.year + 543}, {dt:%H:%M} น.")
+
+
 def _rank(value) -> str:
     try:
         return f"{int(value):,}"
@@ -45,6 +56,61 @@ def _opponent_label(rows: pd.DataFrame, teams: pd.DataFrame) -> str:
         short = teams.short_name.get(int(r.opponent), "?")
         parts.append(f"{short} ({'H' if r.is_home else 'A'})")
     return " + ".join(parts)
+
+
+def squad_alerts(players: pd.DataFrame, squad: list[int], xi: list[int],
+                 captain: int | None) -> tuple[list[dict], list[str]]:
+    """Split squad problems into page context and things worth interrupting for.
+
+    `flags` is everything worth knowing. `alerts` is the subset that costs
+    points if you do nothing before the deadline — an unavailable player in the
+    XI, or a captain who may not play. Only alerts go into a push notification,
+    because a reminder that lists six things is a reminder you scroll past.
+    """
+    flags: list[dict] = []
+    alerts: list[str] = []
+    xi_set = set(xi)
+
+    for pid in squad:
+        if pid not in players.index:
+            continue
+        p = players.loc[pid]
+        in_xi = pid in xi_set
+        news = (p.get("news") or "").strip()
+
+        if p.p_available < 0.5:
+            flags.append({"tag": "ไม่พร้อมลง", "severity": "high", "name": p["name"],
+                          "in_xi": in_xi,
+                          "detail": news or "FPL ติดธงว่าไม่พร้อมลงเล่น"})
+            if in_xi:
+                alerts.append(f"{p['name']} ไม่พร้อมลง แต่ยังอยู่ในตัวจริง"
+                              + (f" — {news}" if news else ""))
+        elif p.p_available < 1.0:
+            flags.append({"tag": "ต้องลุ้น", "severity": "medium", "name": p["name"],
+                          "in_xi": in_xi,
+                          "detail": news or "FPL ระบุว่ามีโอกาสไม่ได้ลง"})
+            if in_xi:
+                alerts.append(f"{p['name']} ยังไม่ชัวร์ว่าได้ลง"
+                              + (f" — {news}" if news else ""))
+        elif p.p_start < 0.55 and p.minutes > 0:
+            flags.append({"tag": "หมุนเวียน", "severity": "medium", "name": p["name"],
+                          "in_xi": in_xi,
+                          "detail": f"ลงตัวจริงแค่ {p.p_start:.0%} ของนัดที่ทีมเตะ"})
+
+        if int(p.get("yellow_cards", 0)) >= 4:
+            flags.append({"tag": "เสี่ยงโดนแบน", "severity": "medium", "name": p["name"],
+                          "in_xi": in_xi,
+                          "detail": f"ใบเหลือง {int(p.yellow_cards)} ใบ — อีกใบเดียวโดนแบน"})
+
+    # A captain who does not play is the most expensive single thing that can go
+    # wrong in a gameweek, so it leads regardless of what else is flagged.
+    if captain is not None and captain in players.index:
+        cap = players.loc[captain]
+        if cap.p_available < 1.0:
+            alerts.insert(0, f"กัปตัน {cap['name']} ไม่ชัวร์ว่าได้ลง — เปลี่ยนกัปตันด่วน")
+
+    flags.sort(key=lambda f: (f["severity"] != "high", not f["in_xi"]))
+    return flags, alerts
 
 
 def build_context(*, cfg: Config, bootstrap: dict, teams: pd.DataFrame,
@@ -201,47 +267,7 @@ def build_context(*, cfg: Config, bootstrap: dict, teams: pd.DataFrame,
     fixture_grid.sort(key=lambda r: r["avg"])
 
     # ---- watch list -------------------------------------------------------
-    # `alerts` is the subset that belongs in a push notification: a problem in
-    # the XI you are about to field. Everything else is context for the page.
-    flags = []
-    alerts: list[str] = []
-    xi_set = set(first.xi)
-    for pid in first.squad:
-        if pid not in players.index:
-            continue
-        p = players.loc[pid]
-        in_xi = pid in xi_set
-        news = (p.get("news") or "").strip()
-        if p.p_available < 0.5:
-            flags.append({"tag": "ไม่พร้อมลง", "severity": "high", "name": p["name"],
-                          "in_xi": in_xi,
-                          "detail": news or "FPL ติดธงว่าไม่พร้อมลงเล่น"})
-            if in_xi:
-                alerts.append(f"{p['name']} ไม่พร้อมลง แต่ยังอยู่ในตัวจริง"
-                              + (f" — {news}" if news else ""))
-        elif p.p_available < 1.0:
-            flags.append({"tag": "ต้องลุ้น", "severity": "medium", "name": p["name"],
-                          "in_xi": in_xi,
-                          "detail": news or "FPL ระบุว่ามีโอกาสไม่ได้ลง"})
-            if in_xi:
-                alerts.append(f"{p['name']} ยังไม่ชัวร์ว่าได้ลง"
-                              + (f" — {news}" if news else ""))
-        elif p.p_start < 0.55 and p.minutes > 0:
-            flags.append({"tag": "หมุนเวียน", "severity": "medium", "name": p["name"],
-                          "in_xi": in_xi,
-                          "detail": f"ลงตัวจริงแค่ {p.p_start:.0%} ของนัดที่ทีมเตะ"})
-        if int(p.get("yellow_cards", 0)) >= 4:
-            flags.append({"tag": "เสี่ยงโดนแบน", "severity": "medium", "name": p["name"],
-                          "in_xi": in_xi,
-                          "detail": f"ใบเหลือง {int(p.yellow_cards)} ใบ — อีกใบเดียวโดนแบน"})
-
-    # The captain not playing is the single most expensive thing that can go
-    # wrong, so it is checked separately and always leads.
-    if first.captain in players.index:
-        cap_row = players.loc[first.captain]
-        if cap_row.p_available < 1.0:
-            alerts.insert(0, f"กัปตัน {cap_row['name']} ไม่ชัวร์ว่าได้ลง — เปลี่ยนกัปตันด่วน")
-    flags.sort(key=lambda f: (f["severity"] != "high", not f["in_xi"]))
+    flags, alerts = squad_alerts(players, first.squad, first.xi, first.captain)
 
     history = entry.get("__history__", {})
     last_gw_points = 0
@@ -252,11 +278,11 @@ def build_context(*, cfg: Config, bootstrap: dict, teams: pd.DataFrame,
         "title": cfg.get("output", "title", default="FPL Assistant"),
         "gw": gw, "horizon": len(horizon_gws), "horizon_gws": horizon_gws,
         "captain_name": captain_name,
-        "built_at": datetime.now(tz).strftime("%d %b %Y, %H:%M"),
+        "built_at": _thai_datetime(datetime.now(tz)),
         "deadline_iso": deadline.isoformat(),
         "deadline_human": f"{int(hours_left // 24)}d {int(hours_left % 24)}h" if hours_left >= 24
                           else f"{int(hours_left)}h",
-        "deadline_local": deadline.astimezone(tz).strftime("%a %d %b, %H:%M %Z"),
+        "deadline_local": _thai_datetime(deadline.astimezone(tz)),
         "hours_left": hours_left,
         "entry": {
             "total_points": entry.get("summary_overall_points", 0),
@@ -270,7 +296,9 @@ def build_context(*, cfg: Config, bootstrap: dict, teams: pd.DataFrame,
         "captains": captains, "targets": targets, "sells": sells,
         "plan": plan_rows, "plan_notes": " ".join(plan.notes),
         "fixture_grid": fixture_grid, "flags": flags[:10], "alerts": alerts,
-        "site_url": cfg.get("notify", "site_url", default="") or "",
+        "site_url": (cfg.get("notify", "site_url", default="") or "").rstrip("/"),
+        "remind_hours": [int(h) for h in cfg.get(
+            "notify", "remind_hours_before", default=[48, 24, 3])],
         "model_version": MODEL_VERSION, "solver_status": plan.status,
     }
 

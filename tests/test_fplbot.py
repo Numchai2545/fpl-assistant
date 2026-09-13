@@ -515,3 +515,84 @@ class TestCalendarFeed:
         ics = calendar_feed.build_ics([])
         assert "BEGIN:VCALENDAR" in ics and "END:VCALENDAR" in ics
         assert "BEGIN:VEVENT" not in ics
+
+
+# -------------------------------------------------------------- squad alerts
+class TestSquadAlerts:
+    """The feature the whole project exists for: never field a broken team.
+
+    GW4 was started with a concussed defender in the XI for 1 point. These
+    encode exactly that situation.
+    """
+
+    def _players(self, rows: list[dict]) -> pd.DataFrame:
+        base = {"p_available": 1.0, "p_start": 0.9, "minutes": 900.0,
+                "news": "", "yellow_cards": 0}
+        return pd.DataFrame([{**base, **r} for r in rows]).set_index("id")
+
+    def test_unavailable_player_in_the_xi_raises_an_alert(self):
+        from fplbot.report import squad_alerts
+        players = self._players([
+            {"id": 1, "name": "Mendy", "p_available": 0.5,
+             "news": "Concussion - 50% chance of playing"},
+        ])
+        flags, alerts = squad_alerts(players, [1], xi=[1], captain=None)
+        assert len(alerts) == 1
+        assert "Mendy" in alerts[0]
+        assert "Concussion" in alerts[0]
+
+    def test_the_same_player_on_the_bench_does_not_interrupt_you(self):
+        """Benched is already the right answer — there is nothing to act on."""
+        from fplbot.report import squad_alerts
+        players = self._players([
+            {"id": 1, "name": "Mendy", "p_available": 0.5, "news": "Concussion"},
+        ])
+        flags, alerts = squad_alerts(players, [1], xi=[], captain=None)
+        assert alerts == []
+        assert len(flags) == 1, "still worth showing on the page"
+
+    def test_a_doubtful_captain_always_leads(self):
+        from fplbot.report import squad_alerts
+        players = self._players([
+            {"id": 1, "name": "Haaland", "p_available": 0.75, "news": "Knock"},
+            {"id": 2, "name": "Mendy", "p_available": 0.25, "news": "Concussion"},
+        ])
+        _, alerts = squad_alerts(players, [1, 2], xi=[1, 2], captain=1)
+        assert "กัปตัน" in alerts[0] and "Haaland" in alerts[0]
+
+    def test_a_fit_squad_produces_nothing(self):
+        from fplbot.report import squad_alerts
+        players = self._players([{"id": i, "name": f"P{i}"} for i in range(1, 12)])
+        flags, alerts = squad_alerts(players, list(range(1, 12)),
+                                     xi=list(range(1, 12)), captain=1)
+        assert alerts == []
+        assert flags == []
+
+    def test_rotation_risk_is_a_flag_but_not_an_alert(self):
+        """Worth knowing, not worth a 3am notification."""
+        from fplbot.report import squad_alerts
+        players = self._players([{"id": 1, "name": "Cherki", "p_start": 0.4}])
+        flags, alerts = squad_alerts(players, [1], xi=[1], captain=None)
+        assert alerts == []
+        assert flags[0]["tag"] == "หมุนเวียน"
+
+    def test_suspension_risk_is_reported(self):
+        from fplbot.report import squad_alerts
+        players = self._players([{"id": 1, "name": "Xhaka", "yellow_cards": 4}])
+        flags, _ = squad_alerts(players, [1], xi=[1], captain=None)
+        assert any(f["tag"] == "เสี่ยงโดนแบน" for f in flags)
+
+    def test_high_severity_and_xi_problems_sort_first(self):
+        from fplbot.report import squad_alerts
+        players = self._players([
+            {"id": 1, "name": "Bench", "p_available": 0.9},
+            {"id": 2, "name": "Starter", "p_available": 0.2},
+        ])
+        flags, _ = squad_alerts(players, [1, 2], xi=[2], captain=None)
+        assert flags[0]["name"] == "Starter"
+
+    def test_players_missing_from_the_dataset_are_skipped(self):
+        from fplbot.report import squad_alerts
+        players = self._players([{"id": 1, "name": "A"}])
+        flags, alerts = squad_alerts(players, [1, 999], xi=[1, 999], captain=999)
+        assert flags == [] and alerts == []
