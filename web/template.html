@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{{ title }}</title>
+<meta name="description" content="Expected points, captain picks and a {{ horizon }}-gameweek transfer plan.">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1A1420" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="FPL">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --ground:#F6F4F8; --surface:#FFFFFF; --surface-2:#EFEAF2; --surface-3:#E5DEEA;
+  --ink:#1F1426; --ink-2:#564B5E; --ink-3:#8A7F92;
+  --rule:#E2DAE8; --rule-strong:#CBBDD4;
+  --accent:#6D28A8; --accent-soft:#F0E6F7;
+  --good:#0E7C72; --good-soft:#DFF0ED;
+  --warn:#9A5B08; --warn-soft:#FAEEDC;
+  --crit:#A01F35; --crit-soft:#FAE3E7;
+  --fdr2:#0E7C72; --fdr3:#9CA3AF; --fdr4:#C25068; --fdr5:#8C1D33; --fdr-ink:#FFFFFF;
+  --shadow:0 1px 2px rgba(31,20,38,.05),0 10px 28px -20px rgba(31,20,38,.35);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ground:#131018; --surface:#1C1724; --surface-2:#261F30; --surface-3:#32283E;
+  --ink:#F0EAF4; --ink-2:#B7ACC0; --ink-3:#877C92;
+  --rule:#302739; --rule-strong:#44374F;
+  --accent:#C79BE8; --accent-soft:#2B1D38;
+  --good:#45C2A4; --good-soft:#123029;
+  --warn:#E0A64E; --warn-soft:#33260F;
+  --crit:#EE8A9E; --crit-soft:#3A1721;
+  --fdr2:#45C2A4; --fdr3:#737B85; --fdr4:#D4687E; --fdr5:#EE8A9E; --fdr-ink:#141018;
+  --shadow:0 1px 2px rgba(0,0,0,.5),0 10px 28px -20px rgba(0,0,0,.9);
+}}
+:root[data-theme="dark"]{
+  --ground:#131018; --surface:#1C1724; --surface-2:#261F30; --surface-3:#32283E;
+  --ink:#F0EAF4; --ink-2:#B7ACC0; --ink-3:#877C92;
+  --rule:#302739; --rule-strong:#44374F;
+  --accent:#C79BE8; --accent-soft:#2B1D38;
+  --good:#45C2A4; --good-soft:#123029;
+  --warn:#E0A64E; --warn-soft:#33260F;
+  --crit:#EE8A9E; --crit-soft:#3A1721;
+  --fdr2:#45C2A4; --fdr3:#737B85; --fdr4:#D4687E; --fdr5:#EE8A9E; --fdr-ink:#141018;
+  --shadow:0 1px 2px rgba(0,0,0,.5),0 10px 28px -20px rgba(0,0,0,.9);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--ground);color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;font-size:15px;line-height:1.6;
+  -webkit-font-smoothing:antialiased;padding-bottom:env(safe-area-inset-bottom)}
+.wrap{max-width:1000px;margin:0 auto;padding-left:18px;padding-right:18px;padding-block:0 60px}
+h1,h2,h3,.disp{font-family:"Bai Jamjuree","IBM Plex Sans",sans-serif;text-wrap:balance;margin:0}
+.mono,.num{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+a{color:var(--accent)}
+
+/* header */
+header{padding-block:26px 20px;display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between;border-bottom:2px solid var(--ink)}
+.brand .eyebrow{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+.brand h1{font-size:clamp(22px,4.6vw,30px);font-weight:700;line-height:1.15;margin-top:3px}
+.countdown{text-align:right}
+.countdown .lab{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+.countdown .val{font-family:"IBM Plex Mono",monospace;font-size:clamp(20px,4.4vw,26px);font-weight:600;line-height:1.2;color:var(--accent)}
+.countdown .sub{font-size:12px;color:var(--ink-2)}
+.countdown.urgent .val{color:var(--crit)}
+
+/* tiles */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0;margin:0}
+.tile{padding:14px 14px 15px 0;border-bottom:1px solid var(--rule)}
+.tile dt{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin-bottom:2px}
+.tile dd{margin:0;font-family:"IBM Plex Mono",monospace;font-size:21px;font-weight:600;line-height:1.2}
+.tile small{display:block;font-family:"IBM Plex Sans",sans-serif;font-size:12px;color:var(--ink-2);font-weight:400}
+
+/* action banner */
+.action{background:var(--surface);border:1px solid var(--rule-strong);border-left:4px solid var(--accent);
+  border-radius:8px;padding:18px 20px;margin:26px 0 0;box-shadow:var(--shadow)}
+.action .lab{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--accent);font-weight:600;font-family:"Bai Jamjuree",sans-serif}
+.action .headline{font-family:"Bai Jamjuree",sans-serif;font-size:clamp(17px,3.4vw,21px);font-weight:600;margin:5px 0 0;line-height:1.35}
+.action .detail{color:var(--ink-2);font-size:14px;margin-top:7px}
+.move{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.move .swap{display:inline-flex;align-items:center;gap:8px;background:var(--surface-2);border-radius:6px;padding:7px 12px;font-size:13.5px;font-weight:500}
+.move .out{color:var(--crit)} .move .in{color:var(--good)} .move .arr{color:var(--ink-3)}
+
+section{padding-block:30px 4px}
+section>h2{font-size:19px;font-weight:700;margin-bottom:3px}
+section>.sub{color:var(--ink-2);font-size:13.5px;margin:0 0 16px}
+
+/* tables */
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--rule);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:560px}
+th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--rule);white-space:nowrap}
+thead th{position:sticky;top:0;background:var(--surface);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--ink-3);font-weight:600;border-bottom:1px solid var(--rule-strong);font-family:"Bai Jamjuree",sans-serif;z-index:1}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:var(--surface-2)}
+td.r,th.r{text-align:right;font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
+.pname{font-weight:600}
+.pmeta{color:var(--ink-3);font-size:11.5px;font-family:"IBM Plex Mono",monospace}
+.pos{display:inline-block;min-width:34px;text-align:center;font-size:10.5px;font-weight:600;padding:2px 5px;border-radius:4px;
+  background:var(--surface-3);color:var(--ink-2);font-family:"IBM Plex Mono",monospace}
+
+/* single-series meter: one hue, value always labelled */
+.meter{display:flex;align-items:center;gap:8px;justify-content:flex-end}
+.meter .track{width:52px;height:5px;border-radius:3px;background:var(--surface-3);overflow:hidden;flex:none}
+.meter .fill{display:block;height:100%;border-radius:3px;background:var(--accent)}
+
+/* fdr cells: diverging ramp, number always printed so colour is never alone */
+.fdr{display:inline-block;min-width:58px;text-align:center;padding:3px 6px;border-radius:4px;
+  font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:600;color:var(--fdr-ink);line-height:1.35}
+.d1,.d2{background:var(--fdr2)} .d3{background:var(--fdr3)} .d4{background:var(--fdr4)} .d5{background:var(--fdr5)}
+.blank{background:var(--surface-3);color:var(--ink-3)}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11.5px;color:var(--ink-2);margin-top:10px;align-items:center}
+.legend i{width:10px;height:10px;border-radius:2px;display:inline-block;margin-right:5px;vertical-align:-1px}
+
+/* pitch */
+.pitch{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:18px 14px}
+.row{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.card{background:var(--surface-2);border:1px solid var(--rule);border-radius:7px;padding:8px 9px;min-width:86px;text-align:center}
+.card.cap{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.card .nm{font-weight:600;font-size:12.5px;overflow:hidden;text-overflow:ellipsis}
+.card .ep{font-family:"IBM Plex Mono",monospace;font-size:14px;font-weight:600;color:var(--accent);line-height:1.3}
+.card .op{font-size:10.5px;color:var(--ink-3);font-family:"IBM Plex Mono",monospace}
+.card .badge{display:inline-block;font-size:9.5px;font-weight:700;background:var(--accent);color:var(--surface);
+  border-radius:3px;padding:0 4px;margin-left:3px;vertical-align:1px;font-family:"IBM Plex Mono",monospace}
+.benchrow{border-top:1px dashed var(--rule-strong);margin-top:14px;padding-top:14px}
+.benchrow .lab{text-align:center;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin-bottom:9px}
+.benchrow .row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.benchrow .card{min-width:0}
+
+/* plan */
+.plan{display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:8px;overflow:hidden}
+.pweek{background:var(--surface);padding:13px 16px;display:grid;grid-template-columns:62px 1fr auto;gap:0 14px;align-items:center}
+.pweek .gw{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:13px;color:var(--accent)}
+.pweek .what{font-size:13.5px}
+.pweek .what .muted{color:var(--ink-3)}
+.pweek .epbar{display:flex;align-items:center;gap:9px;justify-content:flex-end}
+.pweek .epbar .track{width:74px;height:6px;background:var(--surface-3);border-radius:3px;overflow:hidden}
+.pweek .epbar .fill{display:block;height:100%;background:var(--accent);border-radius:3px}
+.pweek .epbar .v{font-family:"IBM Plex Mono",monospace;font-size:13px;font-weight:600;min-width:42px;text-align:right}
+@media(max-width:560px){.pweek{grid-template-columns:52px 1fr}.pweek .epbar{grid-column:2;justify-content:flex-start;margin-top:6px}}
+
+/* flags */
+.flags{display:grid;gap:8px}
+.flag{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:baseline;background:var(--surface);
+  border:1px solid var(--rule);border-left:3px solid var(--warn);border-radius:7px;padding:11px 14px;font-size:13.5px}
+.flag.crit{border-left-color:var(--crit)}
+.flag .tag{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:4px;
+  background:var(--warn-soft);color:var(--warn);white-space:nowrap;font-family:"Bai Jamjuree",sans-serif}
+.flag.crit .tag{background:var(--crit-soft);color:var(--crit)}
+
+/* tabs */
+.tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.tabs button{font:inherit;font-size:12.5px;font-weight:600;padding:6px 13px;border-radius:999px;cursor:pointer;
+  border:1px solid var(--rule-strong);background:var(--surface);color:var(--ink-2);font-family:"Bai Jamjuree",sans-serif}
+.tabs button[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.tabs button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:var(--ink-3);font-size:12px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body data-palette="#6D28A8,#0E7C72,#C25068">
+<div class="wrap">
+
+<header>
+  <div class="brand">
+    <div class="eyebrow">Gameweek {{ gw }} &middot; built {{ built_at }}</div>
+    <h1>{{ title }}</h1>
+  </div>
+  <div class="countdown {% if hours_left < 24 %}urgent{% endif %}">
+    <div class="lab">Deadline</div>
+    <div class="val" id="cd" data-deadline="{{ deadline_iso }}">{{ deadline_human }}</div>
+    <div class="sub">{{ deadline_local }}</div>
+  </div>
+</header>
+
+<dl class="tiles">
+  <div class="tile"><dt>Overall points</dt><dd>{{ entry.total_points }}<small>rank {{ entry.rank_human }}</small></dd></div>
+  <div class="tile"><dt>Last gameweek</dt><dd>{{ entry.last_gw_points }}<small>GW{{ gw - 1 }}</small></dd></div>
+  <div class="tile"><dt>Free transfers</dt><dd>{{ free_transfers }}<small>max 5 banked</small></dd></div>
+  <div class="tile"><dt>In the bank</dt><dd>{{ "%.1f"|format(bank) }}<small>squad {{ "%.1f"|format(squad_value) }}m</small></dd></div>
+  <div class="tile"><dt>Projected GW{{ gw }}</dt><dd>{{ "%.0f"|format(this_gw_ep) }}<small>expected points</small></dd></div>
+</dl>
+
+<div class="action">
+  <div class="lab">Do this before the deadline</div>
+  <p class="headline">{{ action.headline }}</p>
+  {% if action.moves %}
+  <div class="move">
+    {% for m in action.moves %}
+    <span class="swap"><span class="out">{{ m.out }}</span><span class="arr">&rarr;</span><span class="in">{{ m.in_ }}</span></span>
+    {% endfor %}
+  </div>
+  {% endif %}
+  <p class="detail">{{ action.detail }}</p>
+</div>
+
+<section>
+  <h2>Your team for GW{{ gw }}</h2>
+  <p class="sub">Ordered by expected points. (C) is the captain, (V) the vice.</p>
+  <div class="pitch">
+    {% for line in pitch_rows %}
+    <div class="row">
+      {% for p in line %}
+      <div class="card {% if p.is_captain %}cap{% endif %}">
+        <div class="nm">{{ p.name }}{% if p.is_captain %}<span class="badge">C</span>{% elif p.is_vice %}<span class="badge">V</span>{% endif %}</div>
+        <div class="ep">{{ "%.1f"|format(p.ep) }}</div>
+        <div class="op">{{ p.opponent }}</div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endfor %}
+    <div class="benchrow">
+      <div class="lab">Bench &middot; in order</div>
+      <div class="row">
+        {% for p in bench %}
+        <div class="card"><div class="nm">{{ p.name }}</div><div class="ep">{{ "%.1f"|format(p.ep) }}</div><div class="op">{{ p.opponent }}</div></div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Captain shortlist</h2>
+  <p class="sub">Expected points if they wear the armband, before the doubling.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Player</th><th>Opponent</th><th class="r">xG</th><th class="r">xA</th><th class="r">Bonus</th><th class="r">EP</th></tr></thead>
+    <tbody>
+    {% for p in captains %}
+      <tr>
+        <td><span class="pos">{{ p.position }}</span> <span class="pname">{{ p.name }}</span> <span class="pmeta">{{ p.team }}</span></td>
+        <td class="pmeta">{{ p.opponent }}</td>
+        <td class="r">{{ "%.2f"|format(p.exp_goals) }}</td>
+        <td class="r">{{ "%.2f"|format(p.exp_assists) }}</td>
+        <td class="r">{{ "%.2f"|format(p.ep_bonus) }}</td>
+        <td class="r"><span class="meter"><span class="track"><span class="fill" style="width:{{ p.bar }}%"></span></span><b>{{ "%.1f"|format(p.ep) }}</b></span></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <h2>Transfer targets</h2>
+  <p class="sub">Best expected points over the next {{ horizon }} gameweeks, per position. Players you already own are excluded.</p>
+  <div class="tabs" role="tablist">
+    {% for pos in ["GKP","DEF","MID","FWD"] %}
+    <button role="tab" data-pos="{{ pos }}" aria-selected="{{ 'true' if pos=='MID' else 'false' }}">{{ pos }}</button>
+    {% endfor %}
+  </div>
+  {% for pos in ["GKP","DEF","MID","FWD"] %}
+  <div class="scroll target-panel" data-pos="{{ pos }}" {% if pos!='MID' %}hidden{% endif %}><table>
+    <thead><tr><th>Player</th><th class="r">£</th><th class="r">Own%</th><th class="r">Price</th><th class="r">GW{{ gw }}</th><th class="r">Next {{ horizon }}</th><th class="r">EP / £m</th></tr></thead>
+    <tbody>
+    {% for p in targets[pos] %}
+      <tr>
+        <td><span class="pname">{{ p.name }}</span> <span class="pmeta">{{ p.team }}</span></td>
+        <td class="r">{{ "%.1f"|format(p.price) }}</td>
+        <td class="r">{{ "%.1f"|format(p.ownership) }}</td>
+        <td class="r" style="color:{% if p.price_trend=='rising' %}var(--good){% elif p.price_trend=='falling' %}var(--crit){% else %}var(--ink-3){% endif %}">
+          {{ '▲' if p.price_trend=='rising' else ('▼' if p.price_trend=='falling' else '–') }}</td>
+        <td class="r">{{ "%.1f"|format(p.ep_next) }}</td>
+        <td class="r"><b>{{ "%.1f"|format(p.ep_total) }}</b></td>
+        <td class="r">{{ "%.2f"|format(p.ep_per_m) }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+  {% endfor %}
+</section>
+
+<section>
+  <h2>Sell candidates</h2>
+  <p class="sub">Players in your squad whose next {{ horizon }} gameweeks look weakest for the money.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Player</th><th class="r">£</th><th class="r">Next {{ horizon }}</th><th class="r">EP / £m</th><th>Why</th></tr></thead>
+    <tbody>
+    {% for p in sells %}
+      <tr>
+        <td><span class="pos">{{ p.position }}</span> <span class="pname">{{ p.name }}</span> <span class="pmeta">{{ p.team }}</span></td>
+        <td class="r">{{ "%.1f"|format(p.price) }}</td>
+        <td class="r">{{ "%.1f"|format(p.ep_total) }}</td>
+        <td class="r">{{ "%.2f"|format(p.ep_per_m) }}</td>
+        <td style="white-space:normal;color:var(--ink-2)">{{ p.reason }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <h2>The next {{ horizon }} gameweeks</h2>
+  <p class="sub">One plan solved as a whole, not six decisions made one at a time.</p>
+  <div class="plan">
+    {% for w in plan %}
+    <div class="pweek">
+      <span class="gw">GW{{ w.gw }}</span>
+      <span class="what">{{ w.summary }}{% if w.hits %} <span class="muted">&middot; &minus;{{ w.hits * 4 }} hit</span>{% endif %}<br>
+        <span class="muted">C: {{ w.captain }} &middot; {{ w.ft }} FT available</span></span>
+      <span class="epbar"><span class="track"><span class="fill" style="width:{{ w.bar }}%"></span></span><span class="v">{{ "%.0f"|format(w.ep) }}</span></span>
+    </div>
+    {% endfor %}
+  </div>
+  {% if plan_notes %}<p class="sub" style="margin-top:10px">{{ plan_notes }}</p>{% endif %}
+</section>
+
+<section>
+  <h2>Fixture run</h2>
+  <p class="sub">Difficulty of every fixture your squad's clubs face. Lower is easier; the number is printed in each cell.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Club</th>{% for g in horizon_gws %}<th class="r">GW{{ g }}</th>{% endfor %}<th class="r">Avg</th></tr></thead>
+    <tbody>
+    {% for row in fixture_grid %}
+      <tr>
+        <td class="pname">{{ row.team }}</td>
+        {% for cell in row.cells %}
+        <td class="r">{% if cell.games %}{% for g in cell.games %}<span class="fdr d{{ g.fdr }}">{{ g.label }} {{ g.fdr }}</span>{% endfor %}{% else %}<span class="fdr blank">blank</span>{% endif %}</td>
+        {% endfor %}
+        <td class="r">{{ "%.2f"|format(row.avg) }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+  <div class="legend">
+    <span><i style="background:var(--fdr2)"></i>Easy (2)</span>
+    <span><i style="background:var(--fdr3)"></i>Even (3)</span>
+    <span><i style="background:var(--fdr4)"></i>Hard (4)</span>
+    <span><i style="background:var(--fdr5)"></i>Very hard (5)</span>
+    <span style="color:var(--ink-3)">H home &middot; A away</span>
+  </div>
+</section>
+
+{% if flags %}
+<section>
+  <h2>Watch list</h2>
+  <p class="sub">Availability and rotation risk inside your squad.</p>
+  <div class="flags">
+    {% for f in flags %}
+    <div class="flag {{ 'crit' if f.severity=='high' else '' }}">
+      <span class="tag">{{ f.tag }}</span>
+      <span><b>{{ f.name }}</b> — {{ f.detail }}</span>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<footer>
+  Built from the official Fantasy Premier League API on {{ built_at }}. Expected points are a model estimate, not a prediction of the actual score.
+  Model v{{ model_version }} &middot; solver status {{ solver_status }}.
+</footer>
+</div>
+
+<script>
+(function () {
+  var el = document.getElementById('cd');
+  if (!el) return;
+  var target = new Date(el.dataset.deadline).getTime();
+  function tick() {
+    var ms = target - Date.now();
+    if (ms <= 0) { el.textContent = 'closed'; return; }
+    var h = Math.floor(ms / 3600000), m = Math.floor(ms % 3600000 / 60000);
+    var d = Math.floor(h / 24);
+    el.textContent = d >= 1 ? d + 'd ' + (h % 24) + 'h' : h + 'h ' + m + 'm';
+    if (h < 24) el.parentElement.classList.add('urgent');
+  }
+  tick(); setInterval(tick, 30000);
+
+  var tabs = document.querySelectorAll('.tabs [data-pos]');
+  tabs.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      tabs.forEach(function (b) { b.setAttribute('aria-selected', String(b === btn)); });
+      document.querySelectorAll('.target-panel').forEach(function (panel) {
+        panel.hidden = panel.dataset.pos !== btn.dataset.pos;
+      });
+    });
+  });
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(function () {});
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+{
+  "gw": 5,
+  "deadline": "2026-09-18T17:30:00+00:00",
+  "headline": "Make 3 transfers, captain Haaland",
+  "detail": "Uses 3 of your 3 free transfers, no hit. Projected 53 points for GW5.",
+  "captain": "Haaland",
+  "expected_points": 52.81,
+  "plan": [
+    {
+      "gw": 5,
+      "summary": "Gabriel \u2192 Saka, Ampadu \u2192 Tavernier, Cherki \u2192 Khalaili",
+      "hits": 0,
+      "captain": "Haaland",
+      "ft": 3,
+      "ep": 52.81,
+      "bar": 88
+    },
+    {
+      "gw": 6,
+      "summary": "Mendy \u2192 Davis",
+      "hits": 0,
+      "captain": "B.Fernandes",
+      "ft": 1,
+      "ep": 58.82,
+      "bar": 98
+    },
+    {
+      "gw": 7,
+      "summary": "Xhaka \u2192 Schade",
+      "hits": 0,
+      "captain": "Haaland",
+      "ft": 1,
+      "ep": 54.92,
+      "bar": 91
+    },
+    {
+      "gw": 8,
+      "summary": "Dubravka \u2192 Tzolakis",
+      "hits": 0,
+      "captain": "B.Fernandes",
+      "ft": 1,
+      "ep": 60.27,
+      "bar": 100
+    },
+    {
+      "gw": 9,
+      "summary": "Maguire \u2192 Egan",
+      "hits": 0,
+      "captain": "Haaland",
+      "ft": 1,
+      "ep": 57.71,
+      "bar": 96
+    },
+    {
+      "gw": 10,
+      "summary": "Thomas \u2192 De Cuyper",
+      "hits": 0,
+      "captain": "B.Fernandes",
+      "ft": 1,
+      "ep": 59.9,
+      "bar": 99
+    }
+  ],
+  "built_at": "13 Sep 2026, 18:54"
+}

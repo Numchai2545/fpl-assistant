@@ -1,0 +1,16 @@
+[project]
+name = "fpl-assistant"
+version = "0.1.0"
+description = "Expected points and multi-gameweek transfer planning for Fantasy Premier League"
+requires-python = ">=3.11"
+dependencies = [
+  "requests>=2.32", "pandas>=2.2", "numpy>=1.26", "scipy>=1.13",
+  "PuLP>=2.8", "Jinja2>=3.1", "PyYAML>=6.0",
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]

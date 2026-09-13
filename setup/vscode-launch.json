@@ -1,0 +1,23 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Build dashboard",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "fplbot",
+      "args": ["build", "-v"],
+      "console": "integratedTerminal",
+      "env": { "PYTHONPATH": "${workspaceFolder}/src" }
+    },
+    {
+      "name": "Build dashboard (offline, cached)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "fplbot",
+      "args": ["build", "--offline", "-v"],
+      "console": "integratedTerminal",
+      "env": { "PYTHONPATH": "${workspaceFolder}/src" }
+    }
+  ]
+}

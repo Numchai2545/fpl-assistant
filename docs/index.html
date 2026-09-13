@@ -1,0 +1,1049 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gnum United — FPL Assistant</title>
+<meta name="description" content="Expected points, captain picks and a 6-gameweek transfer plan.">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1A1420" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="FPL">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --ground:#F6F4F8; --surface:#FFFFFF; --surface-2:#EFEAF2; --surface-3:#E5DEEA;
+  --ink:#1F1426; --ink-2:#564B5E; --ink-3:#8A7F92;
+  --rule:#E2DAE8; --rule-strong:#CBBDD4;
+  --accent:#6D28A8; --accent-soft:#F0E6F7;
+  --good:#0E7C72; --good-soft:#DFF0ED;
+  --warn:#9A5B08; --warn-soft:#FAEEDC;
+  --crit:#A01F35; --crit-soft:#FAE3E7;
+  --fdr2:#0E7C72; --fdr3:#9CA3AF; --fdr4:#C25068; --fdr5:#8C1D33; --fdr-ink:#FFFFFF;
+  --shadow:0 1px 2px rgba(31,20,38,.05),0 10px 28px -20px rgba(31,20,38,.35);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ground:#131018; --surface:#1C1724; --surface-2:#261F30; --surface-3:#32283E;
+  --ink:#F0EAF4; --ink-2:#B7ACC0; --ink-3:#877C92;
+  --rule:#302739; --rule-strong:#44374F;
+  --accent:#C79BE8; --accent-soft:#2B1D38;
+  --good:#45C2A4; --good-soft:#123029;
+  --warn:#E0A64E; --warn-soft:#33260F;
+  --crit:#EE8A9E; --crit-soft:#3A1721;
+  --fdr2:#45C2A4; --fdr3:#737B85; --fdr4:#D4687E; --fdr5:#EE8A9E; --fdr-ink:#141018;
+  --shadow:0 1px 2px rgba(0,0,0,.5),0 10px 28px -20px rgba(0,0,0,.9);
+}}
+:root[data-theme="dark"]{
+  --ground:#131018; --surface:#1C1724; --surface-2:#261F30; --surface-3:#32283E;
+  --ink:#F0EAF4; --ink-2:#B7ACC0; --ink-3:#877C92;
+  --rule:#302739; --rule-strong:#44374F;
+  --accent:#C79BE8; --accent-soft:#2B1D38;
+  --good:#45C2A4; --good-soft:#123029;
+  --warn:#E0A64E; --warn-soft:#33260F;
+  --crit:#EE8A9E; --crit-soft:#3A1721;
+  --fdr2:#45C2A4; --fdr3:#737B85; --fdr4:#D4687E; --fdr5:#EE8A9E; --fdr-ink:#141018;
+  --shadow:0 1px 2px rgba(0,0,0,.5),0 10px 28px -20px rgba(0,0,0,.9);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--ground);color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;font-size:15px;line-height:1.6;
+  -webkit-font-smoothing:antialiased;padding-bottom:env(safe-area-inset-bottom)}
+.wrap{max-width:1000px;margin:0 auto;padding-left:18px;padding-right:18px;padding-block:0 60px}
+h1,h2,h3,.disp{font-family:"Bai Jamjuree","IBM Plex Sans",sans-serif;text-wrap:balance;margin:0}
+.mono,.num{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+a{color:var(--accent)}
+
+/* header */
+header{padding-block:26px 20px;display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between;border-bottom:2px solid var(--ink)}
+.brand .eyebrow{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+.brand h1{font-size:clamp(22px,4.6vw,30px);font-weight:700;line-height:1.15;margin-top:3px}
+.countdown{text-align:right}
+.countdown .lab{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+.countdown .val{font-family:"IBM Plex Mono",monospace;font-size:clamp(20px,4.4vw,26px);font-weight:600;line-height:1.2;color:var(--accent)}
+.countdown .sub{font-size:12px;color:var(--ink-2)}
+.countdown.urgent .val{color:var(--crit)}
+
+/* tiles */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0;margin:0}
+.tile{padding:14px 14px 15px 0;border-bottom:1px solid var(--rule)}
+.tile dt{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin-bottom:2px}
+.tile dd{margin:0;font-family:"IBM Plex Mono",monospace;font-size:21px;font-weight:600;line-height:1.2}
+.tile small{display:block;font-family:"IBM Plex Sans",sans-serif;font-size:12px;color:var(--ink-2);font-weight:400}
+
+/* action banner */
+.action{background:var(--surface);border:1px solid var(--rule-strong);border-left:4px solid var(--accent);
+  border-radius:8px;padding:18px 20px;margin:26px 0 0;box-shadow:var(--shadow)}
+.action .lab{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--accent);font-weight:600;font-family:"Bai Jamjuree",sans-serif}
+.action .headline{font-family:"Bai Jamjuree",sans-serif;font-size:clamp(17px,3.4vw,21px);font-weight:600;margin:5px 0 0;line-height:1.35}
+.action .detail{color:var(--ink-2);font-size:14px;margin-top:7px}
+.move{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.move .swap{display:inline-flex;align-items:center;gap:8px;background:var(--surface-2);border-radius:6px;padding:7px 12px;font-size:13.5px;font-weight:500}
+.move .out{color:var(--crit)} .move .in{color:var(--good)} .move .arr{color:var(--ink-3)}
+
+section{padding-block:30px 4px}
+section>h2{font-size:19px;font-weight:700;margin-bottom:3px}
+section>.sub{color:var(--ink-2);font-size:13.5px;margin:0 0 16px}
+
+/* tables */
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--rule);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:560px}
+th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--rule);white-space:nowrap}
+thead th{position:sticky;top:0;background:var(--surface);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--ink-3);font-weight:600;border-bottom:1px solid var(--rule-strong);font-family:"Bai Jamjuree",sans-serif;z-index:1}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:var(--surface-2)}
+td.r,th.r{text-align:right;font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
+.pname{font-weight:600}
+.pmeta{color:var(--ink-3);font-size:11.5px;font-family:"IBM Plex Mono",monospace}
+.pos{display:inline-block;min-width:34px;text-align:center;font-size:10.5px;font-weight:600;padding:2px 5px;border-radius:4px;
+  background:var(--surface-3);color:var(--ink-2);font-family:"IBM Plex Mono",monospace}
+
+/* single-series meter: one hue, value always labelled */
+.meter{display:flex;align-items:center;gap:8px;justify-content:flex-end}
+.meter .track{width:52px;height:5px;border-radius:3px;background:var(--surface-3);overflow:hidden;flex:none}
+.meter .fill{display:block;height:100%;border-radius:3px;background:var(--accent)}
+
+/* fdr cells: diverging ramp, number always printed so colour is never alone */
+.fdr{display:inline-block;min-width:58px;text-align:center;padding:3px 6px;border-radius:4px;
+  font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:600;color:var(--fdr-ink);line-height:1.35}
+.d1,.d2{background:var(--fdr2)} .d3{background:var(--fdr3)} .d4{background:var(--fdr4)} .d5{background:var(--fdr5)}
+.blank{background:var(--surface-3);color:var(--ink-3)}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11.5px;color:var(--ink-2);margin-top:10px;align-items:center}
+.legend i{width:10px;height:10px;border-radius:2px;display:inline-block;margin-right:5px;vertical-align:-1px}
+
+/* pitch */
+.pitch{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:18px 14px}
+.row{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.card{background:var(--surface-2);border:1px solid var(--rule);border-radius:7px;padding:8px 9px;min-width:86px;text-align:center}
+.card.cap{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.card .nm{font-weight:600;font-size:12.5px;overflow:hidden;text-overflow:ellipsis}
+.card .ep{font-family:"IBM Plex Mono",monospace;font-size:14px;font-weight:600;color:var(--accent);line-height:1.3}
+.card .op{font-size:10.5px;color:var(--ink-3);font-family:"IBM Plex Mono",monospace}
+.card .badge{display:inline-block;font-size:9.5px;font-weight:700;background:var(--accent);color:var(--surface);
+  border-radius:3px;padding:0 4px;margin-left:3px;vertical-align:1px;font-family:"IBM Plex Mono",monospace}
+.benchrow{border-top:1px dashed var(--rule-strong);margin-top:14px;padding-top:14px}
+.benchrow .lab{text-align:center;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin-bottom:9px}
+.benchrow .row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.benchrow .card{min-width:0}
+
+/* plan */
+.plan{display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:8px;overflow:hidden}
+.pweek{background:var(--surface);padding:13px 16px;display:grid;grid-template-columns:62px 1fr auto;gap:0 14px;align-items:center}
+.pweek .gw{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:13px;color:var(--accent)}
+.pweek .what{font-size:13.5px}
+.pweek .what .muted{color:var(--ink-3)}
+.pweek .epbar{display:flex;align-items:center;gap:9px;justify-content:flex-end}
+.pweek .epbar .track{width:74px;height:6px;background:var(--surface-3);border-radius:3px;overflow:hidden}
+.pweek .epbar .fill{display:block;height:100%;background:var(--accent);border-radius:3px}
+.pweek .epbar .v{font-family:"IBM Plex Mono",monospace;font-size:13px;font-weight:600;min-width:42px;text-align:right}
+@media(max-width:560px){.pweek{grid-template-columns:52px 1fr}.pweek .epbar{grid-column:2;justify-content:flex-start;margin-top:6px}}
+
+/* flags */
+.flags{display:grid;gap:8px}
+.flag{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:baseline;background:var(--surface);
+  border:1px solid var(--rule);border-left:3px solid var(--warn);border-radius:7px;padding:11px 14px;font-size:13.5px}
+.flag.crit{border-left-color:var(--crit)}
+.flag .tag{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:4px;
+  background:var(--warn-soft);color:var(--warn);white-space:nowrap;font-family:"Bai Jamjuree",sans-serif}
+.flag.crit .tag{background:var(--crit-soft);color:var(--crit)}
+
+/* tabs */
+.tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.tabs button{font:inherit;font-size:12.5px;font-weight:600;padding:6px 13px;border-radius:999px;cursor:pointer;
+  border:1px solid var(--rule-strong);background:var(--surface);color:var(--ink-2);font-family:"Bai Jamjuree",sans-serif}
+.tabs button[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.tabs button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:var(--ink-3);font-size:12px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body data-palette="#6D28A8,#0E7C72,#C25068">
+<div class="wrap">
+
+<header>
+  <div class="brand">
+    <div class="eyebrow">Gameweek 5 &middot; built 13 Sep 2026, 18:54</div>
+    <h1>Gnum United — FPL Assistant</h1>
+  </div>
+  <div class="countdown ">
+    <div class="lab">Deadline</div>
+    <div class="val" id="cd" data-deadline="2026-09-18T17:30:00+00:00">5d 5h</div>
+    <div class="sub">Sat 19 Sep, 00:30 +07</div>
+  </div>
+</header>
+
+<dl class="tiles">
+  <div class="tile"><dt>Overall points</dt><dd>252<small>rank 1,756,736</small></dd></div>
+  <div class="tile"><dt>Last gameweek</dt><dd>42<small>GW4</small></dd></div>
+  <div class="tile"><dt>Free transfers</dt><dd>3<small>max 5 banked</small></dd></div>
+  <div class="tile"><dt>In the bank</dt><dd>0.3<small>squad 100.3m</small></dd></div>
+  <div class="tile"><dt>Projected GW5</dt><dd>53<small>expected points</small></dd></div>
+</dl>
+
+<div class="action">
+  <div class="lab">Do this before the deadline</div>
+  <p class="headline">Make 3 transfers, captain Haaland</p>
+  <div class="move">
+    <span class="swap"><span class="out">Gabriel</span><span class="arr">&rarr;</span><span class="in">Saka</span></span>
+    <span class="swap"><span class="out">Ampadu</span><span class="arr">&rarr;</span><span class="in">Tavernier</span></span>
+    <span class="swap"><span class="out">Cherki</span><span class="arr">&rarr;</span><span class="in">Khalaili</span></span>
+  </div>
+  <p class="detail">Uses 3 of your 3 free transfers, no hit. Projected 53 points for GW5.</p>
+</div>
+
+<section>
+  <h2>Your team for GW5</h2>
+  <p class="sub">Ordered by expected points. (C) is the captain, (V) the vice.</p>
+  <div class="pitch">
+    <div class="row">
+      <div class="card ">
+        <div class="nm">Kinsky</div>
+        <div class="ep">3.6</div>
+        <div class="op">AVL (H)</div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="card ">
+        <div class="nm">Khalaili</div>
+        <div class="ep">3.7</div>
+        <div class="op">LEE (A)</div>
+      </div>
+      <div class="card ">
+        <div class="nm">Thomas</div>
+        <div class="ep">3.0</div>
+        <div class="op">NFO (A)</div>
+      </div>
+      <div class="card ">
+        <div class="nm">Maguire</div>
+        <div class="ep">2.6</div>
+        <div class="op">FUL (A)</div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="card ">
+        <div class="nm">B.Fernandes<span class="badge">V</span></div>
+        <div class="ep">5.6</div>
+        <div class="op">FUL (A)</div>
+      </div>
+      <div class="card ">
+        <div class="nm">Tavernier</div>
+        <div class="ep">5.3</div>
+        <div class="op">LIV (H)</div>
+      </div>
+      <div class="card ">
+        <div class="nm">Saka</div>
+        <div class="ep">5.0</div>
+        <div class="op">BHA (A)</div>
+      </div>
+      <div class="card ">
+        <div class="nm">Ødegaard</div>
+        <div class="ep">3.9</div>
+        <div class="op">BHA (A)</div>
+      </div>
+      <div class="card ">
+        <div class="nm">Xhaka</div>
+        <div class="ep">3.4</div>
+        <div class="op">MCI (A)</div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="card cap">
+        <div class="nm">Haaland<span class="badge">C</span></div>
+        <div class="ep">5.9</div>
+        <div class="op">SUN (H)</div>
+      </div>
+      <div class="card ">
+        <div class="nm">João Pedro</div>
+        <div class="ep">4.7</div>
+        <div class="op">BRE (A)</div>
+      </div>
+    </div>
+    <div class="benchrow">
+      <div class="lab">Bench &middot; in order</div>
+      <div class="row">
+        <div class="card"><div class="nm">Igor Jesus</div><div class="ep">2.7</div><div class="op">COV (H)</div></div>
+        <div class="card"><div class="nm">Greaves</div><div class="ep">2.4</div><div class="op">EVE (A)</div></div>
+        <div class="card"><div class="nm">Mendy</div><div class="ep">1.1</div><div class="op">NEW (A)</div></div>
+        <div class="card"><div class="nm">Dubravka</div><div class="ep">0.4</div><div class="op">AVL (H)</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Captain shortlist</h2>
+  <p class="sub">Expected points if they wear the armband, before the doubling.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Player</th><th>Opponent</th><th class="r">xG</th><th class="r">xA</th><th class="r">Bonus</th><th class="r">EP</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="pos">FWD</span> <span class="pname">Haaland</span> <span class="pmeta">MCI</span></td>
+        <td class="pmeta">SUN (H)</td>
+        <td class="r">0.74</td>
+        <td class="r">0.08</td>
+        <td class="r">0.71</td>
+        <td class="r"><span class="meter"><span class="track"><span class="fill" style="width:100%"></span></span><b>5.9</b></span></td>
+      </tr>
+      <tr>
+        <td><span class="pos">MID</span> <span class="pname">B.Fernandes</span> <span class="pmeta">MUN</span></td>
+        <td class="pmeta">FUL (A)</td>
+        <td class="r">0.37</td>
+        <td class="r">0.15</td>
+        <td class="r">1.03</td>
+        <td class="r"><span class="meter"><span class="track"><span class="fill" style="width:94%"></span></span><b>5.6</b></span></td>
+      </tr>
+      <tr>
+        <td><span class="pos">MID</span> <span class="pname">Tavernier</span> <span class="pmeta">BOU</span></td>
+        <td class="pmeta">LIV (H)</td>
+        <td class="r">0.34</td>
+        <td class="r">0.14</td>
+        <td class="r">0.94</td>
+        <td class="r"><span class="meter"><span class="track"><span class="fill" style="width:90%"></span></span><b>5.3</b></span></td>
+      </tr>
+      <tr>
+        <td><span class="pos">MID</span> <span class="pname">Saka</span> <span class="pmeta">ARS</span></td>
+        <td class="pmeta">BHA (A)</td>
+        <td class="r">0.36</td>
+        <td class="r">0.07</td>
+        <td class="r">0.72</td>
+        <td class="r"><span class="meter"><span class="track"><span class="fill" style="width:85%"></span></span><b>5.0</b></span></td>
+      </tr>
+      <tr>
+        <td><span class="pos">FWD</span> <span class="pname">João Pedro</span> <span class="pmeta">CHE</span></td>
+        <td class="pmeta">BRE (A)</td>
+        <td class="r">0.43</td>
+        <td class="r">0.11</td>
+        <td class="r">0.84</td>
+        <td class="r"><span class="meter"><span class="track"><span class="fill" style="width:80%"></span></span><b>4.7</b></span></td>
+      </tr>
+      <tr>
+        <td><span class="pos">MID</span> <span class="pname">Ødegaard</span> <span class="pmeta">ARS</span></td>
+        <td class="pmeta">BHA (A)</td>
+        <td class="r">0.16</td>
+        <td class="r">0.13</td>
+        <td class="r">0.65</td>
+        <td class="r"><span class="meter"><span class="track"><span class="fill" style="width:67%"></span></span><b>3.9</b></span></td>
+      </tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <h2>Transfer targets</h2>
+  <p class="sub">Best expected points over the next 6 gameweeks, per position. Players you already own are excluded.</p>
+  <div class="tabs" role="tablist">
+    <button role="tab" data-pos="GKP" aria-selected="false">GKP</button>
+    <button role="tab" data-pos="DEF" aria-selected="false">DEF</button>
+    <button role="tab" data-pos="MID" aria-selected="true">MID</button>
+    <button role="tab" data-pos="FWD" aria-selected="false">FWD</button>
+  </div>
+  <div class="scroll target-panel" data-pos="GKP" hidden><table>
+    <thead><tr><th>Player</th><th class="r">£</th><th class="r">Own%</th><th class="r">Price</th><th class="r">GW5</th><th class="r">Next 6</th><th class="r">EP / £m</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="pname">Tzolakis</span> <span class="pmeta">HUL</span></td>
+        <td class="r">4.6</td>
+        <td class="r">10.3</td>
+        <td class="r" style="color:var(--ink-3)">
+          –</td>
+        <td class="r">3.9</td>
+        <td class="r"><b>24.5</b></td>
+        <td class="r">5.33</td>
+      </tr>
+      <tr>
+        <td><span class="pname">Martinez</span> <span class="pmeta">CHE</span></td>
+        <td class="r">5.0</td>
+        <td class="r">5.1</td>
+        <td class="r" style="color:var(--ink-3)">
+          –</td>
+        <td class="r">3.7</td>
+        <td class="r"><b>22.8</b></td>
+        <td class="r">4.57</td>
+      </tr>
+      <tr>
+        <td><span class="pname">Trafford</span> <span class="pmeta">LEE</span></td>
+        <td class="r">5.0</td>
+        <td class="r">5.4</td>
+        <td class="r" style="color:var(--ink-3)">
+          –</td>
+        <td class="r">4.0</td>
+        <td class="r"><b>22.6</b></td>
+        <td class="r">4.52</td>
+      </tr>
+      <tr>
+        <td><span class="pname">Suzuki</span> <span class="pmeta">AVL</span></td>
+        <td class="r">5.0</td>
+        <td class="r">1.8</td>
+        <td class="r" style="color:var(--ink-3)">
+          –</td>
+        <td class="r">3.5</td>
+        <td class="r"><b>22.1</b></td>
+        <td class="r">4.42</td>
+      </tr>
+      <tr>
+        <td><span class="pname">Pickford</span> <span class="pmeta">EVE</span></td>
+        <td class="r">5.5</td>
+        <td class="r">8.7</td>
+        <td class="r" style="color:var(--ink-3)">
+          –</td>
+        <td class="r">3.9</td>
+        <td class="r"><b>22.0</b></td>
+        <td class="r">4.00</td>
+      </tr>
+      <tr>
+        <td><span class="pname">Kelleher</span> <span class="pmeta">BRE</span></td>
+        <td class="r">5.0</td>
+        <td class="r">6.6</td>
+        <td class="r" style="color:var(--ink-3)">
+          –</td>
+        <td class="r">3.8</td>
+        <td class="r"><b>21.8</b></td>
+        <td class="r">4.37</td>
+      </tr>
+      <tr>
+        <td><span class="pname">Scherpen</span> <span class="pmeta">IPS</span></td>
+        <td class="r">4.5</td>
+        <td class="r">0.6</td>
+        <td class="r" style="color:var(--ink-3)">
+          –</td>
+        <td class="r">3.5</td>
+        <td class="r"><b>21.8</b></td>
+        <td class="r">4.84</td>
+      </tr>
+      <tr>
+        <td><span class="pname">Raya</span> <span class="pmeta">ARS</span></td>
+        <td class="r">6.0</td>
+        <td class="r">39.4</td>
+        <td class="r" style="color:var(--ink-3)">
+          –</td>
+        <td class="r">3.4</td>
+        <td class="r"><b>21.7</b></td>
+        <td class="r">3.62</td>
+      </tr>
+      <tr>
+        <td><span class="pname">Horníček</span> <span class="pmeta">NEW</span></td>
+        <td class="r">5.0</td>
+        <td class="r">1.4</td>
+        <td class="r" style="color:var(--ink-3)">
+          –</td>
+        <td class="r">3.8</td>
+        <td class="r"><b>21.6</b></td>
+        <td class="r">4.31</td>
+      </tr>
+      <tr>
+        <td><span class="pname">Lammens</span> <span class="pmeta">MUN</span></td>
+        <td class="r">4.9</td>
+        <td class="r">11.3</td>
+        <td class="r" style="color:var(--ink-3)">
+          –</td>
+        <td class="r">3.3</td>
+        <td class="r"><b>21.0</b></td>
+        <td class="r">4.29</td>
+      </tr>
+    </tbody>
+  </table></div>
+  <div class="scroll target-panel" data-pos="DEF" hidden><table>
+    <thead><tr><th>Player</th><th class="r">£</th><th class="r">Own%</th><th class="r">Price</th><th class="r">GW5</th><th class="r">Next 6</th><th class="r">EP / £m</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="pname">Khalaili</span> <span class="pmeta">CRY</span></td>
+        <td class="r">5.0</td>
+        <td class="r">0.3</td>
+        <td class="r" style="color:var(--ink-3)">
+          –</td>
+        <td class="r">3.7</td>
+        <td class="r"><b>25.5</b></td>
+        <td class="r">5.11</td>
+      </tr>
+      <tr>
+        <td><span class="pname">Davis</span> <span class="pmeta">IPS</span></td>
+        <td class="r">4.0</td>
+        <td class="r">5.5</td>
+        <td class="r" style="color:var(--ink-3)">
+          –</td>
+        <td class="r">3.5</td>
+        <td class="r"><b>24.8</b></td>
+        <td class="r">6.20</td>
+      </tr>
+      <tr>
+        <td><span class="pname">Guéhi</span> <span class="pmeta">MCI</span></td>
+        <td class="r">6.0</td>
+        <td class="r">18.5</td>
+        <td class="r" style="color:var(--ink-3)">
+          –</td>
+        <td class="r">4.5</td>
+        <td class="r"><b>23.7</b></td>
+        <td class="r">3.94</td>
+      </tr>
+      <tr>
+        <td><span class="pname">De Cuyper</span> <span class="pmeta">BHA</span></td>
+        <td class="r">4.8</td>
+        <td class="r">22.0</td>
+        <td class="r" style="color:var(--ink-3)">
+          –</td>
+        <td class="r">4.6</td>
+        <td class="r"><b>23.6</b></td>
+        <td class="r">4.92</td>
+      </tr>
+      <tr>
+        <td><span class="pname">Mukiele</span> <span class="pmeta">SUN</span></td>
+        <td class="r">5.5</td>
+        <td class="r">2.1</td>
+        <td class="r" style="color:var(--ink-3)">
+          –</td>
+        <td class="r">3.4</td>
+        <td class="r"><b>23.3</b></td>
+        <td class="r">4.23</td>
+      </tr>
+      <tr>
+        <td><span class="pname">Hall</span> <span class="pmeta">NEW</span></td>
+        <td class="r">5.2</td>
+        <td class="r">14.2</td>
+        <td class="r" style="color:var(--ink-3)">
+          –</td>
+        <td class="r">4.3</td>
+        <td class="r"><b>22.9</b></td>
+        <td class="r">4.41</td>
+      </tr>
+      <tr>
+        <td><span class="pname">Tarkowski</span> <span class="pmeta">EVE</span></td>
+        <td class="r">6.0</td>
+        <td class="r">12.0</td>
+        <td class="r" style="color:var(--ink-3)">
+          –</td>
+        <td class="r">4.2</td>
+        <td class="r"><b>22.6</b></td>
+        <td class="r">3.76</td>
+      </tr>
+      <tr>
+        <td><span class="pname">Silva</span> <span class="pmeta">BOU</span></td>
+        <td class="r">5.0</td>
+        <td class="r">0.4</td>
+        <td class="r" style="color:var(--ink-3)">
+          –</td>
+        <td class="r">4.2</td>
+        <td class="r"><b>22.3</b></td>
+        <td class="r">4.47</td>
+      </tr>
+      <tr>
+        <td><span class="pname">Egan</span> <span class="pmeta">HUL</span></td>
+        <td class="r">4.1</td>
+        <td class="r">6.5</td>
+        <td class="r" style="color:var(--ink-3)">
+          –</td>
+        <td class="r">3.2</td>
+        <td class="r"><b>22.0</b></td>
+        <td class="r">5.36</td>
+      </tr>
+      <tr>
+        <td><span class="pname">Muharemović</span> <span class="pmeta">LEE</span></td>
+        <td class="r">5.0</td>
+        <td class="r">3.9</td>
+        <td class="r" style="color:var(--ink-3)">
+          –</td>
+        <td class="r">4.1</td>
+        <td class="r"><b>21.9</b></td>
+        <td class="r">4.38</td>
+      </tr>
+    </tbody>
+  </table></div>
+  <div class="scroll target-panel" data-pos="MID" ><table>
+    <thead><tr><th>Player</th><th class="r">£</th><th class="r">Own%</th><th class="r">Price</th><th class="r">GW5</th><th class="r">Next 6</th><th class="r">EP / £m</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="pname">Saka</span> <span class="pmeta">ARS</span></td>
+        <td class="r">9.5</td>
+        <td class="r">11.5</td>
+        <td class="r" style="color:var(--ink-3)">
+          –</td>
+        <td class="r">5.0</td>
+        <td class="r"><b>32.5</b></td>
+        <td class="r">3.42</td>
+      </tr>
+      <tr>
+        <td><span class="pname">Tavernier</span> <span class="pmeta">BOU</span></td>
+        <td class="r">6.0</td>
+        <td class="r">4.2</td>
+        <td class="r" style="color:var(--ink-3)">
+          –</td>
+        <td class="r">5.3</td>
+        <td class="r"><b>30.1</b></td>
+        <td class="r">5.02</td>
+      </tr>
+      <tr>
+        <td><span class="pname">Mbeumo</span> <span class="pmeta">MUN</span></td>
+        <td class="r">7.9</td>
+        <td class="r">23.6</td>
+        <td class="r" style="color:var(--ink-3)">
+          –</td>
+        <td class="r">4.5</td>
+        <td class="r"><b>29.4</b></td>
+        <td class="r">3.73</td>
+      </tr>
+      <tr>
+        <td><span class="pname">Rogers</span> <span class="pmeta">CHE</span></td>
+        <td class="r">7.7</td>
+        <td class="r">35.5</td>
+        <td class="r" style="color:var(--good)">
+          ▲</td>
+        <td class="r">4.4</td>
+        <td class="r"><b>28.5</b></td>
+        <td class="r">3.70</td>
+      </tr>
+      <tr>
+        <td><span class="pname">Gakpo</span> <span class="pmeta">LIV</span></td>
+        <td class="r">7.2</td>
+        <td class="r">12.2</td>
+        <td class="r" style="color:var(--ink-3)">
+          –</td>
+        <td class="r">4.4</td>
+        <td class="r"><b>28.2</b></td>
+        <td class="r">3.92</td>
+      </tr>
+      <tr>
+        <td><span class="pname">Palmer</span> <span class="pmeta">CHE</span></td>
+        <td class="r">9.7</td>
+        <td class="r">26.8</td>
+        <td class="r" style="color:var(--ink-3)">
+          –</td>
+        <td class="r">4.3</td>
+        <td class="r"><b>27.7</b></td>
+        <td class="r">2.86</td>
+      </tr>
+      <tr>
+        <td><span class="pname">Gibbs-White</span> <span class="pmeta">NFO</span></td>
+        <td class="r">7.9</td>
+        <td class="r">9.7</td>
+        <td class="r" style="color:var(--ink-3)">
+          –</td>
+        <td class="r">4.8</td>
+        <td class="r"><b>26.7</b></td>
+        <td class="r">3.38</td>
+      </tr>
+      <tr>
+        <td><span class="pname">Scott</span> <span class="pmeta">BOU</span></td>
+        <td class="r">6.1</td>
+        <td class="r">5.9</td>
+        <td class="r" style="color:var(--ink-3)">
+          –</td>
+        <td class="r">4.6</td>
+        <td class="r"><b>26.4</b></td>
+        <td class="r">4.33</td>
+      </tr>
+      <tr>
+        <td><span class="pname">Schade</span> <span class="pmeta">BRE</span></td>
+        <td class="r">6.0</td>
+        <td class="r">4.3</td>
+        <td class="r" style="color:var(--good)">
+          ▲</td>
+        <td class="r">4.6</td>
+        <td class="r"><b>26.3</b></td>
+        <td class="r">4.38</td>
+      </tr>
+      <tr>
+        <td><span class="pname">Szoboszlai</span> <span class="pmeta">LIV</span></td>
+        <td class="r">7.0</td>
+        <td class="r">37.9</td>
+        <td class="r" style="color:var(--crit)">
+          ▼</td>
+        <td class="r">4.1</td>
+        <td class="r"><b>26.1</b></td>
+        <td class="r">3.73</td>
+      </tr>
+    </tbody>
+  </table></div>
+  <div class="scroll target-panel" data-pos="FWD" hidden><table>
+    <thead><tr><th>Player</th><th class="r">£</th><th class="r">Own%</th><th class="r">Price</th><th class="r">GW5</th><th class="r">Next 6</th><th class="r">EP / £m</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="pname">Isak</span> <span class="pmeta">LIV</span></td>
+        <td class="r">9.1</td>
+        <td class="r">22.6</td>
+        <td class="r" style="color:var(--ink-3)">
+          –</td>
+        <td class="r">4.2</td>
+        <td class="r"><b>27.0</b></td>
+        <td class="r">2.97</td>
+      </tr>
+      <tr>
+        <td><span class="pname">Barry</span> <span class="pmeta">EVE</span></td>
+        <td class="r">5.6</td>
+        <td class="r">6.3</td>
+        <td class="r" style="color:var(--ink-3)">
+          –</td>
+        <td class="r">4.4</td>
+        <td class="r"><b>24.7</b></td>
+        <td class="r">4.41</td>
+      </tr>
+      <tr>
+        <td><span class="pname">Gonzalo</span> <span class="pmeta">FUL</span></td>
+        <td class="r">6.0</td>
+        <td class="r">3.8</td>
+        <td class="r" style="color:var(--ink-3)">
+          –</td>
+        <td class="r">4.0</td>
+        <td class="r"><b>22.3</b></td>
+        <td class="r">3.71</td>
+      </tr>
+      <tr>
+        <td><span class="pname">Thiago</span> <span class="pmeta">BRE</span></td>
+        <td class="r">7.9</td>
+        <td class="r">10.3</td>
+        <td class="r" style="color:var(--ink-3)">
+          –</td>
+        <td class="r">4.0</td>
+        <td class="r"><b>22.2</b></td>
+        <td class="r">2.80</td>
+      </tr>
+      <tr>
+        <td><span class="pname">Calvert-Lewin</span> <span class="pmeta">LEE</span></td>
+        <td class="r">6.0</td>
+        <td class="r">22.0</td>
+        <td class="r" style="color:var(--ink-3)">
+          –</td>
+        <td class="r">3.8</td>
+        <td class="r"><b>21.4</b></td>
+        <td class="r">3.57</td>
+      </tr>
+      <tr>
+        <td><span class="pname">Wissa</span> <span class="pmeta">NEW</span></td>
+        <td class="r">6.2</td>
+        <td class="r">18.4</td>
+        <td class="r" style="color:var(--ink-3)">
+          –</td>
+        <td class="r">3.7</td>
+        <td class="r"><b>20.8</b></td>
+        <td class="r">3.36</td>
+      </tr>
+      <tr>
+        <td><span class="pname">Havertz</span> <span class="pmeta">ARS</span></td>
+        <td class="r">7.6</td>
+        <td class="r">8.0</td>
+        <td class="r" style="color:var(--ink-3)">
+          –</td>
+        <td class="r">3.2</td>
+        <td class="r"><b>20.7</b></td>
+        <td class="r">2.73</td>
+      </tr>
+      <tr>
+        <td><span class="pname">Evanilson</span> <span class="pmeta">BOU</span></td>
+        <td class="r">6.0</td>
+        <td class="r">3.3</td>
+        <td class="r" style="color:var(--ink-3)">
+          –</td>
+        <td class="r">3.5</td>
+        <td class="r"><b>19.9</b></td>
+        <td class="r">3.32</td>
+      </tr>
+      <tr>
+        <td><span class="pname">McBurnie</span> <span class="pmeta">HUL</span></td>
+        <td class="r">5.5</td>
+        <td class="r">1.9</td>
+        <td class="r" style="color:var(--ink-3)">
+          –</td>
+        <td class="r">3.0</td>
+        <td class="r"><b>19.0</b></td>
+        <td class="r">3.45</td>
+      </tr>
+      <tr>
+        <td><span class="pname">Emersonn</span> <span class="pmeta">IPS</span></td>
+        <td class="r">5.5</td>
+        <td class="r">2.0</td>
+        <td class="r" style="color:var(--ink-3)">
+          –</td>
+        <td class="r">2.9</td>
+        <td class="r"><b>18.8</b></td>
+        <td class="r">3.41</td>
+      </tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <h2>Sell candidates</h2>
+  <p class="sub">Players in your squad whose next 6 gameweeks look weakest for the money.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Player</th><th class="r">£</th><th class="r">Next 6</th><th class="r">EP / £m</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="pos">GKP</span> <span class="pname">Dubravka</span> <span class="pmeta">TOT</span></td>
+        <td class="r">4.0</td>
+        <td class="r">2.4</td>
+        <td class="r">0.61</td>
+        <td style="white-space:normal;color:var(--ink-2)">starts 0% of the time</td>
+      </tr>
+      <tr>
+        <td><span class="pos">DEF</span> <span class="pname">Mendy</span> <span class="pmeta">HUL</span></td>
+        <td class="r">4.1</td>
+        <td class="r">7.6</td>
+        <td class="r">1.87</td>
+        <td style="white-space:normal;color:var(--ink-2)">availability doubt, starts 50% of the time</td>
+      </tr>
+      <tr>
+        <td><span class="pos">FWD</span> <span class="pname">Igor Jesus</span> <span class="pmeta">NFO</span></td>
+        <td class="r">5.8</td>
+        <td class="r">15.0</td>
+        <td class="r">2.58</td>
+        <td style="white-space:normal;color:var(--ink-2)">fixtures and form both below the alternatives</td>
+      </tr>
+      <tr>
+        <td><span class="pos">DEF</span> <span class="pname">Greaves</span> <span class="pmeta">IPS</span></td>
+        <td class="r">4.0</td>
+        <td class="r">17.2</td>
+        <td class="r">4.31</td>
+        <td style="white-space:normal;color:var(--ink-2)">fixtures and form both below the alternatives</td>
+      </tr>
+      <tr>
+        <td><span class="pos">DEF</span> <span class="pname">Maguire</span> <span class="pmeta">MUN</span></td>
+        <td class="r">4.9</td>
+        <td class="r">18.5</td>
+        <td class="r">3.78</td>
+        <td style="white-space:normal;color:var(--ink-2)">fixtures and form both below the alternatives</td>
+      </tr>
+      <tr>
+        <td><span class="pos">MID</span> <span class="pname">Ampadu</span> <span class="pmeta">LEE</span></td>
+        <td class="r">5.4</td>
+        <td class="r">18.6</td>
+        <td class="r">3.44</td>
+        <td style="white-space:normal;color:var(--ink-2)">fixtures and form both below the alternatives</td>
+      </tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <h2>The next 6 gameweeks</h2>
+  <p class="sub">One plan solved as a whole, not six decisions made one at a time.</p>
+  <div class="plan">
+    <div class="pweek">
+      <span class="gw">GW5</span>
+      <span class="what">Gabriel → Saka, Ampadu → Tavernier, Cherki → Khalaili<br>
+        <span class="muted">C: Haaland &middot; 3 FT available</span></span>
+      <span class="epbar"><span class="track"><span class="fill" style="width:88%"></span></span><span class="v">53</span></span>
+    </div>
+    <div class="pweek">
+      <span class="gw">GW6</span>
+      <span class="what">Mendy → Davis<br>
+        <span class="muted">C: B.Fernandes &middot; 1 FT available</span></span>
+      <span class="epbar"><span class="track"><span class="fill" style="width:98%"></span></span><span class="v">59</span></span>
+    </div>
+    <div class="pweek">
+      <span class="gw">GW7</span>
+      <span class="what">Xhaka → Schade<br>
+        <span class="muted">C: Haaland &middot; 1 FT available</span></span>
+      <span class="epbar"><span class="track"><span class="fill" style="width:91%"></span></span><span class="v">55</span></span>
+    </div>
+    <div class="pweek">
+      <span class="gw">GW8</span>
+      <span class="what">Dubravka → Tzolakis<br>
+        <span class="muted">C: B.Fernandes &middot; 1 FT available</span></span>
+      <span class="epbar"><span class="track"><span class="fill" style="width:100%"></span></span><span class="v">60</span></span>
+    </div>
+    <div class="pweek">
+      <span class="gw">GW9</span>
+      <span class="what">Maguire → Egan<br>
+        <span class="muted">C: Haaland &middot; 1 FT available</span></span>
+      <span class="epbar"><span class="track"><span class="fill" style="width:96%"></span></span><span class="v">58</span></span>
+    </div>
+    <div class="pweek">
+      <span class="gw">GW10</span>
+      <span class="what">Thomas → De Cuyper<br>
+        <span class="muted">C: B.Fernandes &middot; 1 FT available</span></span>
+      <span class="epbar"><span class="track"><span class="fill" style="width:99%"></span></span><span class="v">60</span></span>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Fixture run</h2>
+  <p class="sub">Difficulty of every fixture your squad's clubs face. Lower is easier; the number is printed in each cell.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Club</th><th class="r">GW5</th><th class="r">GW6</th><th class="r">GW7</th><th class="r">GW8</th><th class="r">GW9</th><th class="r">GW10</th><th class="r">Avg</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="pname">Coventry City</td>
+        <td class="r"><span class="fdr d3">NFO A 3</span></td>
+        <td class="r"><span class="fdr d2">NEW H 2</span></td>
+        <td class="r"><span class="fdr d3">TOT A 3</span></td>
+        <td class="r"><span class="fdr d2">FUL H 2</span></td>
+        <td class="r"><span class="fdr d2">SUN H 2</span></td>
+        <td class="r"><span class="fdr d3">EVE A 3</span></td>
+        <td class="r">2.50</td>
+      </tr>
+      <tr>
+        <td class="pname">Arsenal</td>
+        <td class="r"><span class="fdr d3">BHA A 3</span></td>
+        <td class="r"><span class="fdr d2">LEE H 2</span></td>
+        <td class="r"><span class="fdr d3">NFO A 3</span></td>
+        <td class="r"><span class="fdr d3">EVE H 3</span></td>
+        <td class="r"><span class="fdr d4">LIV A 4</span></td>
+        <td class="r"><span class="fdr d2">HUL H 2</span></td>
+        <td class="r">2.83</td>
+      </tr>
+      <tr>
+        <td class="pname">Man City</td>
+        <td class="r"><span class="fdr d2">SUN H 2</span></td>
+        <td class="r"><span class="fdr d4">LIV A 4</span></td>
+        <td class="r"><span class="fdr d2">IPS H 2</span></td>
+        <td class="r"><span class="fdr d4">AVL A 4</span></td>
+        <td class="r"><span class="fdr d2">BHA H 2</span></td>
+        <td class="r"><span class="fdr d3">NFO A 3</span></td>
+        <td class="r">2.83</td>
+      </tr>
+      <tr>
+        <td class="pname">Bournemouth</td>
+        <td class="r"><span class="fdr d4">LIV H 4</span></td>
+        <td class="r"><span class="fdr d4">CHE A 4</span></td>
+        <td class="r"><span class="fdr d2">SUN H 2</span></td>
+        <td class="r"><span class="fdr d4">MUN A 4</span></td>
+        <td class="r"><span class="fdr d2">LEE H 2</span></td>
+        <td class="r"><span class="fdr d2">IPS A 2</span></td>
+        <td class="r">3.00</td>
+      </tr>
+      <tr>
+        <td class="pname">Crystal Palace</td>
+        <td class="r"><span class="fdr d3">LEE A 3</span></td>
+        <td class="r"><span class="fdr d3">NFO H 3</span></td>
+        <td class="r"><span class="fdr d3">BHA A 3</span></td>
+        <td class="r"><span class="fdr d2">NEW H 2</span></td>
+        <td class="r"><span class="fdr d3">TOT A 3</span></td>
+        <td class="r"><span class="fdr d4">LIV H 4</span></td>
+        <td class="r">3.00</td>
+      </tr>
+      <tr>
+        <td class="pname">Ipswich Town</td>
+        <td class="r"><span class="fdr d3">EVE A 3</span></td>
+        <td class="r"><span class="fdr d2">FUL H 2</span></td>
+        <td class="r"><span class="fdr d5">MCI A 5</span></td>
+        <td class="r"><span class="fdr d3">NFO H 3</span></td>
+        <td class="r"><span class="fdr d2">HUL A 2</span></td>
+        <td class="r"><span class="fdr d3">BOU H 3</span></td>
+        <td class="r">3.00</td>
+      </tr>
+      <tr>
+        <td class="pname">Nott&#39;m Forest</td>
+        <td class="r"><span class="fdr d2">COV H 2</span></td>
+        <td class="r"><span class="fdr d3">CRY A 3</span></td>
+        <td class="r"><span class="fdr d4">ARS H 4</span></td>
+        <td class="r"><span class="fdr d2">IPS A 2</span></td>
+        <td class="r"><span class="fdr d3">BRE A 3</span></td>
+        <td class="r"><span class="fdr d4">MCI H 4</span></td>
+        <td class="r">3.00</td>
+      </tr>
+      <tr>
+        <td class="pname">Sunderland</td>
+        <td class="r"><span class="fdr d5">MCI A 5</span></td>
+        <td class="r"><span class="fdr d2">BHA H 2</span></td>
+        <td class="r"><span class="fdr d3">BOU A 3</span></td>
+        <td class="r"><span class="fdr d2">LEE H 2</span></td>
+        <td class="r"><span class="fdr d2">COV A 2</span></td>
+        <td class="r"><span class="fdr d4">CHE H 4</span></td>
+        <td class="r">3.00</td>
+      </tr>
+      <tr>
+        <td class="pname">Chelsea</td>
+        <td class="r"><span class="fdr d3">BRE A 3</span></td>
+        <td class="r"><span class="fdr d3">BOU H 3</span></td>
+        <td class="r"><span class="fdr d3">EVE A 3</span></td>
+        <td class="r"><span class="fdr d3">TOT H 3</span></td>
+        <td class="r"><span class="fdr d4">MUN H 4</span></td>
+        <td class="r"><span class="fdr d3">SUN A 3</span></td>
+        <td class="r">3.17</td>
+      </tr>
+      <tr>
+        <td class="pname">Hull City</td>
+        <td class="r"><span class="fdr d3">NEW A 3</span></td>
+        <td class="r"><span class="fdr d3">EVE H 3</span></td>
+        <td class="r"><span class="fdr d3">FUL A 3</span></td>
+        <td class="r"><span class="fdr d3">BRE H 3</span></td>
+        <td class="r"><span class="fdr d2">IPS H 2</span></td>
+        <td class="r"><span class="fdr d5">ARS A 5</span></td>
+        <td class="r">3.17</td>
+      </tr>
+      <tr>
+        <td class="pname">Man Utd</td>
+        <td class="r"><span class="fdr d3">FUL A 3</span></td>
+        <td class="r"><span class="fdr d3">TOT H 3</span></td>
+        <td class="r"><span class="fdr d3">LEE A 3</span></td>
+        <td class="r"><span class="fdr d3">BOU H 3</span></td>
+        <td class="r"><span class="fdr d4">CHE A 4</span></td>
+        <td class="r"><span class="fdr d3">AVL H 3</span></td>
+        <td class="r">3.17</td>
+      </tr>
+      <tr>
+        <td class="pname">Spurs</td>
+        <td class="r"><span class="fdr d3">AVL H 3</span></td>
+        <td class="r"><span class="fdr d4">MUN A 4</span></td>
+        <td class="r"><span class="fdr d2">COV H 2</span></td>
+        <td class="r"><span class="fdr d4">CHE A 4</span></td>
+        <td class="r"><span class="fdr d3">CRY H 3</span></td>
+        <td class="r"><span class="fdr d3">LEE A 3</span></td>
+        <td class="r">3.17</td>
+      </tr>
+    </tbody>
+  </table></div>
+  <div class="legend">
+    <span><i style="background:var(--fdr2)"></i>Easy (2)</span>
+    <span><i style="background:var(--fdr3)"></i>Even (3)</span>
+    <span><i style="background:var(--fdr4)"></i>Hard (4)</span>
+    <span><i style="background:var(--fdr5)"></i>Very hard (5)</span>
+    <span style="color:var(--ink-3)">H home &middot; A away</span>
+  </div>
+</section>
+
+<section>
+  <h2>Watch list</h2>
+  <p class="sub">Availability and rotation risk inside your squad.</p>
+  <div class="flags">
+    <div class="flag ">
+      <span class="tag">doubt</span>
+      <span><b>Mendy</b> — Concussion - 50% chance of playing</span>
+    </div>
+  </div>
+</section>
+
+<footer>
+  Built from the official Fantasy Premier League API on 13 Sep 2026, 18:54. Expected points are a model estimate, not a prediction of the actual score.
+  Model v0.1.0 &middot; solver status Optimal.
+</footer>
+</div>
+
+<script>
+(function () {
+  var el = document.getElementById('cd');
+  if (!el) return;
+  var target = new Date(el.dataset.deadline).getTime();
+  function tick() {
+    var ms = target - Date.now();
+    if (ms <= 0) { el.textContent = 'closed'; return; }
+    var h = Math.floor(ms / 3600000), m = Math.floor(ms % 3600000 / 60000);
+    var d = Math.floor(h / 24);
+    el.textContent = d >= 1 ? d + 'd ' + (h % 24) + 'h' : h + 'h ' + m + 'm';
+    if (h < 24) el.parentElement.classList.add('urgent');
+  }
+  tick(); setInterval(tick, 30000);
+
+  var tabs = document.querySelectorAll('.tabs [data-pos]');
+  tabs.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      tabs.forEach(function (b) { b.setAttribute('aria-selected', String(b === btn)); });
+      document.querySelectorAll('.target-panel').forEach(function (panel) {
+        panel.hidden = panel.dataset.pos !== btn.dataset.pos;
+      });
+    });
+  });
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(function () {});
+  }
+})();
+</script>
+</body>
+</html>
