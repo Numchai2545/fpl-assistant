@@ -14,6 +14,16 @@ planning:
   max_total_hits: 12        # max across the whole horizon
   candidate_pool: 200       # players considered by the optimiser (top-N by EP + your squad)
   solver_time_limit: 180    # seconds; CBC stops and returns best found after this
+  fallback_budget: 100.0    # used only when your squad cannot be read (GW1, private entry)
+
+  # How many expected points a transfer must gain before it is worth making.
+  # A free transfer is not free: spending it now means not having it later, and
+  # every move carries injury and price risk the model cannot see. At 0 the
+  # solver churns the bench every week for hundredths of a point.
+  #   0.4  loose   - moves often
+  #   0.8  balanced - the default
+  #   1.5  strict  - only clear upgrades, fewest transfers
+  transfer_friction: 0.8
 
 strategy:
   # "balanced"     -> pure expected points, ownership ignored  (recommended for your goal)
@@ -21,8 +31,16 @@ strategy:
   # "differential" -> small bonus for low-owned players (for chasing in a mini-league)
   mode: balanced
   differential_weight: 0.0  # EP bonus per (50 - ownership%) point; used by the two modes above
-  bench_weight: [0.00, 0.16, 0.10, 0.05]   # value of bench slots 1..4 (GK bench ~0)
+  # [reserve GK, then the three outfield subs]. The keeper only plays if your
+  # starter does not, so his points are worth almost nothing; the outfield three
+  # are averaged, because ordering them inside the solver would quadruple the
+  # model for a difference of a few hundredths of a point.
+  bench_weight: [0.00, 0.16, 0.10, 0.05]
   captain_multiplier: 2.0
+
+  # Players the optimiser is never allowed to sell — FPL element ids.
+  # Use it for players you keep for reasons the model cannot see.
+  never_sell: []
 
 model:
   prior_minutes: 360        # shrinkage strength: rates are trusted fully after ~4 full matches
@@ -47,8 +65,12 @@ chips:
   bench_boost_2: false
 
 notify:
-  hours_before_deadline: 24     # send the alert this long before the deadline
+  # Escalating reminders, in hours before the deadline. Each fires once.
+  # 48h = time to plan, 24h = the main one, 3h = last chance.
+  remind_hours_before: [48, 24, 3]
+  final_reminder_only_if_unset: true   # keep the 3h message short and urgent
   timezone: "Asia/Bangkok"
+  site_url: ""                  # your GitHub Pages URL; included in every alert
   telegram:
     enabled: false              # set true and fill the env vars to switch on
     # TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID are read from the environment,

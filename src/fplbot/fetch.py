@@ -10,16 +10,16 @@ from __future__ import annotations
 
 import json
 import logging
-import time
-from datetime import datetime, timezone
+import math
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
-from .config import Config
+from .config import HIT_COST, MAX_SAVED_TRANSFERS, Config
 
 log = logging.getLogger(__name__)
 
@@ -45,6 +45,15 @@ def _session() -> requests.Session:
 
 
 class FPLClient:
+    """Fetches live FPL data, writing every payload to a dated snapshot.
+
+    The cache exists to build history for backtesting and to let `--offline`
+    work, *not* to save requests. Injury news and availability flags change
+    through the day, and a stale snapshot the evening before a deadline is
+    exactly the failure this whole project exists to prevent — so a cached file
+    is only reused inside `cache_ttl_minutes`, or when offline.
+    """
+
     def __init__(self, cfg: Config, offline: bool = False):
         self.cfg = cfg
         self.offline = offline
@@ -52,11 +61,23 @@ class FPLClient:
         stamp = datetime.now(timezone.utc).strftime("%Y-%m-%d")
         self.snapshot_dir = cfg.data_dir / "snapshots" / stamp
         self.snapshot_dir.mkdir(parents=True, exist_ok=True)
+        self.ttl = timedelta(minutes=float(
+            cfg.get("planning", "cache_ttl_minutes", default=90)))
+
+    def _cache_is_fresh(self, path: Path) -> bool:
+        if self.offline:
+            return True
+        age = datetime.now(timezone.utc) - datetime.fromtimestamp(
+            path.stat().st_mtime, tz=timezone.utc)
+        if age <= self.ttl:
+            return True
+        log.debug("cache stale by %s: %s", age - self.ttl, path.name)
+        return False
 
     # ---------------------------------------------------------------- plumbing
     def _get(self, path: str, cache_name: str | None = None) -> Any:
         cache_path = self.snapshot_dir / f"{cache_name}.json" if cache_name else None
-        if cache_path and cache_path.exists():
+        if cache_path and cache_path.exists() and self._cache_is_fresh(cache_path):
             log.debug("cache hit %s", cache_path.name)
             return json.loads(cache_path.read_text(encoding="utf-8"))
         if self.offline:
@@ -85,15 +106,6 @@ class FPLClient:
         """One player's full match-by-match history plus their upcoming fixtures."""
         return self._get(f"element-summary/{element_id}/", f"element_{element_id}")
 
-    def element_summaries(self, ids: Iterable[int], pause: float = 0.15) -> dict[int, dict]:
-        """Fetch histories for a shortlist. Never call this for all ~700 players."""
-        out: dict[int, dict] = {}
-        for i, pid in enumerate(ids):
-            out[pid] = self.element_summary(pid)
-            if pause and i % 10 == 9:
-                time.sleep(pause)
-        return out
-
     # --------------------------------------------------------------- your team
     def entry(self, team_id: int | None = None) -> dict:
         tid = team_id or self.cfg.team_id
@@ -106,6 +118,15 @@ class FPLClient:
     def entry_picks(self, gameweek: int, team_id: int | None = None) -> dict:
         tid = team_id or self.cfg.team_id
         return self._get(f"entry/{tid}/event/{gameweek}/picks/", f"picks_gw{gameweek}")
+
+    def entry_transfers(self, team_id: int | None = None) -> list[dict]:
+        """Every transfer you have made, with the price paid for each player.
+
+        This is public, and it is the only way to recover purchase prices
+        without logging in — `picks` does not carry them.
+        """
+        tid = team_id or self.cfg.team_id
+        return self._get(f"entry/{tid}/transfers/", "entry_transfers")
 
 
 # ------------------------------------------------------------------ gameweeks
@@ -132,26 +153,88 @@ def deadline_utc(event: dict) -> datetime:
     return datetime.fromisoformat(event["deadline_time"].replace("Z", "+00:00"))
 
 
-def free_transfers(entry_history: dict, picks: dict | None) -> int:
+def free_transfers(entry_history: dict) -> int:
     """How many free transfers you have for the upcoming gameweek.
 
-    The API does not expose this directly on the public endpoints, so it is
-    reconstructed from your transfer history: you bank one per gameweek, spend
-    what you use, and the total is capped at five.
+    The public endpoints do not expose this, so it is reconstructed from your
+    transfer history: you bank one per gameweek, spend what you use, and the
+    total is capped at five.
+
+    Wildcard and Free Hit gameweeks are skipped rather than counted — transfers
+    made under those chips are unlimited and free, and treating them as spent
+    free transfers would reset the count to 1 for no reason.
     """
-    max_saved = 5
+    chip_gws = {int(c["event"]): (c.get("name") or "").lower()
+                for c in entry_history.get("chips", []) if c.get("event") is not None}
+    unlimited = {"wildcard", "freehit", "free_hit"}
+
     ft = 1
     for row in entry_history.get("current", []):
+        if chip_gws.get(int(row.get("event", 0)), "") in unlimited:
+            # The chip covered the moves; the banked transfer still accrues.
+            ft = min(MAX_SAVED_TRANSFERS, ft + 1)
+            continue
         made = int(row.get("event_transfers", 0))
-        paid = int(row.get("event_transfers_cost", 0)) // 4
+        paid = int(row.get("event_transfers_cost", 0)) // HIT_COST
         free_used = max(0, made - paid)
-        ft = min(max_saved, max(1, ft - free_used + 1))
-    return max(1, min(max_saved, ft))
+        ft = min(MAX_SAVED_TRANSFERS, max(1, ft - free_used + 1))
+    return max(1, min(MAX_SAVED_TRANSFERS, ft))
+
+
+def purchase_prices(squad: list[int], transfers: list[dict] | None, players) -> dict[int, float]:
+    """What you paid for each player you currently own, in millions.
+
+    Two sources, neither needing a login:
+
+    * Players you transferred in — the public transfers endpoint records
+      `element_in_cost`, the price at the moment you bought. The most recent
+      purchase wins, since you can buy the same player more than once.
+    * Players from your original squad — never transferred in, so you paid the
+      season-start price, which is `now_cost` minus `cost_change_start`.
+    """
+    bought_at: dict[int, float] = {}
+    for row in sorted(transfers or [], key=lambda r: r.get("event") or 0):
+        pid = int(row["element_in"])
+        bought_at[pid] = int(row["element_in_cost"]) / 10.0
+
+    out: dict[int, float] = {}
+    for pid in squad:
+        if pid in bought_at:
+            out[pid] = bought_at[pid]
+        elif pid in players.index:
+            now = float(players.price.get(pid, 0.0))
+            drift = float(players.cost_change_start.get(pid, 0.0)) / 10.0
+            out[pid] = round(now - drift, 1)
+    return out
+
+
+def selling_prices(squad: list[int], transfers: list[dict] | None, players,
+                   fee: float = 0.5) -> dict[int, float]:
+    """What you would actually get back for each player you own, in millions.
+
+    FPL keeps `fee` (normally half) of any price *rise* since you bought,
+    rounded down to the nearest 0.1m; a price fall you absorb in full. Using
+    market value instead inflates the budget and produces plans FPL refuses
+    at the point of sale.
+    """
+    out: dict[int, float] = {}
+    for pid, bought in purchase_prices(squad, transfers, players).items():
+        now = float(players.price.get(pid, bought))
+        if now <= bought:
+            out[pid] = now
+            continue
+        # Tenths, rounded down, is how FPL actually computes the sell-on fee.
+        out[pid] = bought + math.floor((now - bought) * (1.0 - fee) * 10 + 1e-9) / 10.0
+    return out
 
 
 def bank_and_value(entry: dict) -> tuple[float, float]:
-    """Bank and squad value in millions."""
-    return (
-        entry.get("last_deadline_bank", 0) / 10.0,
-        entry.get("last_deadline_value", 1000) / 10.0,
-    )
+    """Bank and squad value in millions, as two separate numbers.
+
+    `last_deadline_value` from the API is the figure FPL shows as "Value", which
+    already includes money in the bank. Reporting both without subtracting would
+    count the bank twice.
+    """
+    bank = entry.get("last_deadline_bank", 0) / 10.0
+    total = entry.get("last_deadline_value", 1000) / 10.0
+    return bank, round(total - bank, 1)

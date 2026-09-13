@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="en">
+<html lang="th">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Gnum United — FPL Assistant</title>
-<meta name="description" content="Expected points, captain picks and a 6-gameweek transfer plan.">
+<meta name="description" content="แต้มที่คาดว่าจะได้ ตัวเลือกกัปตัน และแผนเปลี่ยนตัว 6 วีคข้างหน้า">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#1A1420" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
@@ -14,7 +14,7 @@
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
 :root{
   --ground:#F6F4F8; --surface:#FFFFFF; --surface-2:#EFEAF2; --surface-3:#E5DEEA;
@@ -52,10 +52,10 @@
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--ground);color:var(--ink);
-  font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;font-size:15px;line-height:1.6;
+  font-family:"IBM Plex Sans Thai","IBM Plex Sans",system-ui,-apple-system,sans-serif;font-size:15px;line-height:1.7;
   -webkit-font-smoothing:antialiased;padding-bottom:env(safe-area-inset-bottom)}
 .wrap{max-width:1000px;margin:0 auto;padding-left:18px;padding-right:18px;padding-block:0 60px}
-h1,h2,h3,.disp{font-family:"Bai Jamjuree","IBM Plex Sans",sans-serif;text-wrap:balance;margin:0}
+h1,h2,h3,.disp{font-family:"Bai Jamjuree","IBM Plex Sans Thai",sans-serif;text-wrap:balance;margin:0}
 .mono,.num{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
 a{color:var(--accent)}
 
@@ -64,7 +64,7 @@ header{padding-block:26px 20px;display:flex;flex-wrap:wrap;gap:16px;align-items:
 .brand .eyebrow{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
 .brand h1{font-size:clamp(22px,4.6vw,30px);font-weight:700;line-height:1.15;margin-top:3px}
 .countdown{text-align:right}
-.countdown .lab{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+.countdown .lab{font-size:11.5px;letter-spacing:.04em;color:var(--ink-3);font-weight:600}
 .countdown .val{font-family:"IBM Plex Mono",monospace;font-size:clamp(20px,4.4vw,26px);font-weight:600;line-height:1.2;color:var(--accent)}
 .countdown .sub{font-size:12px;color:var(--ink-2)}
 .countdown.urgent .val{color:var(--crit)}
@@ -72,14 +72,14 @@ header{padding-block:26px 20px;display:flex;flex-wrap:wrap;gap:16px;align-items:
 /* tiles */
 .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0;margin:0}
 .tile{padding:14px 14px 15px 0;border-bottom:1px solid var(--rule)}
-.tile dt{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin-bottom:2px}
+.tile dt{font-size:11px;letter-spacing:.04em;color:var(--ink-3);font-weight:600;margin-bottom:2px}
 .tile dd{margin:0;font-family:"IBM Plex Mono",monospace;font-size:21px;font-weight:600;line-height:1.2}
-.tile small{display:block;font-family:"IBM Plex Sans",sans-serif;font-size:12px;color:var(--ink-2);font-weight:400}
+.tile small{display:block;font-family:"IBM Plex Sans Thai",sans-serif;font-size:12px;color:var(--ink-2);font-weight:400}
 
 /* action banner */
 .action{background:var(--surface);border:1px solid var(--rule-strong);border-left:4px solid var(--accent);
   border-radius:8px;padding:18px 20px;margin:26px 0 0;box-shadow:var(--shadow)}
-.action .lab{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--accent);font-weight:600;font-family:"Bai Jamjuree",sans-serif}
+.action .lab{font-size:11.5px;letter-spacing:.05em;color:var(--accent);font-weight:600;font-family:"Bai Jamjuree",sans-serif}
 .action .headline{font-family:"Bai Jamjuree",sans-serif;font-size:clamp(17px,3.4vw,21px);font-weight:600;margin:5px 0 0;line-height:1.35}
 .action .detail{color:var(--ink-2);font-size:14px;margin-top:7px}
 .move{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
@@ -128,9 +128,18 @@ td.r,th.r{text-align:right;font-family:"IBM Plex Mono",monospace;font-variant-nu
 .card .badge{display:inline-block;font-size:9.5px;font-weight:700;background:var(--accent);color:var(--surface);
   border-radius:3px;padding:0 4px;margin-left:3px;vertical-align:1px;font-family:"IBM Plex Mono",monospace}
 .benchrow{border-top:1px dashed var(--rule-strong);margin-top:14px;padding-top:14px}
-.benchrow .lab{text-align:center;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin-bottom:9px}
+.benchrow .lab{text-align:center;font-size:11px;letter-spacing:.03em;color:var(--ink-3);font-weight:600;margin-bottom:9px}
 .benchrow .row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
-.benchrow .card{min-width:0}
+.benchrow .card{min-width:0;position:relative}
+.card .slot{font-family:"IBM Plex Mono",monospace;font-size:9.5px;font-weight:600;color:var(--ink-3);
+  letter-spacing:.06em;margin-bottom:1px}
+.card.gkslot{background:var(--surface-3)}
+
+/* alerts: the thing that actually costs points when a deadline is missed */
+.action.alert{border-left-color:var(--crit);background:var(--crit-soft)}
+.action.alert .lab{color:var(--crit)}
+.alertlist{margin:8px 0 0;padding-left:18px;display:grid;gap:5px}
+.alertlist li{font-size:14.5px;font-weight:500}
 
 /* plan */
 .plan{display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:8px;overflow:hidden}
@@ -149,7 +158,7 @@ td.r,th.r{text-align:right;font-family:"IBM Plex Mono",monospace;font-variant-nu
 .flag{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:baseline;background:var(--surface);
   border:1px solid var(--rule);border-left:3px solid var(--warn);border-radius:7px;padding:11px 14px;font-size:13.5px}
 .flag.crit{border-left-color:var(--crit)}
-.flag .tag{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:4px;
+.flag .tag{font-size:10.5px;font-weight:700;letter-spacing:.03em;padding:2px 7px;border-radius:4px;
   background:var(--warn-soft);color:var(--warn);white-space:nowrap;font-family:"Bai Jamjuree",sans-serif}
 .flag.crit .tag{background:var(--crit-soft);color:var(--crit)}
 
@@ -169,38 +178,39 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
 
 <header>
   <div class="brand">
-    <div class="eyebrow">Gameweek 5 &middot; built 13 Sep 2026, 18:54</div>
+    <div class="eyebrow">Gameweek 5 &middot; built 13 Sep 2026, 19:04</div>
     <h1>Gnum United — FPL Assistant</h1>
   </div>
   <div class="countdown ">
-    <div class="lab">Deadline</div>
+    <div class="lab">ปิดจัดตัวใน</div>
     <div class="val" id="cd" data-deadline="2026-09-18T17:30:00+00:00">5d 5h</div>
     <div class="sub">Sat 19 Sep, 00:30 +07</div>
   </div>
 </header>
 
 <dl class="tiles">
-  <div class="tile"><dt>Overall points</dt><dd>252<small>rank 1,756,736</small></dd></div>
-  <div class="tile"><dt>Last gameweek</dt><dd>42<small>GW4</small></dd></div>
-  <div class="tile"><dt>Free transfers</dt><dd>3<small>max 5 banked</small></dd></div>
-  <div class="tile"><dt>In the bank</dt><dd>0.3<small>squad 100.3m</small></dd></div>
-  <div class="tile"><dt>Projected GW5</dt><dd>53<small>expected points</small></dd></div>
+  <div class="tile"><dt>แต้มรวม</dt><dd>252<small>อันดับ 1,756,736</small></dd></div>
+  <div class="tile"><dt>วีคที่แล้ว</dt><dd>42<small>GW4</small></dd></div>
+  <div class="tile"><dt>เปลี่ยนตัวฟรี</dt><dd>3<small>เก็บได้สูงสุด 5</small></dd></div>
+  <div class="tile"><dt>เงินเหลือ</dt><dd>0.3<small>มูลค่าทีม 100.0m</small></dd></div>
+  <div class="tile"><dt>คาดการณ์ GW5</dt><dd>53<small>แต้มที่คาดว่าจะได้</small></dd></div>
 </dl>
 
+
 <div class="action">
-  <div class="lab">Do this before the deadline</div>
-  <p class="headline">Make 3 transfers, captain Haaland</p>
+  <div class="lab">ทำแค่นี้ก่อนหมดเวลา</div>
+  <p class="headline">เปลี่ยนตัว 3 คน · กัปตัน Haaland</p>
   <div class="move">
-    <span class="swap"><span class="out">Gabriel</span><span class="arr">&rarr;</span><span class="in">Saka</span></span>
+    <span class="swap"><span class="out">Gabriel</span><span class="arr">&rarr;</span><span class="in">Khalaili</span></span>
     <span class="swap"><span class="out">Ampadu</span><span class="arr">&rarr;</span><span class="in">Tavernier</span></span>
-    <span class="swap"><span class="out">Cherki</span><span class="arr">&rarr;</span><span class="in">Khalaili</span></span>
+    <span class="swap"><span class="out">Cherki</span><span class="arr">&rarr;</span><span class="in">Saka</span></span>
   </div>
-  <p class="detail">Uses 3 of your 3 free transfers, no hit. Projected 53 points for GW5.</p>
+  <p class="detail">ใช้ 3 จาก 3 ครั้งที่มี ไม่เสียแต้ม. คาดการณ์ 53 แต้มใน GW5</p>
 </div>
 
 <section>
-  <h2>Your team for GW5</h2>
-  <p class="sub">Ordered by expected points. (C) is the captain, (V) the vice.</p>
+  <h2>ทีมของคุณสำหรับ GW5</h2>
+  <p class="sub">เรียงตามแต้มที่คาดว่าจะได้ · C คือกัปตัน, V คือรองกัปตัน</p>
   <div class="pitch">
     <div class="row">
       <div class="card ">
@@ -266,22 +276,22 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
       </div>
     </div>
     <div class="benchrow">
-      <div class="lab">Bench &middot; in order</div>
-      <div class="row">
-        <div class="card"><div class="nm">Igor Jesus</div><div class="ep">2.7</div><div class="op">COV (H)</div></div>
-        <div class="card"><div class="nm">Greaves</div><div class="ep">2.4</div><div class="op">EVE (A)</div></div>
-        <div class="card"><div class="nm">Mendy</div><div class="ep">1.1</div><div class="op">NEW (A)</div></div>
-        <div class="card"><div class="nm">Dubravka</div><div class="ep">0.4</div><div class="op">AVL (H)</div></div>
+      <div class="lab">ตัวสำรอง &middot; เรียงตามลำดับที่จะถูกเปลี่ยนเข้า</div>
+      <div class="row benchgrid">
+        <div class="card gkslot"><div class="slot">GK</div><div class="nm">Dubravka</div><div class="ep">0.4</div><div class="op">AVL (H)</div></div>
+        <div class="card"><div class="slot">1</div><div class="nm">Igor Jesus</div><div class="ep">2.7</div><div class="op">COV (H)</div></div>
+        <div class="card"><div class="slot">2</div><div class="nm">Greaves</div><div class="ep">2.4</div><div class="op">EVE (A)</div></div>
+        <div class="card"><div class="slot">3</div><div class="nm">Mendy</div><div class="ep">1.1</div><div class="op">NEW (A)</div></div>
       </div>
     </div>
   </div>
 </section>
 
 <section>
-  <h2>Captain shortlist</h2>
-  <p class="sub">Expected points if they wear the armband, before the doubling.</p>
+  <h2>ตัวเลือกกัปตัน</h2>
+  <p class="sub">แต้มที่คาดว่าจะได้ ก่อนคูณสอง</p>
   <div class="scroll"><table>
-    <thead><tr><th>Player</th><th>Opponent</th><th class="r">xG</th><th class="r">xA</th><th class="r">Bonus</th><th class="r">EP</th></tr></thead>
+    <thead><tr><th>ผู้เล่น</th><th>คู่แข่ง</th><th class="r">xG</th><th class="r">xA</th><th class="r">Bonus</th><th class="r">EP</th></tr></thead>
     <tbody>
       <tr>
         <td><span class="pos">FWD</span> <span class="pname">Haaland</span> <span class="pmeta">MCI</span></td>
@@ -336,8 +346,8 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
 </section>
 
 <section>
-  <h2>Transfer targets</h2>
-  <p class="sub">Best expected points over the next 6 gameweeks, per position. Players you already own are excluded.</p>
+  <h2>ตัวที่น่าซื้อ</h2>
+  <p class="sub">แต้มที่คาดว่าจะได้สูงสุดใน 6 วีคข้างหน้า แยกตามตำแหน่ง (ไม่รวมคนที่คุณมีอยู่แล้ว)</p>
   <div class="tabs" role="tablist">
     <button role="tab" data-pos="GKP" aria-selected="false">GKP</button>
     <button role="tab" data-pos="DEF" aria-selected="false">DEF</button>
@@ -345,7 +355,7 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
     <button role="tab" data-pos="FWD" aria-selected="false">FWD</button>
   </div>
   <div class="scroll target-panel" data-pos="GKP" hidden><table>
-    <thead><tr><th>Player</th><th class="r">£</th><th class="r">Own%</th><th class="r">Price</th><th class="r">GW5</th><th class="r">Next 6</th><th class="r">EP / £m</th></tr></thead>
+    <thead><tr><th>ผู้เล่น</th><th class="r">£</th><th class="r">%ถือครอง</th><th class="r">แนวโน้ม</th><th class="r">GW5</th><th class="r">6 วีค</th><th class="r">EP / £m</th></tr></thead>
     <tbody>
       <tr>
         <td><span class="pname">Tzolakis</span> <span class="pmeta">HUL</span></td>
@@ -450,7 +460,7 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
     </tbody>
   </table></div>
   <div class="scroll target-panel" data-pos="DEF" hidden><table>
-    <thead><tr><th>Player</th><th class="r">£</th><th class="r">Own%</th><th class="r">Price</th><th class="r">GW5</th><th class="r">Next 6</th><th class="r">EP / £m</th></tr></thead>
+    <thead><tr><th>ผู้เล่น</th><th class="r">£</th><th class="r">%ถือครอง</th><th class="r">แนวโน้ม</th><th class="r">GW5</th><th class="r">6 วีค</th><th class="r">EP / £m</th></tr></thead>
     <tbody>
       <tr>
         <td><span class="pname">Khalaili</span> <span class="pmeta">CRY</span></td>
@@ -555,7 +565,7 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
     </tbody>
   </table></div>
   <div class="scroll target-panel" data-pos="MID" ><table>
-    <thead><tr><th>Player</th><th class="r">£</th><th class="r">Own%</th><th class="r">Price</th><th class="r">GW5</th><th class="r">Next 6</th><th class="r">EP / £m</th></tr></thead>
+    <thead><tr><th>ผู้เล่น</th><th class="r">£</th><th class="r">%ถือครอง</th><th class="r">แนวโน้ม</th><th class="r">GW5</th><th class="r">6 วีค</th><th class="r">EP / £m</th></tr></thead>
     <tbody>
       <tr>
         <td><span class="pname">Saka</span> <span class="pmeta">ARS</span></td>
@@ -660,7 +670,7 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
     </tbody>
   </table></div>
   <div class="scroll target-panel" data-pos="FWD" hidden><table>
-    <thead><tr><th>Player</th><th class="r">£</th><th class="r">Own%</th><th class="r">Price</th><th class="r">GW5</th><th class="r">Next 6</th><th class="r">EP / £m</th></tr></thead>
+    <thead><tr><th>ผู้เล่น</th><th class="r">£</th><th class="r">%ถือครอง</th><th class="r">แนวโน้ม</th><th class="r">GW5</th><th class="r">6 วีค</th><th class="r">EP / £m</th></tr></thead>
     <tbody>
       <tr>
         <td><span class="pname">Isak</span> <span class="pmeta">LIV</span></td>
@@ -767,10 +777,10 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
 </section>
 
 <section>
-  <h2>Sell candidates</h2>
-  <p class="sub">Players in your squad whose next 6 gameweeks look weakest for the money.</p>
+  <h2>ตัวที่ควรขาย</h2>
+  <p class="sub">คนในทีมคุณที่ 6 วีคข้างหน้าดูอ่อนที่สุดเมื่อเทียบกับราคา</p>
   <div class="scroll"><table>
-    <thead><tr><th>Player</th><th class="r">£</th><th class="r">Next 6</th><th class="r">EP / £m</th><th>Why</th></tr></thead>
+    <thead><tr><th>ผู้เล่น</th><th class="r">£</th><th class="r">6 วีค</th><th class="r">EP / £m</th><th>เหตุผล</th></tr></thead>
     <tbody>
       <tr>
         <td><span class="pos">GKP</span> <span class="pname">Dubravka</span> <span class="pmeta">TOT</span></td>
@@ -819,53 +829,53 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
 </section>
 
 <section>
-  <h2>The next 6 gameweeks</h2>
-  <p class="sub">One plan solved as a whole, not six decisions made one at a time.</p>
+  <h2>แผน 6 วีคข้างหน้า</h2>
+  <p class="sub">คำนวณทั้ง 6 วีคพร้อมกัน ไม่ใช่ตัดสินใจทีละวีค</p>
   <div class="plan">
     <div class="pweek">
       <span class="gw">GW5</span>
-      <span class="what">Gabriel → Saka, Ampadu → Tavernier, Cherki → Khalaili<br>
-        <span class="muted">C: Haaland &middot; 3 FT available</span></span>
+      <span class="what">Gabriel → Khalaili, Ampadu → Tavernier, Cherki → Saka<br>
+        <span class="muted">กัปตัน: Haaland &middot; มี 3 transfer</span></span>
       <span class="epbar"><span class="track"><span class="fill" style="width:88%"></span></span><span class="v">53</span></span>
     </div>
     <div class="pweek">
       <span class="gw">GW6</span>
       <span class="what">Mendy → Davis<br>
-        <span class="muted">C: B.Fernandes &middot; 1 FT available</span></span>
+        <span class="muted">กัปตัน: B.Fernandes &middot; มี 1 transfer</span></span>
       <span class="epbar"><span class="track"><span class="fill" style="width:98%"></span></span><span class="v">59</span></span>
     </div>
     <div class="pweek">
       <span class="gw">GW7</span>
-      <span class="what">Xhaka → Schade<br>
-        <span class="muted">C: Haaland &middot; 1 FT available</span></span>
-      <span class="epbar"><span class="track"><span class="fill" style="width:91%"></span></span><span class="v">55</span></span>
+      <span class="what">Maguire → De Cuyper<br>
+        <span class="muted">กัปตัน: Haaland &middot; มี 1 transfer</span></span>
+      <span class="epbar"><span class="track"><span class="fill" style="width:92%"></span></span><span class="v">55</span></span>
     </div>
     <div class="pweek">
       <span class="gw">GW8</span>
-      <span class="what">Dubravka → Tzolakis<br>
-        <span class="muted">C: B.Fernandes &middot; 1 FT available</span></span>
+      <span class="what">Kinsky → Tzolakis<br>
+        <span class="muted">กัปตัน: B.Fernandes &middot; มี 1 transfer</span></span>
       <span class="epbar"><span class="track"><span class="fill" style="width:100%"></span></span><span class="v">60</span></span>
     </div>
     <div class="pweek">
       <span class="gw">GW9</span>
-      <span class="what">Maguire → Egan<br>
-        <span class="muted">C: Haaland &middot; 1 FT available</span></span>
-      <span class="epbar"><span class="track"><span class="fill" style="width:96%"></span></span><span class="v">58</span></span>
+      <span class="what">Xhaka → Scott<br>
+        <span class="muted">กัปตัน: Haaland &middot; มี 1 transfer</span></span>
+      <span class="epbar"><span class="track"><span class="fill" style="width:95%"></span></span><span class="v">57</span></span>
     </div>
     <div class="pweek">
       <span class="gw">GW10</span>
-      <span class="what">Thomas → De Cuyper<br>
-        <span class="muted">C: B.Fernandes &middot; 1 FT available</span></span>
-      <span class="epbar"><span class="track"><span class="fill" style="width:99%"></span></span><span class="v">60</span></span>
+      <span class="what">เก็บ transfer ไว้<br>
+        <span class="muted">กัปตัน: B.Fernandes &middot; มี 0 transfer</span></span>
+      <span class="epbar"><span class="track"><span class="fill" style="width:100%"></span></span><span class="v">60</span></span>
     </div>
   </div>
 </section>
 
 <section>
-  <h2>Fixture run</h2>
-  <p class="sub">Difficulty of every fixture your squad's clubs face. Lower is easier; the number is printed in each cell.</p>
+  <h2>โปรแกรมการแข่งขัน</h2>
+  <p class="sub">ความยากของคู่แข่งที่ทีมในสควอดคุณต้องเจอ · ตัวเลขน้อย = ง่ายกว่า</p>
   <div class="scroll"><table>
-    <thead><tr><th>Club</th><th class="r">GW5</th><th class="r">GW6</th><th class="r">GW7</th><th class="r">GW8</th><th class="r">GW9</th><th class="r">GW10</th><th class="r">Avg</th></tr></thead>
+    <thead><tr><th>สโมสร</th><th class="r">GW5</th><th class="r">GW6</th><th class="r">GW7</th><th class="r">GW8</th><th class="r">GW9</th><th class="r">GW10</th><th class="r">เฉลี่ย</th></tr></thead>
     <tbody>
       <tr>
         <td class="pname">Coventry City</td>
@@ -990,28 +1000,28 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
     </tbody>
   </table></div>
   <div class="legend">
-    <span><i style="background:var(--fdr2)"></i>Easy (2)</span>
-    <span><i style="background:var(--fdr3)"></i>Even (3)</span>
-    <span><i style="background:var(--fdr4)"></i>Hard (4)</span>
-    <span><i style="background:var(--fdr5)"></i>Very hard (5)</span>
-    <span style="color:var(--ink-3)">H home &middot; A away</span>
+    <span><i style="background:var(--fdr2)"></i>ง่าย (2)</span>
+    <span><i style="background:var(--fdr3)"></i>กลางๆ (3)</span>
+    <span><i style="background:var(--fdr4)"></i>ยาก (4)</span>
+    <span><i style="background:var(--fdr5)"></i>ยากมาก (5)</span>
+    <span style="color:var(--ink-3)">H เหย้า &middot; A เยือน</span>
   </div>
 </section>
 
 <section>
-  <h2>Watch list</h2>
-  <p class="sub">Availability and rotation risk inside your squad.</p>
+  <h2>รายการเฝ้าระวัง</h2>
+  <p class="sub">ความเสี่ยงเรื่องอาการบาดเจ็บและการหมุนเวียนตัวในทีมคุณ</p>
   <div class="flags">
     <div class="flag ">
-      <span class="tag">doubt</span>
+      <span class="tag">ต้องลุ้น</span>
       <span><b>Mendy</b> — Concussion - 50% chance of playing</span>
     </div>
   </div>
 </section>
 
 <footer>
-  Built from the official Fantasy Premier League API on 13 Sep 2026, 18:54. Expected points are a model estimate, not a prediction of the actual score.
-  Model v0.1.0 &middot; solver status Optimal.
+  สร้างจาก Fantasy Premier League API เมื่อ 13 Sep 2026, 19:04 · ตัวเลขคาดการณ์เป็นค่าประมาณเชิงสถิติ ไม่ใช่คำทำนายผลจริง
+  โมเดล v0.1.0 &middot; สถานะ solver: Optimal
 </footer>
 </div>
 

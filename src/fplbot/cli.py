@@ -15,11 +15,26 @@ from datetime import datetime, timezone
 import pandas as pd
 
 from . import features, model, optimize, report
-from .config import load_config
+from .config import load_config, selling_fee, verify_scoring
 from .fetch import (FPLClient, bank_and_value, deadline_utc, free_transfers,
-                    next_gameweek)
+                    next_gameweek, selling_prices)
 
 log = logging.getLogger("fplbot")
+
+
+def _setup_console() -> None:
+    """Make stdout able to carry Thai on a stock Windows console.
+
+    The default code page there is cp1252, which cannot encode Thai at all, so
+    printing the recommendation raises UnicodeEncodeError and takes the whole
+    run down *after* the dashboard has already been written successfully.
+    """
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            try:
+                stream.reconfigure(encoding="utf-8", errors="replace")
+            except (ValueError, OSError):
+                pass
 
 
 def _setup_logging(verbose: bool) -> None:
@@ -37,6 +52,12 @@ def build(args) -> int:
     log.info("fetching league data")
     bootstrap = client.bootstrap()
     fixtures = client.fixtures()
+
+    # A scoring rule that changed under us would silently poison every expected
+    # point, and nothing downstream would fail. Check it on every build.
+    for problem in verify_scoring(bootstrap):
+        log.warning("SCORING RULE MISMATCH — %s", problem)
+
     event = next_gameweek(bootstrap)
     if event is None:
         log.error("no upcoming gameweek found — season over?")
@@ -49,10 +70,11 @@ def build(args) -> int:
     history = client.entry_history()
     entry["__history__"] = history
     bank, squad_value = bank_and_value(entry)
-    ft = free_transfers(history, None)
+    ft = free_transfers(history)
 
     last_finished = gw - 1
     current_squad: list[int] = []
+    picks = None
     try:
         picks = client.entry_picks(last_finished)
         current_squad = [int(p["element"]) for p in picks["picks"]]
@@ -66,13 +88,32 @@ def build(args) -> int:
     horizon = cfg.horizon
     schedule = features.build_schedule(fixtures, players, gw, horizon)
     horizon_gws = sorted(schedule.gw.unique().tolist())[:horizon]
+    if not horizon_gws:
+        log.error("no fixtures scheduled from GW%s onward — nothing to plan", gw)
+        return 1
 
     log.info("scoring %s players over GW%s-%s", len(players), horizon_gws[0], horizon_gws[-1])
     ep_rows = model.expected_points(players, teams, schedule, cfg)
     ep_grid = model.per_gameweek(ep_rows, horizon_gws)
 
+    try:
+        transfers = client.entry_transfers()
+    except Exception as exc:
+        log.warning("could not read your transfer history (%s)", exc)
+        transfers = []
+    sell_at = selling_prices(current_squad, transfers, players, selling_fee(bootstrap))
+    if sell_at:
+        gap = sum(players.price.get(p, 0.0) for p in sell_at) - sum(sell_at.values())
+        log.info("selling prices reconstructed for %d players — %.1fm below market value",
+                 len(sell_at), gap)
+    else:
+        log.warning("no selling prices available — budget uses market value, "
+                    "which is optimistic if your squad has risen in price")
+
+    locked = [int(p) for p in (cfg.get("strategy", "never_sell", default=[]) or [])]
     log.info("solving the transfer plan")
-    plan = optimize.solve(ep_grid, players, current_squad, bank, ft, cfg)
+    plan = optimize.solve(ep_grid, players, current_squad, bank, ft, cfg,
+                          selling_price=sell_at, locked=locked)
     log.info("solver: %s  objective %.1f  budget %.1fm",
              plan.status, plan.objective, plan.budget)
 
@@ -128,6 +169,7 @@ def main(argv: list[str] | None = None) -> int:
     p_check.set_defaults(func=check)
 
     args = parser.parse_args(argv)
+    _setup_console()
     _setup_logging(args.verbose)
     pd.set_option("display.width", 160)
     try:

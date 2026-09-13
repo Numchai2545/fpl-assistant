@@ -7,9 +7,8 @@ file straight from disk and it still works.
 from __future__ import annotations
 
 import json
-import math
 import shutil
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -40,7 +39,7 @@ def _rank(value) -> str:
 
 def _opponent_label(rows: pd.DataFrame, teams: pd.DataFrame) -> str:
     if rows.empty:
-        return "blank"
+        return "ไม่มีเกม"
     parts = []
     for _, r in rows.iterrows():
         short = teams.short_name.get(int(r.opponent), "?")
@@ -81,6 +80,8 @@ def build_context(*, cfg: Config, bootstrap: dict, teams: pd.DataFrame,
     pitch_rows = [[c for c in xi_cards if c["position"] == pos] for pos in ("GKP", "DEF", "MID", "FWD")]
     pitch_rows = [row for row in pitch_rows if row]
     bench = [card(p) for p in first.bench]
+    bench_gk = [card(p) for p in (first.bench_gk or [])]
+    bench_outfield = [card(p) for p in (first.bench_outfield or [])]
 
     # ---- captain shortlist ----------------------------------------------
     cap_pool = (this_gw[this_gw.player_id.isin(first.xi)]
@@ -123,13 +124,13 @@ def build_context(*, cfg: Config, bootstrap: dict, teams: pd.DataFrame,
     for r in owned.nsmallest(6, "ep_total").itertuples():
         reasons = []
         if r.p_available < 0.75:
-            reasons.append("availability doubt")
+            reasons.append("มีปัญหาเรื่องความพร้อม")
         if r.p_start < 0.6:
-            reasons.append(f"starts {r.p_start:.0%} of the time")
+            reasons.append(f"ลงตัวจริงแค่ {r.p_start:.0%}")
         if r.price_trend == "falling":
-            reasons.append("price falling")
+            reasons.append("ราคากำลังตก")
         if not reasons:
-            reasons.append("fixtures and form both below the alternatives")
+            reasons.append("โปรแกรมและฟอร์มสู้ตัวเลือกอื่นไม่ได้")
         sells.append({
             "name": r.name, "team": r.team_name,
             "position": POSITIONS[int(r.element_type)], "price": float(r.price),
@@ -138,38 +139,40 @@ def build_context(*, cfg: Config, bootstrap: dict, teams: pd.DataFrame,
         })
 
     # ---- this week's action ----------------------------------------------
-    moves = [{"out": id_to_name.get(o, str(o)), "in_": id_to_name.get(i, str(i))}
-             for o, i in zip(first.sells, first.buys)]
+    # Pairs come from the solver already matched by position, so each one is a
+    # transfer that FPL will actually accept.
+    moves = [{"out": id_to_name.get(o, str(o)), "in_": id_to_name.get(i, str(i)),
+              "in": id_to_name.get(i, str(i))}
+             for o, i in (first.moves or list(zip(first.sells, first.buys)))]
     captain_name = id_to_name.get(first.captain, "—")
     if moves:
         n = len(moves)
-        headline = f"Make {n} transfer{'s' if n > 1 else ''}, captain {captain_name}"
+        headline = f"เปลี่ยนตัว {n} คน · กัปตัน {captain_name}"
         free_used = n - first.hits
         if first.hits:
-            detail = (f"{free_used} free, {first.hits} paid — costs "
-                      f"{first.hits * 4} points. ")
+            detail = (f"ใช้ฟรี {free_used} ครั้ง จ่ายเพิ่ม {first.hits} ครั้ง "
+                      f"(เสีย {first.hits * 4} แต้ม). ")
         else:
-            detail = (f"Uses {free_used} of your {free_transfers} free "
-                      f"transfer{'s' if free_transfers > 1 else ''}, no hit. ")
-        detail += f"Projected {first.expected_points:.0f} points for GW{gw}."
+            detail = f"ใช้ {free_used} จาก {free_transfers} ครั้งที่มี ไม่เสียแต้ม. "
+        detail += f"คาดการณ์ {first.expected_points:.0f} แต้มใน GW{gw}"
     else:
-        headline = f"No transfer this week — captain {captain_name}"
-        nxt = next((w for w in plan.gameweeks[1:] if w.buys), None)
-        detail = (f"Bank the free transfer; the plan spends it in GW{nxt.gw}. "
-                  if nxt else "Bank the free transfer. ")
-        detail += f"Projected {first.expected_points:.0f} points for GW{gw}."
+        headline = f"ไม่ต้องเปลี่ยนตัว · กัปตัน {captain_name}"
+        nxt = next((w for w in plan.gameweeks[1:] if (w.moves or w.buys)), None)
+        detail = (f"เก็บ transfer ไว้ก่อน แผนจะใช้ใน GW{nxt.gw}. "
+                  if nxt else "เก็บ transfer ไว้ก่อน. ")
+        detail += f"คาดการณ์ {first.expected_points:.0f} แต้มใน GW{gw}"
     action = {"headline": headline, "detail": detail, "moves": moves}
 
     # ---- the horizon plan -------------------------------------------------
     max_ep = max((w.expected_points for w in plan.gameweeks), default=1.0) or 1.0
     plan_rows = []
     for w in plan.gameweeks:
-        if w.buys:
+        pairs = w.moves or list(zip(w.sells, w.buys))
+        if pairs:
             summary = ", ".join(
-                f"{id_to_name.get(o, o)} → {id_to_name.get(i, i)}"
-                for o, i in zip(w.sells, w.buys))
+                f"{id_to_name.get(o, o)} → {id_to_name.get(i, i)}" for o, i in pairs)
         else:
-            summary = "Hold — bank the transfer"
+            summary = "เก็บ transfer ไว้"
         plan_rows.append({
             "gw": w.gw, "summary": summary, "hits": w.hits,
             "captain": id_to_name.get(w.captain, "—"),
@@ -198,23 +201,47 @@ def build_context(*, cfg: Config, bootstrap: dict, teams: pd.DataFrame,
     fixture_grid.sort(key=lambda r: r["avg"])
 
     # ---- watch list -------------------------------------------------------
+    # `alerts` is the subset that belongs in a push notification: a problem in
+    # the XI you are about to field. Everything else is context for the page.
     flags = []
+    alerts: list[str] = []
+    xi_set = set(first.xi)
     for pid in first.squad:
         if pid not in players.index:
             continue
         p = players.loc[pid]
+        in_xi = pid in xi_set
+        news = (p.get("news") or "").strip()
         if p.p_available < 0.5:
-            flags.append({"tag": "availability", "severity": "high", "name": p["name"],
-                          "detail": (p.get("news") or "flagged by FPL").strip()})
+            flags.append({"tag": "ไม่พร้อมลง", "severity": "high", "name": p["name"],
+                          "in_xi": in_xi,
+                          "detail": news or "FPL ติดธงว่าไม่พร้อมลงเล่น"})
+            if in_xi:
+                alerts.append(f"{p['name']} ไม่พร้อมลง แต่ยังอยู่ในตัวจริง"
+                              + (f" — {news}" if news else ""))
         elif p.p_available < 1.0:
-            flags.append({"tag": "doubt", "severity": "medium", "name": p["name"],
-                          "detail": (p.get("news") or "listed as doubtful").strip()})
+            flags.append({"tag": "ต้องลุ้น", "severity": "medium", "name": p["name"],
+                          "in_xi": in_xi,
+                          "detail": news or "FPL ระบุว่ามีโอกาสไม่ได้ลง"})
+            if in_xi:
+                alerts.append(f"{p['name']} ยังไม่ชัวร์ว่าได้ลง"
+                              + (f" — {news}" if news else ""))
         elif p.p_start < 0.55 and p.minutes > 0:
-            flags.append({"tag": "rotation", "severity": "medium", "name": p["name"],
-                          "detail": f"started only {p.p_start:.0%} of his club's matches"})
+            flags.append({"tag": "หมุนเวียน", "severity": "medium", "name": p["name"],
+                          "in_xi": in_xi,
+                          "detail": f"ลงตัวจริงแค่ {p.p_start:.0%} ของนัดที่ทีมเตะ"})
         if int(p.get("yellow_cards", 0)) >= 4:
-            flags.append({"tag": "suspension", "severity": "medium", "name": p["name"],
-                          "detail": f"{int(p.yellow_cards)} yellow cards — one away from a ban"})
+            flags.append({"tag": "เสี่ยงโดนแบน", "severity": "medium", "name": p["name"],
+                          "in_xi": in_xi,
+                          "detail": f"ใบเหลือง {int(p.yellow_cards)} ใบ — อีกใบเดียวโดนแบน"})
+
+    # The captain not playing is the single most expensive thing that can go
+    # wrong, so it is checked separately and always leads.
+    if first.captain in players.index:
+        cap_row = players.loc[first.captain]
+        if cap_row.p_available < 1.0:
+            alerts.insert(0, f"กัปตัน {cap_row['name']} ไม่ชัวร์ว่าได้ลง — เปลี่ยนกัปตันด่วน")
+    flags.sort(key=lambda f: (f["severity"] != "high", not f["in_xi"]))
 
     history = entry.get("__history__", {})
     last_gw_points = 0
@@ -224,6 +251,7 @@ def build_context(*, cfg: Config, bootstrap: dict, teams: pd.DataFrame,
     return {
         "title": cfg.get("output", "title", default="FPL Assistant"),
         "gw": gw, "horizon": len(horizon_gws), "horizon_gws": horizon_gws,
+        "captain_name": captain_name,
         "built_at": datetime.now(tz).strftime("%d %b %Y, %H:%M"),
         "deadline_iso": deadline.isoformat(),
         "deadline_human": f"{int(hours_left // 24)}d {int(hours_left % 24)}h" if hours_left >= 24
@@ -238,9 +266,11 @@ def build_context(*, cfg: Config, bootstrap: dict, teams: pd.DataFrame,
         "free_transfers": free_transfers, "bank": bank, "squad_value": squad_value,
         "this_gw_ep": first.expected_points,
         "action": action, "pitch_rows": pitch_rows, "bench": bench,
+        "bench_gk": bench_gk, "bench_outfield": bench_outfield,
         "captains": captains, "targets": targets, "sells": sells,
         "plan": plan_rows, "plan_notes": " ".join(plan.notes),
-        "fixture_grid": fixture_grid, "flags": flags[:10],
+        "fixture_grid": fixture_grid, "flags": flags[:10], "alerts": alerts,
+        "site_url": cfg.get("notify", "site_url", default="") or "",
         "model_version": MODEL_VERSION, "solver_status": plan.status,
     }
 
@@ -259,11 +289,18 @@ def render(context: dict, cfg: Config) -> Path:
             shutil.copy2(src, out_dir / asset)
 
     # A machine-readable copy, for the notifier and for future backtesting.
+    # The captain comes from the plan, not from the captain shortlist: the
+    # shortlist is sorted by expected points and can disagree with the armband
+    # the solver actually chose, and the alert must match the dashboard.
     (out_dir / "summary.json").write_text(json.dumps({
         "gw": context["gw"], "deadline": context["deadline_iso"],
+        "deadline_local": context["deadline_local"],
         "headline": context["action"]["headline"], "detail": context["action"]["detail"],
-        "captain": context["captains"][0]["name"] if context["captains"] else None,
+        "captain": context["captain_name"],
+        "moves": [{"out": m["out"], "in": m["in_"]} for m in context["action"]["moves"]],
+        "alerts": context["alerts"],
         "expected_points": context["this_gw_ep"],
+        "site_url": context["site_url"],
         "plan": context["plan"], "built_at": context["built_at"],
-    }, indent=2), encoding="utf-8")
+    }, indent=2, ensure_ascii=False), encoding="utf-8")
     return index

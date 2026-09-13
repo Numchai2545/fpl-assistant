@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="en">
+<html lang="th">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>{{ title }}</title>
-<meta name="description" content="Expected points, captain picks and a {{ horizon }}-gameweek transfer plan.">
+<meta name="description" content="แต้มที่คาดว่าจะได้ ตัวเลือกกัปตัน และแผนเปลี่ยนตัว {{ horizon }} วีคข้างหน้า">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#1A1420" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
@@ -14,7 +14,7 @@
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
 :root{
   --ground:#F6F4F8; --surface:#FFFFFF; --surface-2:#EFEAF2; --surface-3:#E5DEEA;
@@ -52,10 +52,10 @@
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--ground);color:var(--ink);
-  font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;font-size:15px;line-height:1.6;
+  font-family:"IBM Plex Sans Thai","IBM Plex Sans",system-ui,-apple-system,sans-serif;font-size:15px;line-height:1.7;
   -webkit-font-smoothing:antialiased;padding-bottom:env(safe-area-inset-bottom)}
 .wrap{max-width:1000px;margin:0 auto;padding-left:18px;padding-right:18px;padding-block:0 60px}
-h1,h2,h3,.disp{font-family:"Bai Jamjuree","IBM Plex Sans",sans-serif;text-wrap:balance;margin:0}
+h1,h2,h3,.disp{font-family:"Bai Jamjuree","IBM Plex Sans Thai",sans-serif;text-wrap:balance;margin:0}
 .mono,.num{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
 a{color:var(--accent)}
 
@@ -64,7 +64,7 @@ header{padding-block:26px 20px;display:flex;flex-wrap:wrap;gap:16px;align-items:
 .brand .eyebrow{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
 .brand h1{font-size:clamp(22px,4.6vw,30px);font-weight:700;line-height:1.15;margin-top:3px}
 .countdown{text-align:right}
-.countdown .lab{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+.countdown .lab{font-size:11.5px;letter-spacing:.04em;color:var(--ink-3);font-weight:600}
 .countdown .val{font-family:"IBM Plex Mono",monospace;font-size:clamp(20px,4.4vw,26px);font-weight:600;line-height:1.2;color:var(--accent)}
 .countdown .sub{font-size:12px;color:var(--ink-2)}
 .countdown.urgent .val{color:var(--crit)}
@@ -72,14 +72,14 @@ header{padding-block:26px 20px;display:flex;flex-wrap:wrap;gap:16px;align-items:
 /* tiles */
 .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0;margin:0}
 .tile{padding:14px 14px 15px 0;border-bottom:1px solid var(--rule)}
-.tile dt{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin-bottom:2px}
+.tile dt{font-size:11px;letter-spacing:.04em;color:var(--ink-3);font-weight:600;margin-bottom:2px}
 .tile dd{margin:0;font-family:"IBM Plex Mono",monospace;font-size:21px;font-weight:600;line-height:1.2}
-.tile small{display:block;font-family:"IBM Plex Sans",sans-serif;font-size:12px;color:var(--ink-2);font-weight:400}
+.tile small{display:block;font-family:"IBM Plex Sans Thai",sans-serif;font-size:12px;color:var(--ink-2);font-weight:400}
 
 /* action banner */
 .action{background:var(--surface);border:1px solid var(--rule-strong);border-left:4px solid var(--accent);
   border-radius:8px;padding:18px 20px;margin:26px 0 0;box-shadow:var(--shadow)}
-.action .lab{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--accent);font-weight:600;font-family:"Bai Jamjuree",sans-serif}
+.action .lab{font-size:11.5px;letter-spacing:.05em;color:var(--accent);font-weight:600;font-family:"Bai Jamjuree",sans-serif}
 .action .headline{font-family:"Bai Jamjuree",sans-serif;font-size:clamp(17px,3.4vw,21px);font-weight:600;margin:5px 0 0;line-height:1.35}
 .action .detail{color:var(--ink-2);font-size:14px;margin-top:7px}
 .move{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
@@ -128,9 +128,18 @@ td.r,th.r{text-align:right;font-family:"IBM Plex Mono",monospace;font-variant-nu
 .card .badge{display:inline-block;font-size:9.5px;font-weight:700;background:var(--accent);color:var(--surface);
   border-radius:3px;padding:0 4px;margin-left:3px;vertical-align:1px;font-family:"IBM Plex Mono",monospace}
 .benchrow{border-top:1px dashed var(--rule-strong);margin-top:14px;padding-top:14px}
-.benchrow .lab{text-align:center;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin-bottom:9px}
+.benchrow .lab{text-align:center;font-size:11px;letter-spacing:.03em;color:var(--ink-3);font-weight:600;margin-bottom:9px}
 .benchrow .row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
-.benchrow .card{min-width:0}
+.benchrow .card{min-width:0;position:relative}
+.card .slot{font-family:"IBM Plex Mono",monospace;font-size:9.5px;font-weight:600;color:var(--ink-3);
+  letter-spacing:.06em;margin-bottom:1px}
+.card.gkslot{background:var(--surface-3)}
+
+/* alerts: the thing that actually costs points when a deadline is missed */
+.action.alert{border-left-color:var(--crit);background:var(--crit-soft)}
+.action.alert .lab{color:var(--crit)}
+.alertlist{margin:8px 0 0;padding-left:18px;display:grid;gap:5px}
+.alertlist li{font-size:14.5px;font-weight:500}
 
 /* plan */
 .plan{display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:8px;overflow:hidden}
@@ -149,7 +158,7 @@ td.r,th.r{text-align:right;font-family:"IBM Plex Mono",monospace;font-variant-nu
 .flag{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:baseline;background:var(--surface);
   border:1px solid var(--rule);border-left:3px solid var(--warn);border-radius:7px;padding:11px 14px;font-size:13.5px}
 .flag.crit{border-left-color:var(--crit)}
-.flag .tag{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:4px;
+.flag .tag{font-size:10.5px;font-weight:700;letter-spacing:.03em;padding:2px 7px;border-radius:4px;
   background:var(--warn-soft);color:var(--warn);white-space:nowrap;font-family:"Bai Jamjuree",sans-serif}
 .flag.crit .tag{background:var(--crit-soft);color:var(--crit)}
 
@@ -173,22 +182,31 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
     <h1>{{ title }}</h1>
   </div>
   <div class="countdown {% if hours_left < 24 %}urgent{% endif %}">
-    <div class="lab">Deadline</div>
+    <div class="lab">ปิดจัดตัวใน</div>
     <div class="val" id="cd" data-deadline="{{ deadline_iso }}">{{ deadline_human }}</div>
     <div class="sub">{{ deadline_local }}</div>
   </div>
 </header>
 
 <dl class="tiles">
-  <div class="tile"><dt>Overall points</dt><dd>{{ entry.total_points }}<small>rank {{ entry.rank_human }}</small></dd></div>
-  <div class="tile"><dt>Last gameweek</dt><dd>{{ entry.last_gw_points }}<small>GW{{ gw - 1 }}</small></dd></div>
-  <div class="tile"><dt>Free transfers</dt><dd>{{ free_transfers }}<small>max 5 banked</small></dd></div>
-  <div class="tile"><dt>In the bank</dt><dd>{{ "%.1f"|format(bank) }}<small>squad {{ "%.1f"|format(squad_value) }}m</small></dd></div>
-  <div class="tile"><dt>Projected GW{{ gw }}</dt><dd>{{ "%.0f"|format(this_gw_ep) }}<small>expected points</small></dd></div>
+  <div class="tile"><dt>แต้มรวม</dt><dd>{{ entry.total_points }}<small>อันดับ {{ entry.rank_human }}</small></dd></div>
+  <div class="tile"><dt>วีคที่แล้ว</dt><dd>{{ entry.last_gw_points }}<small>GW{{ gw - 1 }}</small></dd></div>
+  <div class="tile"><dt>เปลี่ยนตัวฟรี</dt><dd>{{ free_transfers }}<small>เก็บได้สูงสุด 5</small></dd></div>
+  <div class="tile"><dt>เงินเหลือ</dt><dd>{{ "%.1f"|format(bank) }}<small>มูลค่าทีม {{ "%.1f"|format(squad_value) }}m</small></dd></div>
+  <div class="tile"><dt>คาดการณ์ GW{{ gw }}</dt><dd>{{ "%.0f"|format(this_gw_ep) }}<small>แต้มที่คาดว่าจะได้</small></dd></div>
 </dl>
 
+{% if alerts %}
+<div class="action alert">
+  <div class="lab">ต้องแก้ก่อนปิด</div>
+  <ul class="alertlist">
+    {% for a in alerts %}<li>{{ a }}</li>{% endfor %}
+  </ul>
+</div>
+{% endif %}
+
 <div class="action">
-  <div class="lab">Do this before the deadline</div>
+  <div class="lab">ทำแค่นี้ก่อนหมดเวลา</div>
   <p class="headline">{{ action.headline }}</p>
   {% if action.moves %}
   <div class="move">
@@ -201,8 +219,8 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
 </div>
 
 <section>
-  <h2>Your team for GW{{ gw }}</h2>
-  <p class="sub">Ordered by expected points. (C) is the captain, (V) the vice.</p>
+  <h2>ทีมของคุณสำหรับ GW{{ gw }}</h2>
+  <p class="sub">เรียงตามแต้มที่คาดว่าจะได้ · C คือกัปตัน, V คือรองกัปตัน</p>
   <div class="pitch">
     {% for line in pitch_rows %}
     <div class="row">
@@ -216,10 +234,13 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
     </div>
     {% endfor %}
     <div class="benchrow">
-      <div class="lab">Bench &middot; in order</div>
-      <div class="row">
-        {% for p in bench %}
-        <div class="card"><div class="nm">{{ p.name }}</div><div class="ep">{{ "%.1f"|format(p.ep) }}</div><div class="op">{{ p.opponent }}</div></div>
+      <div class="lab">ตัวสำรอง &middot; เรียงตามลำดับที่จะถูกเปลี่ยนเข้า</div>
+      <div class="row benchgrid">
+        {% for p in bench_gk %}
+        <div class="card gkslot"><div class="slot">GK</div><div class="nm">{{ p.name }}</div><div class="ep">{{ "%.1f"|format(p.ep) }}</div><div class="op">{{ p.opponent }}</div></div>
+        {% endfor %}
+        {% for p in bench_outfield %}
+        <div class="card"><div class="slot">{{ loop.index }}</div><div class="nm">{{ p.name }}</div><div class="ep">{{ "%.1f"|format(p.ep) }}</div><div class="op">{{ p.opponent }}</div></div>
         {% endfor %}
       </div>
     </div>
@@ -227,10 +248,10 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
 </section>
 
 <section>
-  <h2>Captain shortlist</h2>
-  <p class="sub">Expected points if they wear the armband, before the doubling.</p>
+  <h2>ตัวเลือกกัปตัน</h2>
+  <p class="sub">แต้มที่คาดว่าจะได้ ก่อนคูณสอง</p>
   <div class="scroll"><table>
-    <thead><tr><th>Player</th><th>Opponent</th><th class="r">xG</th><th class="r">xA</th><th class="r">Bonus</th><th class="r">EP</th></tr></thead>
+    <thead><tr><th>ผู้เล่น</th><th>คู่แข่ง</th><th class="r">xG</th><th class="r">xA</th><th class="r">Bonus</th><th class="r">EP</th></tr></thead>
     <tbody>
     {% for p in captains %}
       <tr>
@@ -247,8 +268,8 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
 </section>
 
 <section>
-  <h2>Transfer targets</h2>
-  <p class="sub">Best expected points over the next {{ horizon }} gameweeks, per position. Players you already own are excluded.</p>
+  <h2>ตัวที่น่าซื้อ</h2>
+  <p class="sub">แต้มที่คาดว่าจะได้สูงสุดใน {{ horizon }} วีคข้างหน้า แยกตามตำแหน่ง (ไม่รวมคนที่คุณมีอยู่แล้ว)</p>
   <div class="tabs" role="tablist">
     {% for pos in ["GKP","DEF","MID","FWD"] %}
     <button role="tab" data-pos="{{ pos }}" aria-selected="{{ 'true' if pos=='MID' else 'false' }}">{{ pos }}</button>
@@ -256,7 +277,7 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
   </div>
   {% for pos in ["GKP","DEF","MID","FWD"] %}
   <div class="scroll target-panel" data-pos="{{ pos }}" {% if pos!='MID' %}hidden{% endif %}><table>
-    <thead><tr><th>Player</th><th class="r">£</th><th class="r">Own%</th><th class="r">Price</th><th class="r">GW{{ gw }}</th><th class="r">Next {{ horizon }}</th><th class="r">EP / £m</th></tr></thead>
+    <thead><tr><th>ผู้เล่น</th><th class="r">£</th><th class="r">%ถือครอง</th><th class="r">แนวโน้ม</th><th class="r">GW{{ gw }}</th><th class="r">{{ horizon }} วีค</th><th class="r">EP / £m</th></tr></thead>
     <tbody>
     {% for p in targets[pos] %}
       <tr>
@@ -276,10 +297,10 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
 </section>
 
 <section>
-  <h2>Sell candidates</h2>
-  <p class="sub">Players in your squad whose next {{ horizon }} gameweeks look weakest for the money.</p>
+  <h2>ตัวที่ควรขาย</h2>
+  <p class="sub">คนในทีมคุณที่ {{ horizon }} วีคข้างหน้าดูอ่อนที่สุดเมื่อเทียบกับราคา</p>
   <div class="scroll"><table>
-    <thead><tr><th>Player</th><th class="r">£</th><th class="r">Next {{ horizon }}</th><th class="r">EP / £m</th><th>Why</th></tr></thead>
+    <thead><tr><th>ผู้เล่น</th><th class="r">£</th><th class="r">{{ horizon }} วีค</th><th class="r">EP / £m</th><th>เหตุผล</th></tr></thead>
     <tbody>
     {% for p in sells %}
       <tr>
@@ -295,14 +316,14 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
 </section>
 
 <section>
-  <h2>The next {{ horizon }} gameweeks</h2>
-  <p class="sub">One plan solved as a whole, not six decisions made one at a time.</p>
+  <h2>แผน {{ horizon }} วีคข้างหน้า</h2>
+  <p class="sub">คำนวณทั้ง {{ horizon }} วีคพร้อมกัน ไม่ใช่ตัดสินใจทีละวีค</p>
   <div class="plan">
     {% for w in plan %}
     <div class="pweek">
       <span class="gw">GW{{ w.gw }}</span>
-      <span class="what">{{ w.summary }}{% if w.hits %} <span class="muted">&middot; &minus;{{ w.hits * 4 }} hit</span>{% endif %}<br>
-        <span class="muted">C: {{ w.captain }} &middot; {{ w.ft }} FT available</span></span>
+      <span class="what">{{ w.summary }}{% if w.hits %} <span class="muted">&middot; &minus;{{ w.hits * 4 }} แต้ม</span>{% endif %}<br>
+        <span class="muted">กัปตัน: {{ w.captain }} &middot; มี {{ w.ft }} transfer</span></span>
       <span class="epbar"><span class="track"><span class="fill" style="width:{{ w.bar }}%"></span></span><span class="v">{{ "%.0f"|format(w.ep) }}</span></span>
     </div>
     {% endfor %}
@@ -311,16 +332,16 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
 </section>
 
 <section>
-  <h2>Fixture run</h2>
-  <p class="sub">Difficulty of every fixture your squad's clubs face. Lower is easier; the number is printed in each cell.</p>
+  <h2>โปรแกรมการแข่งขัน</h2>
+  <p class="sub">ความยากของคู่แข่งที่ทีมในสควอดคุณต้องเจอ · ตัวเลขน้อย = ง่ายกว่า</p>
   <div class="scroll"><table>
-    <thead><tr><th>Club</th>{% for g in horizon_gws %}<th class="r">GW{{ g }}</th>{% endfor %}<th class="r">Avg</th></tr></thead>
+    <thead><tr><th>สโมสร</th>{% for g in horizon_gws %}<th class="r">GW{{ g }}</th>{% endfor %}<th class="r">เฉลี่ย</th></tr></thead>
     <tbody>
     {% for row in fixture_grid %}
       <tr>
         <td class="pname">{{ row.team }}</td>
         {% for cell in row.cells %}
-        <td class="r">{% if cell.games %}{% for g in cell.games %}<span class="fdr d{{ g.fdr }}">{{ g.label }} {{ g.fdr }}</span>{% endfor %}{% else %}<span class="fdr blank">blank</span>{% endif %}</td>
+        <td class="r">{% if cell.games %}{% for g in cell.games %}<span class="fdr d{{ g.fdr }}">{{ g.label }} {{ g.fdr }}</span>{% endfor %}{% else %}<span class="fdr blank">ไม่มีเกม</span>{% endif %}</td>
         {% endfor %}
         <td class="r">{{ "%.2f"|format(row.avg) }}</td>
       </tr>
@@ -328,18 +349,18 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
     </tbody>
   </table></div>
   <div class="legend">
-    <span><i style="background:var(--fdr2)"></i>Easy (2)</span>
-    <span><i style="background:var(--fdr3)"></i>Even (3)</span>
-    <span><i style="background:var(--fdr4)"></i>Hard (4)</span>
-    <span><i style="background:var(--fdr5)"></i>Very hard (5)</span>
-    <span style="color:var(--ink-3)">H home &middot; A away</span>
+    <span><i style="background:var(--fdr2)"></i>ง่าย (2)</span>
+    <span><i style="background:var(--fdr3)"></i>กลางๆ (3)</span>
+    <span><i style="background:var(--fdr4)"></i>ยาก (4)</span>
+    <span><i style="background:var(--fdr5)"></i>ยากมาก (5)</span>
+    <span style="color:var(--ink-3)">H เหย้า &middot; A เยือน</span>
   </div>
 </section>
 
 {% if flags %}
 <section>
-  <h2>Watch list</h2>
-  <p class="sub">Availability and rotation risk inside your squad.</p>
+  <h2>รายการเฝ้าระวัง</h2>
+  <p class="sub">ความเสี่ยงเรื่องอาการบาดเจ็บและการหมุนเวียนตัวในทีมคุณ</p>
   <div class="flags">
     {% for f in flags %}
     <div class="flag {{ 'crit' if f.severity=='high' else '' }}">
@@ -352,8 +373,8 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
 {% endif %}
 
 <footer>
-  Built from the official Fantasy Premier League API on {{ built_at }}. Expected points are a model estimate, not a prediction of the actual score.
-  Model v{{ model_version }} &middot; solver status {{ solver_status }}.
+  สร้างจาก Fantasy Premier League API เมื่อ {{ built_at }} · ตัวเลขคาดการณ์เป็นค่าประมาณเชิงสถิติ ไม่ใช่คำทำนายผลจริง
+  โมเดล v{{ model_version }} &middot; สถานะ solver: {{ solver_status }}
 </footer>
 </div>
 

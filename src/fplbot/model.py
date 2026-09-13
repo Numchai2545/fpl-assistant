@@ -175,7 +175,6 @@ def _expected_concede_penalty(lam: np.ndarray) -> np.ndarray:
 def _apply_strategy(s: pd.DataFrame, cfg: Config) -> pd.DataFrame:
     mode = cfg.get("strategy", "mode", default="balanced")
     weight = float(cfg.get("strategy", "differential_weight", default=0.0) or 0.0)
-    s["ep_raw"] = s.ep
     if mode == "balanced" or weight == 0.0:
         return s
     own = pd.to_numeric(s.selected_by_percent, errors="coerce").fillna(0.0)
