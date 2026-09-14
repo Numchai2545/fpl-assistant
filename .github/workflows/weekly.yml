@@ -1,27 +1,12 @@
-name: Build FPL dashboard
+name: Check FPL assistant manually
 
-# Runs in GitHub's cloud, so the dashboard is fresh whether or not your PC is on.
-#
-# The schedule is deliberately dense in the 48 hours before a normal Saturday
-# deadline, because the requirement is that the data is READY at least 24 hours
-# before the deadline — not that a job ran at some point that week. Deadlines
-# move (midweek gameweeks, cup finals), so `notify` decides for itself whether a
-# reminder is due rather than trusting the cron to line up.
+# The product is intentionally user-driven. This workflow is only a manual
+# verification option; it never changes the FPL team or publishes a report.
 on:
-  schedule:
-    - cron: "40 2 * * *"      # 09:40 Bangkok, daily — after overnight price changes
-    - cron: "0 13 * * *"      # 20:00 Bangkok, daily
-    - cron: "0 8,17 * * 3,4,5"  # 15:00 & 00:00 Bangkok, Wed-Fri — the 48h/24h window
   workflow_dispatch:
 
 permissions:
-  contents: write
-  pages: write
-  id-token: write
-
-concurrency:
-  group: fpl-dashboard
-  cancel-in-progress: false
+  contents: read
 
 jobs:
   build:
@@ -37,7 +22,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r requirements-lock.txt
 
       # The model is only as good as its arithmetic, and a wrong constant is
       # silent. Never publish a dashboard from a tree whose tests fail.
@@ -51,23 +36,4 @@ jobs:
           PYTHONPATH: src
           PYTHONIOENCODING: utf-8
           FPL_TEAM_ID: ${{ vars.FPL_TEAM_ID }}
-        run: python -m fplbot build -v
-
-      # Reminder state lives in data/, which is committed, so a reminder that
-      # has already gone out is not sent again by the next scheduled run.
-      - name: Send deadline reminder
-        env:
-          PYTHONPATH: src
-          PYTHONIOENCODING: utf-8
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: python -m fplbot notify
-        continue-on-error: true
-
-      - name: Commit the refreshed dashboard
-        run: |
-          git config user.name  "fpl-assistant"
-          git config user.email "actions@users.noreply.github.com"
-          git add docs data/notified
-          git diff --staged --quiet || git commit -m "dashboard: $(date -u +'%Y-%m-%d %H:%M UTC')"
-          git push
+        run: python -m fplbot -v build

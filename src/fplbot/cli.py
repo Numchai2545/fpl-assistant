@@ -4,6 +4,7 @@
     python -m fplbot build --offline  rebuild from today's cached snapshot
     python -m fplbot notify         send the alert if the deadline is close
     python -m fplbot check          print the next deadline and exit
+    python -m fplbot backtest       evaluate frozen projections after matches
 """
 from __future__ import annotations
 
@@ -14,10 +15,10 @@ from datetime import datetime, timezone
 
 import pandas as pd
 
-from . import calendar_feed, features, model, optimize, report
+from . import backtest, calendar_feed, features, model, optimize, report
 from .config import load_config, selling_fee, verify_scoring
-from .fetch import (FPLClient, bank_and_value, deadline_utc, free_transfers,
-                    next_gameweek, selling_prices)
+from .fetch import (FPLClient, apply_event_transfer_state, bank_and_value,
+                    deadline_utc, free_transfers, next_gameweek, selling_prices)
 
 log = logging.getLogger("fplbot")
 
@@ -82,11 +83,46 @@ def build(args) -> int:
         log.warning("could not read GW%s picks (%s) — planning from scratch",
                     last_finished, exc)
 
+    try:
+        transfers = client.entry_transfers()
+    except Exception as exc:
+        log.warning("could not read your transfer history (%s)", exc)
+        transfers = []
+    current_squad, bank, moves_already_made = apply_event_transfer_state(
+        current_squad, bank, transfers, gw)
+    if moves_already_made:
+        ft = max(0, ft - moves_already_made)
+        log.info("applied %d transfer(s) already made in GW%s; current bank %.1fm",
+                 moves_already_made, gw, bank)
+
     log.info("building features")
     teams = features.build_teams(bootstrap)
     players = features.build_players(bootstrap, teams, fixtures)
+    shortlist = features.minutes_shortlist(
+        players, current_squad,
+        int(cfg.get("planning", "minutes_shortlist", default=30)))
+    if client.offline:
+        shortlist = [pid for pid in shortlist
+                     if (client.snapshot_dir / f"element_{pid}.json").exists()]
+    histories: dict[int, dict] = {}
+    for pid in shortlist:
+        try:
+            histories[pid] = client.element_summary(pid)
+        except Exception as exc:
+            log.debug("minutes history unavailable for element %s: %s", pid, exc)
+    if histories:
+        log.info("using recent match histories for %d/%d shortlisted players",
+                 len(histories), len(shortlist))
+        players = features.apply_recent_minutes(players, histories, cfg)
+    else:
+        log.warning("recent match histories unavailable — using season minutes fallback")
+    players = features.apply_price_forecast(players, cfg)
     horizon = cfg.horizon
-    schedule = features.build_schedule(fixtures, players, gw, horizon)
+    outlook_matches = int(cfg.get("planning", "outlook_matches", default=5))
+    # Pull a little beyond the optimiser horizon so a blank gameweek does not
+    # leave a player's five-match buying window one fixture short.
+    schedule = features.build_schedule(
+        fixtures, players, gw, max(horizon, outlook_matches + 2))
     horizon_gws = sorted(schedule.gw.unique().tolist())[:horizon]
     if not horizon_gws:
         log.error("no fixtures scheduled from GW%s onward — nothing to plan", gw)
@@ -96,11 +132,6 @@ def build(args) -> int:
     ep_rows = model.expected_points(players, teams, schedule, cfg)
     ep_grid = model.per_gameweek(ep_rows, horizon_gws)
 
-    try:
-        transfers = client.entry_transfers()
-    except Exception as exc:
-        log.warning("could not read your transfer history (%s)", exc)
-        transfers = []
     sell_at = selling_prices(current_squad, transfers, players, selling_fee(bootstrap))
     if sell_at:
         gap = sum(players.price.get(p, 0.0) for p in sell_at) - sum(sell_at.values())
@@ -111,9 +142,16 @@ def build(args) -> int:
                     "which is optimistic if your squad has risen in price")
 
     locked = [int(p) for p in (cfg.get("strategy", "never_sell", default=[]) or [])]
+    advice = optimize.analyse_transfers(
+        ep_rows, players, current_squad, bank, ft, cfg, selling_price=sell_at)
+    forced_move = None
+    if advice.recommend and advice.out_id is not None and advice.candidates:
+        forced_move = (advice.out_id, advice.candidates[0].in_id)
     log.info("solving the transfer plan")
     plan = optimize.solve(ep_grid, players, current_squad, bank, ft, cfg,
-                          selling_price=sell_at, locked=locked)
+                          selling_price=sell_at, locked=locked,
+                          forced_first_move=forced_move,
+                          hold_first_week=not advice.recommend)
     log.info("solver: %s  objective %.1f  budget %.1fm",
              plan.status, plan.objective, plan.budget)
 
@@ -122,16 +160,22 @@ def build(args) -> int:
         ep_rows=ep_rows, ep_grid=ep_grid, plan=plan, entry=entry,
         current_squad=current_squad, free_transfers=ft,
         bank=bank, squad_value=squad_value, event=event,
+        transfer_advice=advice, selling_price=sell_at,
     )
     path = report.render(ctx, cfg)
     log.info("dashboard written to %s", path)
+    projection = backtest.write_projection(
+        cfg, event, players, ep_rows, plan, advice,
+        model_version=report.MODEL_VERSION)
+    if projection:
+        log.info("pre-deadline projection frozen at %s", projection)
 
     ics = calendar_feed.write(
         bootstrap["events"], cfg.site_dir,
         site_url=cfg.get("notify", "site_url", default="") or "",
         calendar_name=cfg.get("output", "title", default="FPL"),
         remind_hours=[float(h) for h in cfg.get(
-            "notify", "remind_hours_before", default=[48, 24, 3])],
+            "notify", "remind_hours_before", default=[24])],
     )
     log.info("deadline calendar written to %s", ics)
     print(f"\n  {ctx['action']['headline']}\n  {ctx['action']['detail']}\n")
@@ -158,6 +202,26 @@ def check(args) -> int:
     return 0
 
 
+def serve(args) -> int:
+    from .webapp import serve as serve_dashboard
+    cfg = load_config(args.config)
+    return serve_dashboard(cfg.site_dir, cfg.path.parent, port=args.port,
+                           config_path=args.config, open_browser=not args.no_browser)
+
+
+def run_backtest(args) -> int:
+    cfg = load_config(args.config)
+    client = FPLClient(cfg, offline=args.offline)
+    result = backtest.evaluate_projections(cfg, client.element_summary)
+    if result["gameweeks"] == 0:
+        print("ยังไม่มี projection ที่ deadline ผ่านแล้วสำหรับ backtest")
+        return 0
+    path = backtest.write_report(cfg, result)
+    print(backtest.format_summary(result))
+    print(f"\n  report: {path}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="fplbot", description="FPL assistant")
     parser.add_argument("--config", default=None, help="path to config.yaml")
@@ -176,6 +240,17 @@ def main(argv: list[str] | None = None) -> int:
     p_check = sub.add_parser("check", help="print the next deadline")
     p_check.add_argument("--offline", action="store_true")
     p_check.set_defaults(func=check)
+
+    p_serve = sub.add_parser("serve", help="open the local dashboard in a browser")
+    p_serve.add_argument("--port", type=int, default=8765)
+    p_serve.add_argument("--no-browser", action="store_true", help=argparse.SUPPRESS)
+    p_serve.set_defaults(func=serve)
+
+    p_backtest = sub.add_parser(
+        "backtest", help="score frozen pre-deadline projections against outcomes")
+    p_backtest.add_argument("--offline", action="store_true",
+                            help="use cached element histories only")
+    p_backtest.set_defaults(func=run_backtest)
 
     args = parser.parse_args(argv)
     _setup_console()

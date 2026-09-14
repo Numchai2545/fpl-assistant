@@ -152,4 +152,6 @@ def load_config(path: str | Path | None = None) -> Config:
     # environment overrides, handy for CI
     if os.environ.get("FPL_TEAM_ID"):
         raw.setdefault("entry", {})["team_id"] = int(os.environ["FPL_TEAM_ID"])
+    if os.environ.get("FPL_SITE_URL"):
+        raw.setdefault("notify", {})["site_url"] = os.environ["FPL_SITE_URL"].rstrip("/")
     return Config(raw=raw, path=cfg_path)

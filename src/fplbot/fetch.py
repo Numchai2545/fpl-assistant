@@ -59,8 +59,21 @@ class FPLClient:
         self.offline = offline
         self.session = _session()
         stamp = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-        self.snapshot_dir = cfg.data_dir / "snapshots" / stamp
-        self.snapshot_dir.mkdir(parents=True, exist_ok=True)
+        snapshots = cfg.data_dir / "snapshots"
+        today = snapshots / stamp
+        if offline and not (today / "bootstrap.json").exists():
+            available = sorted(
+                (path for path in snapshots.glob("*")
+                 if path.is_dir() and (path / "bootstrap.json").exists()),
+                reverse=True,
+            )
+            self.snapshot_dir = available[0] if available else today
+            if available:
+                log.warning("offline mode using latest snapshot %s", self.snapshot_dir.name)
+        else:
+            self.snapshot_dir = today
+        if not offline:
+            self.snapshot_dir.mkdir(parents=True, exist_ok=True)
         self.ttl = timedelta(minutes=float(
             cfg.get("planning", "cache_ttl_minutes", default=90)))
 
@@ -179,6 +192,54 @@ def free_transfers(entry_history: dict) -> int:
         free_used = max(0, made - paid)
         ft = min(MAX_SAVED_TRANSFERS, max(1, ft - free_used + 1))
     return max(1, min(MAX_SAVED_TRANSFERS, ft))
+
+
+def apply_event_transfer_state(squad: list[int], bank: float,
+                               transfers: list[dict] | None,
+                               event: int) -> tuple[list[int], float, int]:
+    """Bring the last deadline's squad and bank through this GW's moves.
+
+    The entry endpoint exposes the bank at the previous deadline. Transfers
+    made since then must therefore update both the player ids and the cash:
+    ``bank + sale price - purchase price``. The transfer endpoint reports both
+    prices in tenths, so this does not need an estimate of the sell-on fee.
+    """
+    current = list(squad)
+    current_bank = float(bank)
+    applied = 0
+    rows = [row for row in (transfers or []) if int(row.get("event") or 0) == event]
+    for row in sorted(rows, key=lambda r: r.get("time") or ""):
+        out_id, in_id = int(row["element_out"]), int(row["element_in"])
+        if out_id not in current:
+            continue
+        current[current.index(out_id)] = in_id
+        try:
+            sale = int(row["element_out_cost"]) / 10.0
+            purchase = int(row["element_in_cost"]) / 10.0
+        except (KeyError, TypeError, ValueError) as exc:
+            raise ValueError(
+                f"current-GW transfer {out_id} -> {in_id} has no usable prices; "
+                "cannot reconstruct the current bank safely"
+            ) from exc
+        else:
+            current_bank += sale - purchase
+        applied += 1
+    return current, round(current_bank, 1), applied
+
+
+def apply_event_transfers(squad: list[int], transfers: list[dict] | None,
+                          event: int) -> tuple[list[int], int]:
+    """Compatibility wrapper for callers that only need the updated squad."""
+    current = list(squad)
+    applied = 0
+    rows = [row for row in (transfers or []) if int(row.get("event") or 0) == event]
+    for row in sorted(rows, key=lambda r: r.get("time") or ""):
+        out_id, in_id = int(row["element_out"]), int(row["element_in"])
+        if out_id not in current:
+            continue
+        current[current.index(out_id)] = in_id
+        applied += 1
+    return current, applied
 
 
 def purchase_prices(squad: list[int], transfers: list[dict] | None, players) -> dict[int, float]:

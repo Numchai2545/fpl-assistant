@@ -1,13 +1,14 @@
 {
   "name": "Gnum United — ผู้ช่วยจัดตัว FPL",
   "short_name": "FPL",
+  "id": "./",
   "description": "แต้มที่คาดว่าจะได้ ตัวเลือกกัปตัน และแผนเปลี่ยนตัวล่วงหน้า",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#131018",
-  "theme_color": "#6D28A8",
+  "background_color": "#F5F7FC",
+  "theme_color": "#5B5FEF",
   "icons": [
     {
       "src": "icon.svg",

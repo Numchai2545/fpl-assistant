@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "model_version": "0.2.0",
+  "gw": 5,
+  "built_at": "2026-09-14T15:03:08.683402+00:00",
+  "deadline": "2026-09-18T17:30:00+00:00",
+  "players": [
+    {
+      "player_id": 4,
+      "name": "Gabriel",
+      "position": "DEF",
+      "model_ep": 3.1833,
+      "fpl_ep_next": 6.0
+    },
+    {
+      "player_id": 15,
+      "name": "Ødegaard",
+      "position": "MID",
+      "model_ep": 4.3754,
+      "fpl_ep_next": 6.8
+    },
+    {
+      "player_id": 165,
+      "name": "João Pedro",
+      "position": "FWD",
+      "model_ep": 5.3667,
+      "fpl_ep_next": 8.2
+    },
+    {
+      "player_id": 173,
+      "name": "Thomas",
+      "position": "DEF",
+      "model_ep": 2.9548,
+      "fpl_ep_next": 3.8
+    },
+    {
+      "player_id": 305,
+      "name": "Davis",
+      "position": "DEF",
+      "model_ep": 3.858,
+      "fpl_ep_next": 5.8
+    },
+    {
+      "player_id": 306,
+      "name": "Greaves",
+      "position": "DEF",
+      "model_ep": 2.204,
+      "fpl_ep_next": 0.8
+    },
+    {
+      "player_id": 338,
+      "name": "Ampadu",
+      "position": "MID",
+      "model_ep": 3.0834,
+      "fpl_ep_next": 2.2
+    },
+    {
+      "player_id": 399,
+      "name": "Cherki",
+      "position": "MID",
+      "model_ep": 3.6125,
+      "fpl_ep_next": 6.2
+    },
+    {
+      "player_id": 411,
+      "name": "Haaland",
+      "position": "FWD",
+      "model_ep": 6.0525,
+      "fpl_ep_next": 6.0
+    },
+    {
+      "player_id": 418,
+      "name": "Maguire",
+      "position": "DEF",
+      "model_ep": 2.5017,
+      "fpl_ep_next": 1.8
+    },
+    {
+      "player_id": 426,
+      "name": "B.Fernandes",
+      "position": "MID",
+      "model_ep": 5.7614,
+      "fpl_ep_next": 6.8
+    },
+    {
+      "player_id": 491,
+      "name": "Igor Jesus",
+      "position": "FWD",
+      "model_ep": 2.5961,
+      "fpl_ep_next": 2.8
+    },
+    {
+      "player_id": 496,
+      "name": "Kinsky",
+      "position": "GKP",
+      "model_ep": 3.7142,
+      "fpl_ep_next": 4.0
+    },
+    {
+      "player_id": 497,
+      "name": "Dubravka",
+      "position": "GKP",
+      "model_ep": 0.3356,
+      "fpl_ep_next": 0.0
+    },
+    {
+      "player_id": 544,
+      "name": "Xhaka",
+      "position": "MID",
+      "model_ep": 3.6478,
+      "fpl_ep_next": 4.8
+    },
+    {
+      "player_id": 277,
+      "name": "Egan",
+      "position": "DEF",
+      "model_ep": 3.6865,
+      "fpl_ep_next": 6.2
+    },
+    {
+      "player_id": 279,
+      "name": "Ajayi",
+      "position": "DEF",
+      "model_ep": 3.2816,
+      "fpl_ep_next": 6.5
+    },
+    {
+      "player_id": 282,
+      "name": "Giles",
+      "position": "DEF",
+      "model_ep": 3.1674,
+      "fpl_ep_next": 6.0
+    }
+  ]
+}

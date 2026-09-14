@@ -55,7 +55,7 @@ def build_teams(bootstrap: dict) -> pd.DataFrame:
 
 
 def build_players(bootstrap: dict, teams: pd.DataFrame,
-                  fixtures: list[dict] | None = None) -> pd.DataFrame:
+                   fixtures: list[dict] | None = None) -> pd.DataFrame:
     df = pd.DataFrame(bootstrap["elements"])
     for col in NUMERIC_FIELDS:
         if col in df.columns:
@@ -104,6 +104,109 @@ def build_players(bootstrap: dict, teams: pd.DataFrame,
         ["rising", "falling"], default="stable",
     )
     return df.set_index("id")
+
+
+def minutes_shortlist(players: pd.DataFrame, current_squad: list[int],
+                      target_count: int) -> list[int]:
+    """Choose a bounded set whose match histories can change a decision.
+
+    element-summary is one request per player, so fetching it for the entire
+    league is both slow and discourteous. Current players are always included;
+    the remainder is balanced by position and ranked with only public FPL
+    signals available before our own expected-points model runs.
+    """
+    valid_owned = {int(pid) for pid in current_squad if pid in players.index}
+    frame = players[players.p_available > 0.25].copy()
+    price = frame.price.clip(lower=3.5)
+    def numeric(name: str) -> pd.Series:
+        source = frame[name] if name in frame else pd.Series(0.0, index=frame.index)
+        return pd.to_numeric(source, errors="coerce").fillna(0.0)
+
+    frame["_shortlist_score"] = (
+        numeric("ep_next") * 2.0 + numeric("form") + numeric("points_per_game")
+        + numeric("total_points") / price / 5.0
+    )
+    keep = set(valid_owned)
+    shares = {1: 0.12, 2: 0.32, 3: 0.34, 4: 0.22}
+    for position, share in shares.items():
+        count = max(3, round(target_count * share))
+        band = frame[(frame.element_type == position) & (~frame.index.isin(keep))]
+        keep.update(band.nlargest(count, "_shortlist_score").index.astype(int).tolist())
+    return sorted(keep)
+
+
+def apply_recent_minutes(players: pd.DataFrame, histories: dict[int, dict],
+                         cfg) -> pd.DataFrame:
+    """Blend recent starts and minutes into the season-level availability model.
+
+    The blend is deliberately Bayesian-looking rather than absolute: six recent
+    matches can move a player strongly, but a single start cannot erase the
+    season evidence. Missing or malformed histories leave the original values
+    untouched, which keeps offline and pre-season builds usable.
+    """
+    out = players.copy()
+    out["minutes_history_matches"] = 0
+    out["minutes_model_source"] = "season"
+    matches = int(cfg.get("model", "recent_minutes_matches", default=6))
+    half_life = max(0.25, float(cfg.get(
+        "model", "recent_minutes_half_life", default=3.0)))
+    prior_matches = max(0.0, float(cfg.get(
+        "model", "recent_minutes_prior_matches", default=3.0)))
+
+    for pid, payload in histories.items():
+        if pid not in out.index or not isinstance(payload, dict):
+            continue
+        rows = payload.get("history") or []
+        rows = sorted((r for r in rows if r.get("round") is not None),
+                      key=lambda r: int(r["round"]))[-matches:]
+        if not rows:
+            continue
+
+        minutes = np.array([max(0.0, min(90.0, float(r.get("minutes") or 0.0)))
+                            for r in rows], dtype=float)
+        starts = np.array([
+            float(r.get("starts")) if r.get("starts") is not None
+            else float(m >= 60.0) for r, m in zip(rows, minutes)
+        ], dtype=float)
+        ages = np.arange(len(rows) - 1, -1, -1, dtype=float)
+        weights = np.power(0.5, ages / half_life)
+        weight_sum = float(weights.sum())
+        recent_start = float(np.average(starts, weights=weights))
+        recent_any = float(np.average(minutes > 0, weights=weights))
+        recent_60 = float(np.average(minutes >= 60, weights=weights))
+        recent_minutes = float(np.average(minutes, weights=weights))
+        evidence = weight_sum / (weight_sum + prior_matches) if weight_sum else 0.0
+
+        availability = float(out.at[pid, "p_available"])
+        base_any = float(out.at[pid, "p_any_minutes"]) / max(availability, 1e-9)
+        base_60 = float(out.at[pid, "p_60plus"]) / max(availability, 1e-9)
+        base_minutes = float(out.at[pid, "exp_minutes"]) / max(availability, 1e-9)
+        start_rate = (1.0 - evidence) * float(out.at[pid, "start_rate"]) + evidence * recent_start
+        any_rate = (1.0 - evidence) * base_any + evidence * recent_any
+        sixty_rate = (1.0 - evidence) * base_60 + evidence * recent_60
+        minute_rate = (1.0 - evidence) * base_minutes + evidence * recent_minutes
+
+        out.at[pid, "start_rate"] = float(np.clip(start_rate, 0.0, 1.0))
+        out.at[pid, "p_start"] = float(np.clip(start_rate * availability, 0.0, 1.0))
+        out.at[pid, "p_any_minutes"] = float(np.clip(any_rate * availability, 0.0, 1.0))
+        out.at[pid, "p_60plus"] = float(np.clip(sixty_rate * availability, 0.0, 1.0))
+        out.at[pid, "exp_minutes"] = float(np.clip(minute_rate * availability, 0.0, 90.0))
+        out.at[pid, "minutes_history_matches"] = len(rows)
+        out.at[pid, "minutes_model_source"] = "recent"
+    return out
+
+
+def apply_price_forecast(players: pd.DataFrame, cfg) -> pd.DataFrame:
+    """Add a bounded urgency signal without allowing price to alter EP ranks."""
+    out = players.copy()
+    rise = max(0.01, float(cfg.get("model", "price_rise_pressure", default=0.45)))
+    fall = min(-0.01, float(cfg.get("model", "price_fall_pressure", default=-0.45)))
+    pressure = pd.to_numeric(out.transfer_pressure, errors="coerce").fillna(0.0)
+    out["price_change_signal"] = np.select(
+        [pressure >= rise, pressure <= fall], ["rising", "falling"], default="stable")
+    scale = np.where(pressure >= 0, rise, abs(fall))
+    out["price_risk_score"] = np.clip(np.abs(pressure) / scale, 0.0, 2.0) / 2.0
+    return out
 
 
 def _team_games_played(bootstrap: dict, fixtures: list[dict] | None) -> pd.Series:

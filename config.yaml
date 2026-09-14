@@ -16,6 +16,19 @@ planning:
   solver_time_limit: 180    # seconds; CBC stops and returns best found after this
   fallback_budget: 100.0    # used only when your squad cannot be read (GW1, private entry)
 
+  # The report recommends at most one out -> in decision per gameweek. The
+  # ranked Candidate list contains alternatives for that same squad slot.
+  max_transfers_per_gw: 1
+
+  # Judge a purchase over the player's next five actual fixtures, rather than
+  # only the next gameweek. Blank and double gameweeks remain visible.
+  outlook_matches: 5
+  candidate_count: 4        # alternatives shown for the selected weak link
+  comparison_count: 8       # top affordable peers shown when you click a player
+  min_candidate_start: 0.50 # hide likely non-starters from replacement rankings
+  min_transfer_gain: 3.0    # minimum five-match EP improvement to recommend a move
+  hit_policy: emergency_only # a -4 is allowed only for an uncovered unavailable starter
+
   # How many expected points a transfer must gain before it is worth making.
   # A free transfer is not free: spending it now means not having it later, and
   # every move carries injury and price risk the model cannot see. At 0 the
@@ -24,6 +37,10 @@ planning:
   #   0.8  balanced - the default
   #   1.5  strict  - only clear upgrades, fewest transfers
   transfer_friction: 0.8
+
+  # Keep the live API workload bounded. Full match histories are fetched only
+  # for the current squad plus this many plausible transfer targets.
+  minutes_shortlist: 30
 
 strategy:
   # "balanced"     -> pure expected points, ownership ignored  (recommended for your goal)
@@ -44,6 +61,7 @@ strategy:
 
 model:
   prior_minutes: 360        # shrinkage strength: rates are trusted fully after ~4 full matches
+  recent_form_weight: 0.15  # small FPL recent-form signal; fixtures and underlying stats stay primary
   xg_weight: 0.70           # xG vs actual goals in the blended scoring rate
   xa_weight: 0.75           # xA vs actual assists
   home_attack_mult: 1.10
@@ -52,6 +70,27 @@ model:
   penalty_taker_mult: 1.08      # uplift for the #1 penalty taker
   set_piece_mult: 1.06          # uplift for the #1 corner/free-kick taker (assists only)
   opponent_clip: [0.60, 1.60]   # min/max opponent adjustment multiplier
+
+  # Recent match histories improve the weakest part of v0.1: expected minutes.
+  # The season estimate remains the fallback and supplies the prior when the
+  # recent sample is small or element-summary cannot be fetched.
+  recent_minutes_matches: 6
+  recent_minutes_half_life: 3.0
+  recent_minutes_prior_matches: 3.0
+
+  # Bench slots are valued as the chance their points rescue a missing starter.
+  # These probabilities are deliberately conservative until backtesting can
+  # calibrate them; the outfield values also determine the displayed order.
+  auto_sub_slot_probability: [0.06, 0.20, 0.11, 0.05]
+
+  # Price pressure is an alert, never part of the EP ranking.
+  price_rise_pressure: 0.45
+  price_fall_pressure: -0.45
+
+backtest:
+  # Projections are frozen before the deadline. Later backtests fetch outcomes
+  # only for these evaluated players, never element-summary for the full league.
+  max_players_per_gameweek: 30
 
 chips:
   # Mark chips as used once you play them. First set expires after GW19.
@@ -65,18 +104,11 @@ chips:
   bench_boost_2: false
 
 notify:
-  # Escalating reminders, in hours before the deadline. Each fires once.
-  # 48h = time to plan, 24h = the main one, 3h = last chance.
-  remind_hours_before: [48, 24, 3]
-  final_reminder_only_if_unset: true   # keep the 3h message short and urgent
+  # The calendar reminds you to double-click run_weekly.bat and review the data.
+  remind_hours_before: [24]
   timezone: "Asia/Bangkok"
-  site_url: ""                  # your GitHub Pages URL; included in every alert
-  telegram:
-    enabled: false              # set true and fill the env vars to switch on
-    # TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID are read from the environment,
-    # never written in this file.
 
 output:
-  site_dir: "docs"              # GitHub Pages serves from /docs
+  site_dir: "docs"              # generated local dashboard and calendar
   data_dir: "data"              # raw API snapshots, one folder per run
   title: "Gnum United — FPL Assistant"

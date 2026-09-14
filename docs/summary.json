@@ -2,81 +2,75 @@
   "gw": 5,
   "deadline": "2026-09-18T17:30:00+00:00",
   "deadline_local": "เสาร์ 19 ก.ย. 2569, 00:30 น.",
-  "headline": "เปลี่ยนตัว 3 คน · กัปตัน Haaland",
-  "detail": "ใช้ 3 จาก 3 ครั้งที่มี ไม่เสียแต้ม. คาดการณ์ 53 แต้มใน GW5",
+  "headline": "พิจารณา Ampadu → Groß · กัปตัน Haaland",
+  "detail": "เพิ่ม 15.0 แต้มใน 5 นัดและไม่เสียแต้ม. คาดการณ์ 55 แต้มใน GW5. ราคา: Groß มีแรงซื้อสูงและเสี่ยงขึ้นราคา",
   "captain": "Haaland",
   "moves": [
     {
-      "out": "Gabriel",
-      "in": "Khalaili"
-    },
-    {
       "out": "Ampadu",
-      "in": "Tavernier"
-    },
-    {
-      "out": "Cherki",
-      "in": "Saka"
+      "in": "Groß"
     }
   ],
   "alerts": [],
-  "expected_points": 52.81,
+  "expected_points": 55.44,
   "site_url": "",
-  "plan": [
+  "candidates": [
     {
-      "gw": 5,
-      "summary": "Gabriel → Khalaili, Ampadu → Tavernier, Cherki → Saka",
-      "hits": 0,
-      "captain": "Haaland",
-      "ft": 3,
-      "ep": 52.81,
-      "bar": 88
+      "rank": 1,
+      "name": "Groß",
+      "price": 5.6,
+      "ep": 26.28,
+      "gain": 15.04,
+      "fixtures": [
+        "GW5 ARS (H) [4]",
+        "GW6 SUN (A) [3]",
+        "GW7 CRY (H) [3]",
+        "GW8 LIV (A) [4]",
+        "GW9 MCI (A) [5]"
+      ]
     },
     {
-      "gw": 6,
-      "summary": "Mendy → Davis",
-      "hits": 0,
-      "captain": "B.Fernandes",
-      "ft": 1,
-      "ep": 58.82,
-      "bar": 98
+      "rank": 2,
+      "name": "Janelt",
+      "price": 5.0,
+      "ep": 22.24,
+      "gain": 11.0,
+      "fixtures": [
+        "GW5 CHE (H) [4]",
+        "GW6 AVL (A) [4]",
+        "GW7 LIV (H) [4]",
+        "GW8 HUL (A) [2]",
+        "GW9 NFO (H) [3]"
+      ]
     },
     {
-      "gw": 7,
-      "summary": "Maguire → De Cuyper",
-      "hits": 0,
-      "captain": "Haaland",
-      "ft": 1,
-      "ep": 55.29,
-      "bar": 92
+      "rank": 3,
+      "name": "Mainoo",
+      "price": 5.5,
+      "ep": 21.27,
+      "gain": 10.03,
+      "fixtures": [
+        "GW5 FUL (A) [3]",
+        "GW6 TOT (H) [3]",
+        "GW7 LEE (A) [3]",
+        "GW8 BOU (H) [3]",
+        "GW9 CHE (A) [4]"
+      ]
     },
     {
-      "gw": 8,
-      "summary": "Kinsky → Tzolakis",
-      "hits": 0,
-      "captain": "B.Fernandes",
-      "ft": 1,
-      "ep": 59.91,
-      "bar": 100
-    },
-    {
-      "gw": 9,
-      "summary": "Xhaka → Scott",
-      "hits": 0,
-      "captain": "Haaland",
-      "ft": 1,
-      "ep": 57.1,
-      "bar": 95
-    },
-    {
-      "gw": 10,
-      "summary": "เก็บ transfer ไว้",
-      "hits": 0,
-      "captain": "B.Fernandes",
-      "ft": 0,
-      "ep": 59.98,
-      "bar": 100
+      "rank": 4,
+      "name": "King",
+      "price": 5.5,
+      "ep": 21.18,
+      "gain": 9.94,
+      "fixtures": [
+        "GW5 MUN (H) [4]",
+        "GW6 IPS (A) [2]",
+        "GW7 HUL (H) [2]",
+        "GW8 COV (A) [2]",
+        "GW9 AVL (A) [4]"
+      ]
     }
   ],
-  "built_at": "อาทิตย์ 13 ก.ย. 2569, 19:16 น."
+  "built_at": "จันทร์ 14 ก.ย. 2569, 23:22 น."
 }

@@ -55,7 +55,7 @@ def build_ics(events: list[dict], *, site_url: str = "", calendar_name: str = "F
     phone fires them locally. A subscription that only carried the dates would
     still leave you to notice them.
     """
-    remind_hours = remind_hours or [48, 24, 3]
+    remind_hours = remind_hours or [24]
     now = datetime.now(timezone.utc)
 
     lines = [

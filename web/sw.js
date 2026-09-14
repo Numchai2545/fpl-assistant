@@ -1,7 +1,10 @@
 // Cache the dashboard so it opens instantly from the home screen, even with no
 // signal. Network-first, so a fresh build always wins when you are online.
-const CACHE = 'fpl-assistant-v2';
-const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon.svg',
+const CACHE = 'fpl-assistant-v4';
+// The stylesheet belongs here: without it a cold offline launch renders the
+// dashboard unstyled, because nothing has warmed the runtime cache yet.
+const ASSETS = ['./', './index.html', './sports-ui.css', './manifest.webmanifest',
+                './icon.svg', './icon-180.png', './icon-512.png',
                 './summary.json', './deadlines.ics'];
 
 self.addEventListener('install', (e) => {

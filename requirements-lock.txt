@@ -1,0 +1,24 @@
+# Reproducible environment verified on Python 3.13 / Windows on 2026-09-14.
+# Regenerate deliberately after running the full test and offline-build checks.
+certifi==2025.8.3
+charset-normalizer==3.4.3
+colorama==0.4.6
+idna==3.10
+iniconfig==2.3.0
+Jinja2==3.1.6
+MarkupSafe==3.0.3
+numpy==2.3.3
+packaging==25.0
+pandas==2.3.2
+pluggy==1.6.0
+PuLP[cbc]==3.3.2
+Pygments==2.21.0
+pytest==9.1.1
+python-dateutil==2.9.0.post0
+pytz==2025.2
+PyYAML==6.0.3
+requests==2.32.5
+scipy==1.16.2
+six==1.17.0
+tzdata==2025.2
+urllib3==2.5.0

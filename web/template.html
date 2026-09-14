@@ -4,202 +4,53 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>{{ title }}</title>
-<meta name="description" content="แต้มที่คาดว่าจะได้ ตัวเลือกกัปตัน และแผนเปลี่ยนตัว {{ horizon }} วีคข้างหน้า">
+<meta name="description" content="วิเคราะห์ทีม ตัวเลือกกัปตัน และ Candidate สำหรับการตัดสินใจก่อน deadline">
 <link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#1A1420" media="(prefers-color-scheme: dark)">
-<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0B1829" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#F5F7FC" media="(prefers-color-scheme: light)">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="FPL">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
-<style>
-:root{
-  --ground:#F6F4F8; --surface:#FFFFFF; --surface-2:#EFEAF2; --surface-3:#E5DEEA;
-  --ink:#1F1426; --ink-2:#564B5E; --ink-3:#8A7F92;
-  --rule:#E2DAE8; --rule-strong:#CBBDD4;
-  --accent:#6D28A8; --accent-soft:#F0E6F7;
-  --good:#0E7C72; --good-soft:#DFF0ED;
-  --warn:#9A5B08; --warn-soft:#FAEEDC;
-  --crit:#A01F35; --crit-soft:#FAE3E7;
-  --fdr2:#0E7C72; --fdr3:#9CA3AF; --fdr4:#C25068; --fdr5:#8C1D33; --fdr-ink:#FFFFFF;
-  --shadow:0 1px 2px rgba(31,20,38,.05),0 10px 28px -20px rgba(31,20,38,.35);
-}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --ground:#131018; --surface:#1C1724; --surface-2:#261F30; --surface-3:#32283E;
-  --ink:#F0EAF4; --ink-2:#B7ACC0; --ink-3:#877C92;
-  --rule:#302739; --rule-strong:#44374F;
-  --accent:#C79BE8; --accent-soft:#2B1D38;
-  --good:#45C2A4; --good-soft:#123029;
-  --warn:#E0A64E; --warn-soft:#33260F;
-  --crit:#EE8A9E; --crit-soft:#3A1721;
-  --fdr2:#45C2A4; --fdr3:#737B85; --fdr4:#D4687E; --fdr5:#EE8A9E; --fdr-ink:#141018;
-  --shadow:0 1px 2px rgba(0,0,0,.5),0 10px 28px -20px rgba(0,0,0,.9);
-}}
-:root[data-theme="dark"]{
-  --ground:#131018; --surface:#1C1724; --surface-2:#261F30; --surface-3:#32283E;
-  --ink:#F0EAF4; --ink-2:#B7ACC0; --ink-3:#877C92;
-  --rule:#302739; --rule-strong:#44374F;
-  --accent:#C79BE8; --accent-soft:#2B1D38;
-  --good:#45C2A4; --good-soft:#123029;
-  --warn:#E0A64E; --warn-soft:#33260F;
-  --crit:#EE8A9E; --crit-soft:#3A1721;
-  --fdr2:#45C2A4; --fdr3:#737B85; --fdr4:#D4687E; --fdr5:#EE8A9E; --fdr-ink:#141018;
-  --shadow:0 1px 2px rgba(0,0,0,.5),0 10px 28px -20px rgba(0,0,0,.9);
-}
-*{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--ground);color:var(--ink);
-  font-family:"IBM Plex Sans Thai","IBM Plex Sans",system-ui,-apple-system,sans-serif;font-size:15px;line-height:1.7;
-  -webkit-font-smoothing:antialiased;padding-bottom:env(safe-area-inset-bottom)}
-.wrap{max-width:1000px;margin:0 auto;padding-left:18px;padding-right:18px;padding-block:0 60px}
-h1,h2,h3,.disp{font-family:"Bai Jamjuree","IBM Plex Sans Thai",sans-serif;text-wrap:balance;margin:0}
-.mono,.num{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
-a{color:var(--accent)}
-
-/* header */
-header{padding-block:26px 20px;display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between;border-bottom:2px solid var(--ink)}
-.brand .eyebrow{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
-.brand h1{font-size:clamp(22px,4.6vw,30px);font-weight:700;line-height:1.15;margin-top:3px}
-.countdown{text-align:right}
-.countdown .lab{font-size:11.5px;letter-spacing:.04em;color:var(--ink-3);font-weight:600}
-.countdown .val{font-family:"IBM Plex Mono",monospace;font-size:clamp(20px,4.4vw,26px);font-weight:600;line-height:1.2;color:var(--accent)}
-.countdown .sub{font-size:12px;color:var(--ink-2)}
-.countdown.urgent .val{color:var(--crit)}
-
-/* tiles */
-.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0;margin:0}
-.tile{padding:14px 14px 15px 0;border-bottom:1px solid var(--rule)}
-.tile dt{font-size:11px;letter-spacing:.04em;color:var(--ink-3);font-weight:600;margin-bottom:2px}
-.tile dd{margin:0;font-family:"IBM Plex Mono",monospace;font-size:21px;font-weight:600;line-height:1.2}
-.tile small{display:block;font-family:"IBM Plex Sans Thai",sans-serif;font-size:12px;color:var(--ink-2);font-weight:400}
-
-/* action banner */
-.action{background:var(--surface);border:1px solid var(--rule-strong);border-left:4px solid var(--accent);
-  border-radius:8px;padding:18px 20px;margin:26px 0 0;box-shadow:var(--shadow)}
-.action .lab{font-size:11.5px;letter-spacing:.05em;color:var(--accent);font-weight:600;font-family:"Bai Jamjuree",sans-serif}
-.action .headline{font-family:"Bai Jamjuree",sans-serif;font-size:clamp(17px,3.4vw,21px);font-weight:600;margin:5px 0 0;line-height:1.35}
-.action .detail{color:var(--ink-2);font-size:14px;margin-top:7px}
-.move{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
-.move .swap{display:inline-flex;align-items:center;gap:8px;background:var(--surface-2);border-radius:6px;padding:7px 12px;font-size:13.5px;font-weight:500}
-.move .out{color:var(--crit)} .move .in{color:var(--good)} .move .arr{color:var(--ink-3)}
-
-section{padding-block:30px 4px}
-section>h2{font-size:19px;font-weight:700;margin-bottom:3px}
-section>.sub{color:var(--ink-2);font-size:13.5px;margin:0 0 16px}
-
-/* tables */
-.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--rule);border-radius:8px;background:var(--surface)}
-table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:560px}
-th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--rule);white-space:nowrap}
-thead th{position:sticky;top:0;background:var(--surface);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
-  color:var(--ink-3);font-weight:600;border-bottom:1px solid var(--rule-strong);font-family:"Bai Jamjuree",sans-serif;z-index:1}
-tbody tr:last-child td{border-bottom:0}
-tbody tr:hover{background:var(--surface-2)}
-td.r,th.r{text-align:right;font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
-.pname{font-weight:600}
-.pmeta{color:var(--ink-3);font-size:11.5px;font-family:"IBM Plex Mono",monospace}
-.pos{display:inline-block;min-width:34px;text-align:center;font-size:10.5px;font-weight:600;padding:2px 5px;border-radius:4px;
-  background:var(--surface-3);color:var(--ink-2);font-family:"IBM Plex Mono",monospace}
-
-/* single-series meter: one hue, value always labelled */
-.meter{display:flex;align-items:center;gap:8px;justify-content:flex-end}
-.meter .track{width:52px;height:5px;border-radius:3px;background:var(--surface-3);overflow:hidden;flex:none}
-.meter .fill{display:block;height:100%;border-radius:3px;background:var(--accent)}
-
-/* fdr cells: diverging ramp, number always printed so colour is never alone */
-.fdr{display:inline-block;min-width:58px;text-align:center;padding:3px 6px;border-radius:4px;
-  font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:600;color:var(--fdr-ink);line-height:1.35}
-.d1,.d2{background:var(--fdr2)} .d3{background:var(--fdr3)} .d4{background:var(--fdr4)} .d5{background:var(--fdr5)}
-.blank{background:var(--surface-3);color:var(--ink-3)}
-.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11.5px;color:var(--ink-2);margin-top:10px;align-items:center}
-.legend i{width:10px;height:10px;border-radius:2px;display:inline-block;margin-right:5px;vertical-align:-1px}
-
-/* pitch */
-.pitch{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:18px 14px}
-.row{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
-.card{background:var(--surface-2);border:1px solid var(--rule);border-radius:7px;padding:8px 9px;min-width:86px;text-align:center}
-.card.cap{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
-.card .nm{font-weight:600;font-size:12.5px;overflow:hidden;text-overflow:ellipsis}
-.card .ep{font-family:"IBM Plex Mono",monospace;font-size:14px;font-weight:600;color:var(--accent);line-height:1.3}
-.card .op{font-size:10.5px;color:var(--ink-3);font-family:"IBM Plex Mono",monospace}
-.card .badge{display:inline-block;font-size:9.5px;font-weight:700;background:var(--accent);color:var(--surface);
-  border-radius:3px;padding:0 4px;margin-left:3px;vertical-align:1px;font-family:"IBM Plex Mono",monospace}
-.benchrow{border-top:1px dashed var(--rule-strong);margin-top:14px;padding-top:14px}
-.benchrow .lab{text-align:center;font-size:11px;letter-spacing:.03em;color:var(--ink-3);font-weight:600;margin-bottom:9px}
-.benchrow .row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
-.benchrow .card{min-width:0;position:relative}
-.card .slot{font-family:"IBM Plex Mono",monospace;font-size:9.5px;font-weight:600;color:var(--ink-3);
-  letter-spacing:.06em;margin-bottom:1px}
-.card.gkslot{background:var(--surface-3)}
-
-/* alerts: the thing that actually costs points when a deadline is missed */
-.action.alert{border-left-color:var(--crit);background:var(--crit-soft)}
-.action.alert .lab{color:var(--crit)}
-.alertlist{margin:8px 0 0;padding-left:18px;display:grid;gap:5px}
-.alertlist li{font-size:14.5px;font-weight:500}
-
-/* plan */
-.plan{display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:8px;overflow:hidden}
-.pweek{background:var(--surface);padding:13px 16px;display:grid;grid-template-columns:62px 1fr auto;gap:0 14px;align-items:center}
-.pweek .gw{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:13px;color:var(--accent)}
-.pweek .what{font-size:13.5px}
-.pweek .what .muted{color:var(--ink-3)}
-.pweek .epbar{display:flex;align-items:center;gap:9px;justify-content:flex-end}
-.pweek .epbar .track{width:74px;height:6px;background:var(--surface-3);border-radius:3px;overflow:hidden}
-.pweek .epbar .fill{display:block;height:100%;background:var(--accent);border-radius:3px}
-.pweek .epbar .v{font-family:"IBM Plex Mono",monospace;font-size:13px;font-weight:600;min-width:42px;text-align:right}
-@media(max-width:560px){.pweek{grid-template-columns:52px 1fr}.pweek .epbar{grid-column:2;justify-content:flex-start;margin-top:6px}}
-
-/* flags */
-.flags{display:grid;gap:8px}
-.flag{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:baseline;background:var(--surface);
-  border:1px solid var(--rule);border-left:3px solid var(--warn);border-radius:7px;padding:11px 14px;font-size:13.5px}
-.flag.crit{border-left-color:var(--crit)}
-.flag .tag{font-size:10.5px;font-weight:700;letter-spacing:.03em;padding:2px 7px;border-radius:4px;
-  background:var(--warn-soft);color:var(--warn);white-space:nowrap;font-family:"Bai Jamjuree",sans-serif}
-.flag.crit .tag{background:var(--crit-soft);color:var(--crit)}
-
-/* tabs */
-.tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
-.tabs button{font:inherit;font-size:12.5px;font-weight:600;padding:6px 13px;border-radius:999px;cursor:pointer;
-  border:1px solid var(--rule-strong);background:var(--surface);color:var(--ink-2);font-family:"Bai Jamjuree",sans-serif}
-.tabs button[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:var(--surface)}
-.tabs button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-
-
-/* calendar subscription: the one reminder that survives everything else */
-.subscribe{display:flex;flex-wrap:wrap;gap:14px 18px;align-items:center;background:var(--surface);
-  border:1px solid var(--rule);border-radius:8px;padding:16px 18px}
-.btn{display:inline-block;background:var(--accent);color:var(--surface);text-decoration:none;
-  font-family:"Bai Jamjuree",sans-serif;font-weight:600;font-size:14.5px;padding:10px 20px;
-  border-radius:6px;white-space:nowrap;flex:none}
-.btn:hover{filter:brightness(1.08)}
-.subscribe .how{font-size:12.5px;color:var(--ink-2);line-height:1.75;flex:1 1 240px}
-.subscribe .how b{color:var(--ink)}
-.feedurl{font-family:"IBM Plex Mono",monospace;font-size:11.5px;background:var(--surface-2);
-  padding:2px 6px;border-radius:4px;word-break:break-all;color:var(--ink-2)}
-footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:var(--ink-3);font-size:12px}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="sports-ui.css">
 </head>
-<body data-palette="#6D28A8,#0E7C72,#C25068">
+<body>
 <div class="wrap">
 
 <header>
-  <div class="brand">
-    <div class="eyebrow">Gameweek {{ gw }} &middot; built {{ built_at }}</div>
-    <h1>{{ title }}</h1>
+  <div class="brandline">
+    <div class="appmark">FPL</div>
+    <div class="brand">
+      <div class="eyebrow">Gameweek {{ gw }} &middot; Analytics</div>
+      <h1>{{ title }}</h1>
+    </div>
   </div>
-  <div class="countdown {% if hours_left < 24 %}urgent{% endif %}">
-    <div class="lab">ปิดจัดตัวใน</div>
-    <div class="val" id="cd" data-deadline="{{ deadline_iso }}">{{ deadline_human }}</div>
-    <div class="sub">{{ deadline_local }}</div>
+  <div class="header-actions">
+    <div class="countdown {% if hours_left < 24 %}urgent{% endif %}">
+      <div class="lab">ปิดจัดตัวใน</div>
+      <div class="val" id="cd" data-deadline="{{ deadline_iso }}">{{ deadline_human }}</div>
+      <div class="sub">{{ deadline_local }}</div>
+    </div>
+    <button class="iconbtn" type="button" id="theme-toggle" aria-label="เปลี่ยนธีม" title="เปลี่ยนธีม">
+      <span class="theme-sun" aria-hidden="true">☀</span><span class="theme-moon" aria-hidden="true">☾</span>
+    </button>
   </div>
 </header>
 
+<div class="webtools">
+  <form method="post" action="/refresh" id="refresh-form">
+    <button class="btn refreshbtn" type="submit" id="refresh-btn"><span class="refreshicon" aria-hidden="true">↻</span><span class="refresh-label">อัปเดตข้อมูลล่าสุด</span></button>
+    <button class="btn installbtn" type="button" id="install-btn" hidden><span aria-hidden="true">↓</span> ติดตั้งแอป</button>
+  </form>
+  <span class="stamp">ข้อมูลชุดนี้สร้างเมื่อ {{ built_at }}</span>
+  <div class="refresh-status" id="refresh-status" role="status" aria-live="polite" hidden></div>
+</div>
+
+<div class="overview-label">ภาพรวมก่อนตัดสินใจ</div>
+<div class="top-summary">
 <dl class="tiles">
   <div class="tile"><dt>แต้มรวม</dt><dd>{{ entry.total_points }}<small>อันดับ {{ entry.rank_human }}</small></dd></div>
   <div class="tile"><dt>วีคที่แล้ว</dt><dd>{{ entry.last_gw_points }}<small>GW{{ gw - 1 }}</small></dd></div>
@@ -218,7 +69,7 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
 {% endif %}
 
 <div class="action">
-  <div class="lab">ทำแค่นี้ก่อนหมดเวลา</div>
+  <div class="lab">คำแนะนำสำหรับประกอบการตัดสินใจ</div>
   <p class="headline">{{ action.headline }}</p>
   {% if action.moves %}
   <div class="move">
@@ -229,19 +80,20 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
   {% endif %}
   <p class="detail">{{ action.detail }}</p>
 </div>
+</div>
 
 <section>
   <h2>ทีมของคุณสำหรับ GW{{ gw }}</h2>
-  <p class="sub">เรียงตามแต้มที่คาดว่าจะได้ · C คือกัปตัน, V คือรองกัปตัน</p>
+  <p class="sub">แผน {{ formation }} เลือกใหม่ตาม EP ฟอร์ม และโปรแกรม · กดชื่อนักเตะเพื่อเทียบตัวเลือกตำแหน่งเดียวกัน</p>
   <div class="pitch">
     {% for line in pitch_rows %}
     <div class="row">
       {% for p in line %}
-      <div class="card {% if p.is_captain %}cap{% endif %}">
+      <button type="button" class="card player-open {% if p.is_captain %}cap{% endif %}" data-player="{{ p.id }}">
         <div class="nm">{{ p.name }}{% if p.is_captain %}<span class="badge">C</span>{% elif p.is_vice %}<span class="badge">V</span>{% endif %}</div>
         <div class="ep">{{ "%.1f"|format(p.ep) }}</div>
         <div class="op">{{ p.opponent }}</div>
-      </div>
+      </button>
       {% endfor %}
     </div>
     {% endfor %}
@@ -249,18 +101,19 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
       <div class="lab">ตัวสำรอง &middot; เรียงตามลำดับที่จะถูกเปลี่ยนเข้า</div>
       <div class="row benchgrid">
         {% for p in bench_gk %}
-        <div class="card gkslot"><div class="slot">GK</div><div class="nm">{{ p.name }}</div><div class="ep">{{ "%.1f"|format(p.ep) }}</div><div class="op">{{ p.opponent }}</div></div>
+        <button type="button" class="card player-open gkslot" data-player="{{ p.id }}"><div class="slot">GK</div><div class="nm">{{ p.name }}</div><div class="ep">{{ "%.1f"|format(p.ep) }}</div><div class="op">{{ p.opponent }}</div></button>
         {% endfor %}
         {% for p in bench_outfield %}
-        <div class="card"><div class="slot">{{ loop.index }}</div><div class="nm">{{ p.name }}</div><div class="ep">{{ "%.1f"|format(p.ep) }}</div><div class="op">{{ p.opponent }}</div></div>
+        <button type="button" class="card player-open" data-player="{{ p.id }}"><div class="slot">{{ loop.index }}</div><div class="nm">{{ p.name }}</div><div class="ep">{{ "%.1f"|format(p.ep) }}</div><div class="op">{{ p.opponent }}</div></button>
         {% endfor %}
       </div>
     </div>
   </div>
 </section>
 
-<section>
-  <h2>ตัวเลือกกัปตัน</h2>
+<details class="insight">
+  <summary><span class="summary-icon">C</span><span><strong>ตัวเลือกกัปตัน</strong><small>ดูคะแนนคาดการณ์ก่อนคูณสอง</small></span><span class="chevron">⌄</span></summary>
+  <div class="insight-body">
   <p class="sub">แต้มที่คาดว่าจะได้ ก่อนคูณสอง</p>
   <div class="scroll"><table>
     <thead><tr><th>ผู้เล่น</th><th>คู่แข่ง</th><th class="r">xG</th><th class="r">xA</th><th class="r">Bonus</th><th class="r">EP</th></tr></thead>
@@ -277,81 +130,69 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
     {% endfor %}
     </tbody>
   </table></div>
-</section>
-
-<section>
-  <h2>ตัวที่น่าซื้อ</h2>
-  <p class="sub">แต้มที่คาดว่าจะได้สูงสุดใน {{ horizon }} วีคข้างหน้า แยกตามตำแหน่ง (ไม่รวมคนที่คุณมีอยู่แล้ว)</p>
-  <div class="tabs" role="tablist">
-    {% for pos in ["GKP","DEF","MID","FWD"] %}
-    <button role="tab" data-pos="{{ pos }}" aria-selected="{{ 'true' if pos=='MID' else 'false' }}">{{ pos }}</button>
-    {% endfor %}
   </div>
-  {% for pos in ["GKP","DEF","MID","FWD"] %}
-  <div class="scroll target-panel" data-pos="{{ pos }}" {% if pos!='MID' %}hidden{% endif %}><table>
-    <thead><tr><th>ผู้เล่น</th><th class="r">£</th><th class="r">%ถือครอง</th><th class="r">แนวโน้ม</th><th class="r">GW{{ gw }}</th><th class="r">{{ horizon }} วีค</th><th class="r">EP / £m</th></tr></thead>
+</details>
+
+<details class="insight">
+  <summary><span class="summary-icon">SWAP</span><span><strong>Candidate สำหรับจุดอ่อนหลัก</strong><small>ดูตัวแทนที่อยู่ในงบและตำแหน่งเดียวกัน</small></span><span class="chevron">⌄</span></summary>
+  <div class="insight-body">
+  {% if transfer_out %}
+  <p class="sub">
+    เทียบตัวแทนตำแหน่ง {{ transfer_out.position }} กับ <b>{{ transfer_out.name }}</b>
+    (ราคาขาย £{{ "%.1f"|format(transfer_out.price) }}m · EP {{ outlook_matches }} นัด {{ "%.1f"|format(transfer_out.ep) }})
+    · เรียงจากผลต่าง EP โดยไม่ใช้ ownership จัดอันดับ
+  </p>
+  {% else %}
+  <p class="sub">ยังระบุจุดอ่อนจากทีมปัจจุบันไม่ได้</p>
+  {% endif %}
+  {% if transfer_candidates %}
+  <div class="scroll"><table>
+    <thead><tr><th>#</th><th>ผู้เล่น</th><th class="r">£</th><th class="r">%ถือครอง</th><th>โปรแกรม {{ outlook_matches }} นัด</th><th class="r">GW{{ gw }}</th><th class="r">EP {{ outlook_matches }} นัด</th><th class="r">ผลต่างสุทธิ</th><th class="r">โอกาสลง</th></tr></thead>
     <tbody>
-    {% for p in targets[pos] %}
-      <tr>
-        <td><span class="pname">{{ p.name }}</span> <span class="pmeta">{{ p.team }}</span></td>
+    {% for p in transfer_candidates %}
+      <tr{% if p.recommended %} style="background:var(--good-soft)"{% endif %}>
+        <td class="r">{{ p.rank }}</td>
+        <td><span class="pname">{{ p.name }}</span> <span class="pmeta">{{ p.team }}</span>{% if p.recommended %} <span class="pos">แนะนำ</span>{% endif %}{% if p.price_signal == 'rising' %} <span class="pos">ราคาเสี่ยงขึ้น</span>{% elif p.price_signal == 'falling' %} <span class="pos">ราคาเสี่ยงลง</span>{% endif %}</td>
         <td class="r">{{ "%.1f"|format(p.price) }}</td>
         <td class="r">{{ "%.1f"|format(p.ownership) }}</td>
-        <td class="r" style="color:{% if p.price_trend=='rising' %}var(--good){% elif p.price_trend=='falling' %}var(--crit){% else %}var(--ink-3){% endif %}">
-          {{ '▲' if p.price_trend=='rising' else ('▼' if p.price_trend=='falling' else '–') }}</td>
+        <td style="white-space:normal"><span class="pmeta">{{ p.fixtures|join(' · ') }}</span></td>
         <td class="r">{{ "%.1f"|format(p.ep_next) }}</td>
-        <td class="r"><b>{{ "%.1f"|format(p.ep_total) }}</b></td>
-        <td class="r">{{ "%.2f"|format(p.ep_per_m) }}</td>
+        <td class="r"><b>{{ "%.1f"|format(p.ep) }}</b></td>
+        <td class="r" style="color:{{ 'var(--good)' if p.gain >= 3 else 'var(--ink-2)' }}">{{ "%+.1f"|format(p.net_gain) }}</td>
+        <td class="r">{{ "%.0f%%"|format(p.availability * 100) }}</td>
       </tr>
     {% endfor %}
     </tbody>
   </table></div>
-  {% endfor %}
-</section>
+  <p class="sub" style="margin-top:10px">เกณฑ์แนะนำย้าย: เพิ่มอย่างน้อย 3.0 EP ใน {{ outlook_matches }} นัด หากไม่ถึงเกณฑ์ Candidate เป็นเพียง watchlist</p>
+  {% endif %}
+  </div>
+</details>
 
-<section>
-  <h2>ตัวที่ควรขาย</h2>
-  <p class="sub">คนในทีมคุณที่ {{ horizon }} วีคข้างหน้าดูอ่อนที่สุดเมื่อเทียบกับราคา</p>
-  <div class="scroll"><table>
-    <thead><tr><th>ผู้เล่น</th><th class="r">£</th><th class="r">{{ horizon }} วีค</th><th class="r">EP / £m</th><th>เหตุผล</th></tr></thead>
-    <tbody>
-    {% for p in sells %}
-      <tr>
-        <td><span class="pos">{{ p.position }}</span> <span class="pname">{{ p.name }}</span> <span class="pmeta">{{ p.team }}</span></td>
-        <td class="r">{{ "%.1f"|format(p.price) }}</td>
-        <td class="r">{{ "%.1f"|format(p.ep_total) }}</td>
-        <td class="r">{{ "%.2f"|format(p.ep_per_m) }}</td>
-        <td style="white-space:normal;color:var(--ink-2)">{{ p.reason }}</td>
-      </tr>
-    {% endfor %}
-    </tbody>
-  </table></div>
-</section>
-
-<section>
-  <h2>แผน {{ horizon }} วีคข้างหน้า</h2>
-  <p class="sub">คำนวณทั้ง {{ horizon }} วีคพร้อมกัน ไม่ใช่ตัดสินใจทีละวีค</p>
-  <div class="plan">
-    {% for w in plan %}
-    <div class="pweek">
-      <span class="gw">GW{{ w.gw }}</span>
-      <span class="what">{{ w.summary }}{% if w.hits %} <span class="muted">&middot; &minus;{{ w.hits * 4 }} แต้ม</span>{% endif %}<br>
-        <span class="muted">กัปตัน: {{ w.captain }} &middot; มี {{ w.ft }} transfer</span></span>
-      <span class="epbar"><span class="track"><span class="fill" style="width:{{ w.bar }}%"></span></span><span class="v">{{ "%.0f"|format(w.ep) }}</span></span>
-    </div>
+{% if chip_signals %}
+<details class="insight">
+  <summary><span class="summary-icon">CHIP</span><span><strong>สัญญาณชิป</strong><small>ดูเฉพาะโอกาสจากโครงสร้างโปรแกรม</small></span><span class="chevron">⌄</span></summary>
+  <div class="insight-body">
+  <p class="sub">แจ้งเฉพาะโอกาสจากโครงสร้างโปรแกรม คุณเป็นผู้ตัดสินใจใช้ชิปเอง</p>
+  <div class="flags">
+    {% for signal in chip_signals %}
+    <div class="flag"><span class="tag">พิจารณา</span><span>{{ signal }}</span></div>
     {% endfor %}
   </div>
-  {% if plan_notes %}<p class="sub" style="margin-top:10px">{{ plan_notes }}</p>{% endif %}
-</section>
+  </div>
+</details>
+{% endif %}
 
-<section>
-  <h2>โปรแกรมการแข่งขัน</h2>
-  <p class="sub">ความยากของคู่แข่งที่ทีมในสควอดคุณต้องเจอ · ตัวเลขน้อย = ง่ายกว่า</p>
+<details class="insight">
+  <summary><span class="summary-icon">GW</span><span><strong>โปรแกรมการแข่งขัน</strong><small>ดูคู่แข่งของนักเตะในทีมล่วงหน้า</small></span><span class="chevron">⌄</span></summary>
+  <div class="insight-body">
+  <p class="sub">ดูว่านักเตะของคุณแต่ละกลุ่มเจอใครบ้าง · กดชื่อนักเตะเพื่อเปิดอันดับเปรียบเทียบ</p>
   <div class="scroll"><table>
-    <thead><tr><th>สโมสร</th>{% for g in horizon_gws %}<th class="r">GW{{ g }}</th>{% endfor %}<th class="r">เฉลี่ย</th></tr></thead>
+    <thead><tr><th>นักเตะในทีมคุณ</th>{% for g in horizon_gws %}<th class="r">GW{{ g }}</th>{% endfor %}<th class="r">เฉลี่ย</th></tr></thead>
     <tbody>
     {% for row in fixture_grid %}
       <tr>
-        <td class="pname">{{ row.team }}</td>
+        <td><div class="playerlist">{% for p in row.players %}<button type="button" class="playerlink player-open" data-player="{{ p.id }}">{{ p.name }} <span class="pmeta">{{ p.position }}</span></button>{% endfor %}</div><span class="pmeta">{{ row.team }}</span></td>
         {% for cell in row.cells %}
         <td class="r">{% if cell.games %}{% for g in cell.games %}<span class="fdr d{{ g.fdr }}">{{ g.label }} {{ g.fdr }}</span>{% endfor %}{% else %}<span class="fdr blank">ไม่มีเกม</span>{% endif %}</td>
         {% endfor %}
@@ -367,11 +208,58 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
     <span><i style="background:var(--fdr5)"></i>ยากมาก (5)</span>
     <span style="color:var(--ink-3)">H เหย้า &middot; A เยือน</span>
   </div>
-</section>
+  </div>
+</details>
+
+{% if plan %}
+<details class="insight">
+  <summary><span class="summary-icon">PLAN</span><span><strong>แผนล่วงหน้า {{ horizon }} สัปดาห์</strong><small>ดูว่าการเปลี่ยนตัวรอบนี้พาไปทางไหน</small></span><span class="chevron">⌄</span></summary>
+  <div class="insight-body">
+  <p class="sub">ภาพที่ solver มองไว้ล่วงหน้า ใช้ประกอบการตัดสินใจของสัปดาห์นี้เท่านั้น ไม่ใช่ตารางที่ต้องทำตาม สัปดาห์ถัดไปข้อมูลเปลี่ยน แผนก็เปลี่ยน</p>
+  <div class="plan">
+    {% for w in plan %}
+    <div class="pweek">
+      <span class="gw">GW{{ w.gw }}</span>
+      <span class="what">{{ w.summary }}
+        <span class="muted">&middot; กัปตัน {{ w.captain }} &middot; FT {{ w.ft }}{% if w.hits %} &middot; ลบ {{ w.hits }}{% endif %}</span>
+      </span>
+      <span class="epbar">
+        <span class="track"><span class="fill" style="width:{{ w.bar }}%"></span></span>
+        <b class="v">{{ "%.1f"|format(w.ep) }}</b>
+      </span>
+    </div>
+    {% endfor %}
+  </div>
+  {% if plan_notes %}<p class="sub" style="margin-top:10px">{{ plan_notes }}</p>{% endif %}
+  </div>
+</details>
+{% endif %}
+
+<div class="modalback" id="player-modal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="compare-title">
+    <div class="modalhead">
+      <div><h2 id="compare-title">เปรียบเทียบนักเตะ</h2><div class="pmeta" id="compare-sub"></div></div>
+      <button type="button" class="closebtn" id="compare-close" aria-label="ปิด">&times;</button>
+    </div>
+    <div class="comparefilters" aria-label="เรียงตัวเลือก">
+      <button class="filterbtn" data-sort="ep" aria-selected="true">คะแนนสูงสุด</button>
+      <button class="filterbtn" data-sort="price">ราคาใกล้เคียง</button>
+      <button class="filterbtn" data-sort="form">ฟอร์มดีที่สุด</button>
+      <button class="filterbtn" data-sort="fixtures">โปรแกรมดีที่สุด</button>
+    </div>
+    <p class="swipehint">เลื่อนตารางซ้าย–ขวาเพื่อดู EP ผลต่าง และโอกาสลง</p>
+    <div class="scroll comparetable" tabindex="0" aria-label="ตารางเปรียบเทียบนักเตะ เลื่อนซ้ายขวาเพื่อดูทุกคอลัมน์"><table>
+      <thead><tr><th>อันดับ</th><th>ผู้เล่น</th><th class="r">£</th><th>โปรแกรม</th><th class="r">ฟอร์ม</th><th class="r">EP {{ outlook_matches }} นัด</th><th class="r">เทียบคนที่เลือก</th><th class="r">โอกาสลง</th></tr></thead>
+      <tbody id="compare-body"></tbody>
+    </table></div>
+    <p class="sub" style="margin-top:10px">จัดอันดับเฉพาะตำแหน่งเดียวกันและราคาที่ซื้อได้จริง · ownership ไม่มีผลต่ออันดับ</p>
+  </div>
+</div>
 
 {% if flags %}
-<section>
-  <h2>รายการเฝ้าระวัง</h2>
+<details class="insight">
+  <summary><span class="summary-icon">ALERT</span><span><strong>รายการเฝ้าระวัง</strong><small>ดูความเสี่ยงอาการเจ็บและการหมุนเวียน</small></span><span class="chevron">⌄</span></summary>
+  <div class="insight-body">
   <p class="sub">ความเสี่ยงเรื่องอาการบาดเจ็บและการหมุนเวียนตัวในทีมคุณ</p>
   <div class="flags">
     {% for f in flags %}
@@ -381,12 +269,14 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
     </div>
     {% endfor %}
   </div>
-</section>
+  </div>
+</details>
 {% endif %}
 
-<section>
-  <h2>กันลืม</h2>
-  <p class="sub">สมัครครั้งเดียว มือถือจะเตือนเองก่อนทุก deadline ที่เหลือของฤดูกาล แม้ระบบนี้จะล่ม</p>
+<details class="insight">
+  <summary><span class="summary-icon">CAL</span><span><strong>กันลืม</strong><small>ตั้งปฏิทินเตือนก่อน deadline</small></span><span class="chevron">⌄</span></summary>
+  <div class="insight-body">
+  <p class="sub">เพิ่มลงปฏิทินครั้งเดียว เพื่อเตือนให้กดอัปเดตรายงานก่อน deadline 24 ชั่วโมง</p>
   <div class="subscribe">
     <a class="btn" href="deadlines.ics" download>เพิ่มลงปฏิทิน</a>
     <div class="how">
@@ -396,9 +286,10 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
     </div>
   </div>
   <p class="sub" style="margin-top:14px">
-    และกด &ldquo;เพิ่มไปยังหน้าจอโฮม&rdquo; จากเมนูแชร์ของเบราว์เซอร์ เพื่อเปิดหน้านี้ได้เหมือนแอป
+    เมื่อได้รับการเตือน ให้ดับเบิลคลิก <code>เปิดเว็บ FPL.bat</code> แล้วกดปุ่มอัปเดตข้อมูลล่าสุด
   </p>
-</section>
+  </div>
+</details>
 
 <footer>
   สร้างจาก Fantasy Premier League API เมื่อ {{ built_at }} · ตัวเลขคาดการณ์เป็นค่าประมาณเชิงสถิติ ไม่ใช่คำทำนายผลจริง
@@ -408,6 +299,150 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
 
 <script>
 (function () {
+  var comparisons = {{ player_comparisons|tojson }};
+  var modal = document.getElementById('player-modal');
+  var compareTitle = document.getElementById('compare-title');
+  var compareSub = document.getElementById('compare-sub');
+  var compareBody = document.getElementById('compare-body');
+  var activePlayerId = null, compareSort = "ep";
+  function fixtureScore(p) { var n=p.fixtures.map(function(x){var m=x.match(/\[(\d)\]/);return m?Number(m[1]):3;}); return n.reduce(function(a,b){return a+b;},0)/Math.max(n.length,1); }
+  function openComparison(playerId) {
+    var data = comparisons[String(playerId)];
+    if (!data) return;
+    activePlayerId = playerId;
+    var chosen=data.rows.find(function(p){return p.selected;}) || data.rows[0];
+    var rows=data.rows.slice().sort(function(a,b){if(compareSort==="price")return Math.abs(a.price-chosen.price)-Math.abs(b.price-chosen.price)||b.ep-a.ep;if(compareSort==="form")return b.form-a.form||b.ep-a.ep;if(compareSort==="fixtures")return fixtureScore(a)-fixtureScore(b)||b.ep-a.ep;return b.ep-a.ep;});
+    document.querySelectorAll(".filterbtn").forEach(function(b){b.setAttribute("aria-selected",String(b.dataset.sort===compareSort));});
+    compareTitle.textContent = data.name + ' เทียบกับตัวเลือกตำแหน่ง ' + data.position;
+    compareSub.textContent = 'อันดับ ' + data.selected_rank + ' จาก ' + data.total_ranked +
+      ' คนที่ซื้อได้ · งบสูงสุด £' + data.budget.toFixed(1) + 'm';
+    compareBody.textContent = '';
+    rows.forEach(function (p) {
+      var tr = document.createElement('tr');
+      if (p.selected) tr.className = 'selectedrow';
+      var values = [
+        p.rank,
+        p.name + ' · ' + p.team + (p.selected ? ' (คนที่เลือก)' : ''),
+        '£' + p.price.toFixed(1),
+        p.fixtures.join(' · '),
+        p.form.toFixed(1),
+        p.ep.toFixed(1),
+        (p.gain >= 0 ? '+' : '') + p.gain.toFixed(1),
+        Math.round(p.availability * 100) + '%'
+      ];
+      values.forEach(function (value, index) {
+        var td = document.createElement('td');
+        td.textContent = value;
+        if ([0, 2, 4, 5, 6, 7].indexOf(index) >= 0) td.className = 'r';
+        if (index === 3) td.style.whiteSpace = 'normal';
+        tr.appendChild(td);
+      });
+      compareBody.appendChild(tr);
+    });
+    modal.hidden = false;
+    document.body.style.overflow = 'hidden';
+  }
+  document.querySelectorAll('.player-open').forEach(function (button) {
+    button.addEventListener('click', function () { openComparison(button.dataset.player); });
+  });
+  document.querySelectorAll(".filterbtn").forEach(function(button){button.addEventListener("click",function(){compareSort=button.dataset.sort;if(activePlayerId)openComparison(activePlayerId);});});
+  function closeComparison() {
+    modal.hidden = true;
+    document.body.style.overflow = '';
+  }
+  document.getElementById('compare-close').addEventListener('click', closeComparison);
+  modal.addEventListener('click', function (event) { if (event.target === modal) closeComparison(); });
+  document.addEventListener('keydown', function (event) { if (event.key === 'Escape') closeComparison(); });
+
+  var refreshForm = document.getElementById('refresh-form');
+  var refreshBtn = document.getElementById('refresh-btn');
+  var refreshLabel = refreshBtn.querySelector('.refresh-label');
+  var refreshStatus = document.getElementById('refresh-status');
+  var canBuildLocally = location.hostname === '127.0.0.1' || location.hostname === 'localhost';
+  if (location.protocol === 'file:') {
+    refreshForm.hidden = true;
+  } else if (canBuildLocally) {
+    refreshForm.addEventListener('submit', async function (event) {
+      event.preventDefault();
+      refreshBtn.disabled = true;
+      refreshBtn.classList.add('loading');
+      refreshLabel.textContent = 'กำลังวิเคราะห์ข้อมูล…';
+      refreshStatus.hidden = false;
+      refreshStatus.className = 'refresh-status working';
+      refreshStatus.textContent = 'กำลังดึงข้อมูลล่าสุดและจัดทีมใหม่ ใช้เวลาประมาณ 5–30 วินาที';
+      try {
+        var response = await fetch('/refresh', {
+          method: 'POST', headers: { 'Accept': 'application/json' }
+        });
+        var result = await response.json().catch(function () { return {}; });
+        if (!response.ok || !result.ok) throw new Error(result.error || 'อัปเดตไม่สำเร็จ');
+        refreshStatus.className = 'refresh-status success';
+        refreshStatus.textContent = 'อัปเดตสำเร็จ กำลังเปิดรายงานใหม่…';
+        location.replace('/index.html?updated=' + Date.now());
+      } catch (error) {
+        refreshStatus.className = 'refresh-status error';
+        refreshStatus.textContent = error.message || 'อัปเดตไม่สำเร็จ กรุณาลองอีกครั้ง';
+        refreshBtn.disabled = false;
+        refreshBtn.classList.remove('loading');
+        refreshLabel.textContent = 'ลองอัปเดตอีกครั้ง';
+      }
+    });
+  } else {
+    refreshLabel.textContent = 'ตรวจข้อมูลล่าสุด';
+    refreshForm.addEventListener('submit', async function (event) {
+      event.preventDefault();
+      refreshBtn.disabled = true;
+      refreshBtn.classList.add('loading');
+      refreshStatus.hidden = false;
+      refreshStatus.className = 'refresh-status working';
+      refreshStatus.textContent = 'กำลังตรวจรายงานล่าสุดจากระบบ Cloud…';
+      if (!navigator.onLine) {
+        refreshStatus.className = 'refresh-status error';
+        refreshStatus.textContent = 'ขณะนี้ออฟไลน์ จึงแสดงรายงานล่าสุดที่บันทึกไว้ในเครื่อง';
+        refreshBtn.disabled = false;
+        refreshBtn.classList.remove('loading');
+        return;
+      }
+      try {
+        var latestUrl = './index.html?fresh=' + Date.now();
+        var latest = await fetch(latestUrl, { cache: 'no-store' });
+        if (!latest.ok) throw new Error('ยังตรวจรายงานล่าสุดไม่ได้');
+        location.replace(latestUrl);
+      } catch (error) {
+        refreshStatus.className = 'refresh-status error';
+        refreshStatus.textContent = error.message || 'ตรวจข้อมูลไม่สำเร็จ กรุณาลองอีกครั้ง';
+        refreshBtn.disabled = false;
+        refreshBtn.classList.remove('loading');
+      }
+    });
+  }
+
+  var themeToggle = document.getElementById('theme-toggle');
+  var savedTheme = localStorage.getItem('fpl-theme');
+  if (savedTheme) document.documentElement.dataset.theme = savedTheme;
+  themeToggle.addEventListener('click', function () {
+    var current = document.documentElement.dataset.theme;
+    var systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var next = current === 'dark' || (!current && systemDark) ? 'light' : 'dark';
+    document.documentElement.dataset.theme = next;
+    localStorage.setItem('fpl-theme', next);
+  });
+
+  var installPrompt = null;
+  var installBtn = document.getElementById('install-btn');
+  window.addEventListener('beforeinstallprompt', function (event) {
+    event.preventDefault();
+    installPrompt = event;
+    installBtn.hidden = false;
+  });
+  installBtn.addEventListener('click', async function () {
+    if (!installPrompt) return;
+    installPrompt.prompt();
+    await installPrompt.userChoice;
+    installPrompt = null;
+    installBtn.hidden = true;
+  });
+  window.addEventListener('appinstalled', function () { installBtn.hidden = true; });
   var el = document.getElementById('cd');
   if (!el) return;
   var target = new Date(el.dataset.deadline).getTime();
@@ -420,16 +455,6 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
     if (h < 24) el.parentElement.classList.add('urgent');
   }
   tick(); setInterval(tick, 30000);
-
-  var tabs = document.querySelectorAll('.tabs [data-pos]');
-  tabs.forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      tabs.forEach(function (b) { b.setAttribute('aria-selected', String(b === btn)); });
-      document.querySelectorAll('.target-panel').forEach(function (panel) {
-        panel.hidden = panel.dataset.pos !== btn.dataset.pos;
-      });
-    });
-  });
 
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(function () {});

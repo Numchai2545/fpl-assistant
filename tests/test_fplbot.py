@@ -8,15 +8,30 @@ only place a plan can become one FPL would refuse.
 """
 from __future__ import annotations
 
+import json
+import os
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+from tempfile import TemporaryDirectory
+
 import numpy as np
 import pandas as pd
 import pytest
 
-from fplbot import features, model, notify, optimize
+from fplbot import backtest, features, model, notify, optimize, report
 from fplbot.config import (CLEAN_SHEET_POINTS, GOAL_POINTS, MAX_PER_CLUB,
                            MAX_SAVED_TRANSFERS, SQUAD_BY_POSITION, SQUAD_SIZE,
-                           XI_SIZE, Config, verify_scoring)
-from fplbot.fetch import free_transfers, purchase_prices, selling_prices
+                           XI_SIZE, Config, load_config, verify_scoring)
+from fplbot.fetch import (FPLClient, apply_event_transfer_state, apply_event_transfers,
+                          free_transfers, purchase_prices, selling_prices)
+from fplbot.webapp import build_environment
+
+
+@pytest.fixture
+def local_tmp_path():
+    """Workspace-local temp directory for restricted Windows test runners."""
+    with TemporaryDirectory(prefix=".fpltest-", dir=Path.cwd()) as folder:
+        yield Path(folder)
 
 
 # --------------------------------------------------------------- shrinkage
@@ -88,6 +103,56 @@ class TestConcedePenalty:
         assert (out >= 0).all()
 
 
+class TestRecentForm:
+    def test_form_moves_close_players_without_overriding_availability(self):
+        baseline = pd.Series([5.0, 5.0, 5.0])
+        form = pd.Series([9.0, 2.0, 9.0])
+        availability = pd.Series([1.0, 1.0, 0.0])
+        blended = model.blend_recent_form(baseline, form, availability, 0.15)
+        assert blended.iloc[0] > baseline.iloc[0]
+        assert blended.iloc[1] < baseline.iloc[1]
+        assert blended.iloc[2] < baseline.iloc[2]
+        assert blended.iloc[0] < form.iloc[0], "form must stay a minority signal"
+
+
+class TestRecentMinutes:
+    def _players(self, availability=1.0):
+        return pd.DataFrame([{
+            "id": 1, "element_type": 3, "p_available": availability,
+            "start_rate": 0.2, "p_start": 0.2 * availability,
+            "p_any_minutes": 0.45 * availability,
+            "p_60plus": 0.15 * availability, "exp_minutes": 24.0 * availability,
+            "ep_next": 3.0, "form": 2.0, "points_per_game": 2.5,
+            "total_points": 10, "price": 6.0,
+        }]).set_index("id")
+
+    def test_recent_starts_raise_expected_minutes_without_erasing_prior(self):
+        histories = {1: {"history": [
+            {"round": gw, "minutes": 90, "starts": 1} for gw in range(1, 7)
+        ]}}
+        out = features.apply_recent_minutes(self._players(), histories, _cfg())
+        assert 0.2 < out.at[1, "p_start"] < 1.0
+        assert 24.0 < out.at[1, "exp_minutes"] < 90.0
+        assert out.at[1, "minutes_model_source"] == "recent"
+
+    def test_availability_still_overrides_a_strong_recent_history(self):
+        histories = {1: {"history": [{"round": 6, "minutes": 90, "starts": 1}]}}
+        out = features.apply_recent_minutes(self._players(availability=0.0), histories, _cfg())
+        assert out.at[1, "p_start"] == 0.0
+        assert out.at[1, "exp_minutes"] == 0.0
+
+    def test_missing_history_keeps_the_season_fallback(self):
+        out = features.apply_recent_minutes(self._players(), {}, _cfg())
+        assert out.at[1, "p_start"] == pytest.approx(0.2)
+        assert out.at[1, "minutes_model_source"] == "season"
+
+    def test_price_pressure_is_display_only_signal(self):
+        players = pd.DataFrame({"transfer_pressure": [0.8, -0.8, 0.0]}, index=[1, 2, 3])
+        out = features.apply_price_forecast(players, _cfg())
+        assert out.price_change_signal.to_dict() == {1: "rising", 2: "falling", 3: "stable"}
+        assert "ep" not in out, "price pressure must not manufacture or alter EP"
+
+
 # ------------------------------------------------------------ free transfers
 class TestFreeTransfers:
     def _history(self, rows, chips=None):
@@ -131,6 +196,48 @@ class TestFreeTransfers:
         without = free_transfers(self._history(rows))
         assert with_chip > without
         assert with_chip == MAX_SAVED_TRANSFERS - 1
+
+    def test_current_gameweek_moves_update_the_squad_in_time_order(self):
+        transfers = [
+            {"event": 5, "element_out": 2, "element_in": 20,
+             "time": "2026-09-13T10:00:00Z"},
+            {"event": 5, "element_out": 20, "element_in": 21,
+             "time": "2026-09-13T11:00:00Z"},
+            {"event": 4, "element_out": 1, "element_in": 99,
+             "time": "2026-09-01T10:00:00Z"},
+        ]
+        squad, used = apply_event_transfers([1, 2, 3], transfers, event=5)
+        assert squad == [1, 21, 3]
+        assert used == 2
+
+    def test_current_gameweek_moves_update_the_bank_from_transaction_prices(self):
+        transfers = [
+            {"event": 5, "element_out": 2, "element_in": 20,
+             "element_out_cost": 55, "element_in_cost": 60,
+             "time": "2026-09-13T10:00:00Z"},
+            {"event": 5, "element_out": 20, "element_in": 21,
+             "element_out_cost": 61, "element_in_cost": 58,
+             "time": "2026-09-13T11:00:00Z"},
+        ]
+        squad, bank, used = apply_event_transfer_state(
+            [1, 2, 3], 1.0, transfers, event=5)
+        assert squad == [1, 21, 3]
+        assert bank == pytest.approx(0.8)
+        assert used == 2
+
+    def test_ignored_transfer_does_not_change_the_bank(self):
+        transfers = [{"event": 5, "element_out": 99, "element_in": 20,
+                      "element_out_cost": 55, "element_in_cost": 60}]
+        squad, bank, used = apply_event_transfer_state(
+            [1, 2, 3], 1.0, transfers, event=5)
+        assert squad == [1, 2, 3]
+        assert bank == pytest.approx(1.0)
+        assert used == 0
+
+    def test_applied_transfer_without_prices_refuses_an_unsafe_bank(self):
+        transfers = [{"event": 5, "element_out": 2, "element_in": 20}]
+        with pytest.raises(ValueError, match="cannot reconstruct the current bank safely"):
+            apply_event_transfer_state([1, 2, 3], 1.0, transfers, event=5)
 
 
 # --------------------------------------------------------------- sell prices
@@ -399,6 +506,13 @@ class TestOptimiserConstraints:
         first = plan.gameweeks[0]
         assert len(first.moves) <= first.free_transfers_before + first.hits
 
+    def test_every_move_uses_free_transfers_before_hits(self, solved):
+        plan, *_ = solved
+        for week in plan.gameweeks:
+            moves = len(week.moves)
+            assert week.free_transfers_used == min(moves, week.free_transfers_before)
+            assert week.hits == max(0, moves - week.free_transfers_before)
+
 
 class TestOptimiserBehaviour:
     def test_empty_squad_falls_back_to_a_real_budget(self):
@@ -421,6 +535,57 @@ class TestOptimiserBehaviour:
         assert strict_moves < loose_moves
         assert strict_moves == 0, "prohibitive friction should stop every transfer"
 
+    def test_free_transfer_state_rolls_exactly_and_caps_at_five(self):
+        players, ep = _synthetic_league()
+        squad = _legal_squad(players)
+        plan = optimize.solve(
+            ep, players, squad, 2.0, 4, _cfg(transfer_friction=50.0))
+        assert [w.free_transfers_before for w in plan.gameweeks] == [4, 5, 5]
+
+    def test_paid_moves_start_only_after_the_free_transfer_is_used(self):
+        players, _ = _synthetic_league()
+        squad = _legal_squad(players)
+        working = list(squad)
+        targets: list[int] = []
+        for out_id in list(squad):
+            if int(players.element_type[out_id]) == 1:
+                continue
+            for in_id in players.index:
+                if in_id in squad or in_id in working or int(players.element_type[in_id]) != int(
+                        players.element_type[out_id]):
+                    continue
+                trial = [in_id if pid == out_id else pid for pid in working]
+                if players.loc[trial].team.value_counts().max() <= MAX_PER_CLUB:
+                    working = trial
+                    targets.append(int(in_id))
+                    break
+            if len(targets) == 2:
+                break
+        assert len(targets) == 2
+
+        ep = pd.DataFrame(0.1, index=players.index, columns=[1])
+        ep.loc[targets, 1] = 100.0
+        plan = optimize.solve(
+            ep, players, squad, bank=20.0, free_transfers=1,
+            cfg=_cfg(horizon=1, max_transfers_per_gw=2))
+        week = plan.gameweeks[0]
+        assert len(week.moves) == 2
+        assert week.free_transfers_used == 1
+        assert week.hits == 1
+
+    def test_outfield_bench_uses_the_configured_slot_order(self):
+        players, _ = _synthetic_league()
+        squad = _legal_squad(players)
+        ep = pd.DataFrame(1.0, index=players.index, columns=[1])
+        # Distinct values make the optimal slot assignment unambiguous.
+        for offset, pid in enumerate(squad):
+            ep.at[pid, 1] = 2.0 + offset / 10.0
+        plan = optimize.solve(
+            ep, players, squad, 0.0, 1, _cfg(horizon=1, transfer_friction=50.0),
+            hold_first_week=True)
+        bench_ep = [ep.at[pid, 1] for pid in plan.gameweeks[0].bench_outfield]
+        assert bench_ep == sorted(bench_ep, reverse=True)
+
     def test_never_sell_keeps_a_player_for_the_whole_horizon(self):
         players, ep = _synthetic_league()
         squad = _legal_squad(players)
@@ -438,6 +603,159 @@ class TestOptimiserBehaviour:
         real = optimize.solve(ep, players, squad, 0.0, 1, _cfg(), selling_price=discounted)
         assert real.budget < full.budget
         assert real.budget == pytest.approx(full.budget - 0.3 * len(squad), abs=0.05)
+
+    def test_forced_first_move_and_weekly_cap_are_respected(self):
+        players, ep = _synthetic_league()
+        squad = _legal_squad(players)
+        out_id = squad[0]
+        pos = int(players.element_type[out_id])
+        in_id = next(p for p in players.index
+                     if p not in squad and int(players.element_type[p]) == pos
+                     and players.loc[squad].team.value_counts().get(players.team[p], 0) < 3)
+        plan = optimize.solve(
+            ep, players, squad, bank=20.0, free_transfers=3,
+            cfg=_cfg(max_transfers_per_gw=1), forced_first_move=(out_id, in_id))
+        assert plan.gameweeks[0].moves == [(out_id, in_id)]
+        assert all(len(week.moves) <= 1 for week in plan.gameweeks)
+
+    def test_hold_first_week_overrides_a_small_optimiser_gain(self):
+        players, ep = _synthetic_league()
+        squad = _legal_squad(players)
+        plan = optimize.solve(ep, players, squad, 5.0, 3, _cfg(), hold_first_week=True)
+        assert plan.gameweeks[0].moves == []
+
+    def test_formation_changes_to_follow_the_highest_expected_points(self):
+        players, ep = _synthetic_league()
+        squad = _legal_squad(players)
+        base = pd.DataFrame(1.0, index=players.index, columns=[1])
+        base.loc[players.element_type == 4, 1] = 2.0
+
+        defender_ep = base.copy()
+        defender_ep.loc[players.element_type == 2, 1] = 10.0
+        defender_plan = optimize.solve(
+            defender_ep, players, squad, 20.0, 1, _cfg(horizon=1),
+            hold_first_week=True)
+
+        midfielder_ep = base.copy()
+        midfielder_ep.loc[players.element_type == 3, 1] = 10.0
+        midfielder_plan = optimize.solve(
+            midfielder_ep, players, squad, 20.0, 1, _cfg(horizon=1),
+            hold_first_week=True)
+
+        def shape(plan):
+            xi = plan.gameweeks[0].xi
+            return tuple(sum(int(players.element_type[p]) == pos for p in xi)
+                         for pos in (2, 3, 4))
+
+        assert shape(defender_plan) == (5, 2, 3)
+        assert shape(midfielder_plan) == (3, 5, 2)
+
+
+def _advice_players() -> pd.DataFrame:
+    return pd.DataFrame([
+        {"id": 1, "element_type": 3, "team": 1, "price": 6.0,
+         "p_available": 1.0, "p_start": 0.9, "name": "Weak",
+         "team_name": "A", "selected_by_percent": "50.0"},
+        {"id": 2, "element_type": 3, "team": 2, "price": 6.5,
+         "p_available": 1.0, "p_start": 0.9, "name": "Best",
+         "team_name": "B", "selected_by_percent": "0.1"},
+        {"id": 3, "element_type": 3, "team": 3, "price": 6.4,
+         "p_available": 1.0, "p_start": 0.9, "name": "Second",
+         "team_name": "C", "selected_by_percent": "95.0"},
+        {"id": 4, "element_type": 3, "team": 4, "price": 6.3,
+         "p_available": 1.0, "p_start": 0.9, "name": "Third",
+         "team_name": "D", "selected_by_percent": "20.0"},
+        {"id": 5, "element_type": 3, "team": 5, "price": 6.2,
+         "p_available": 1.0, "p_start": 0.9, "name": "Fourth",
+         "team_name": "E", "selected_by_percent": "10.0"},
+        {"id": 6, "element_type": 3, "team": 6, "price": 8.0,
+         "p_available": 1.0, "p_start": 0.9, "name": "Too expensive",
+         "team_name": "F", "selected_by_percent": "80.0"},
+    ]).set_index("id")
+
+
+def _advice_rows(per_match: dict[int, float], games: int = 6) -> pd.DataFrame:
+    rows = []
+    for pid, value in per_match.items():
+        for n in range(games):
+            rows.append({"player_id": pid, "gw": n + 1, "team": pid,
+                         "opponent": (pid + n) % 20 + 1, "is_home": n % 2 == 0,
+                         "fdr": 2 + n % 4, "kickoff": f"2026-09-{10+n:02d}T12:00:00Z",
+                         "ep": value if n < 5 else value * 100})
+    return pd.DataFrame(rows)
+
+
+class TestTransferAdvice:
+    def test_ranks_four_affordable_same_position_candidates_by_five_match_gain(self):
+        players = _advice_players()
+        rows = _advice_rows({1: 2.0, 2: 4.0, 3: 3.8, 4: 3.6, 5: 3.4, 6: 9.0})
+        advice = optimize.analyse_transfers(
+            rows, players, [1], bank=0.5, free_transfers=1,
+            cfg=_cfg(outlook_matches=5, candidate_count=4, min_transfer_gain=3.0))
+        assert advice.recommend
+        assert [c.in_id for c in advice.candidates] == [2, 3, 4, 5]
+        assert advice.candidates[0].gain == pytest.approx(10.0)
+        assert len(advice.candidates[0].fixtures) == 5
+        assert 6 not in [c.in_id for c in advice.candidates]
+
+    def test_ownership_does_not_change_the_ranking(self):
+        players = _advice_players()
+        rows = _advice_rows({1: 2.0, 2: 4.0, 3: 3.8})
+        advice = optimize.analyse_transfers(rows, players, [1], 0.5, 1, _cfg())
+        assert advice.candidates[0].in_id == 2
+
+    def test_recommends_holding_below_three_point_threshold(self):
+        players = _advice_players()
+        rows = _advice_rows({1: 2.0, 2: 2.5, 3: 2.4})
+        advice = optimize.analyse_transfers(
+            rows, players, [1], 0.5, 1, _cfg(min_transfer_gain=3.0))
+        assert not advice.recommend
+        assert "เพิ่มเพียง" in advice.reason
+
+    def test_no_free_transfer_does_not_create_a_routine_hit(self):
+        players = _advice_players()
+        rows = _advice_rows({1: 2.0, 2: 5.0})
+        advice = optimize.analyse_transfers(rows, players, [1], 0.5, 0, _cfg())
+        assert not advice.recommend
+        assert not advice.hit
+
+    def test_hit_is_reserved_for_an_uncovered_unavailable_starter(self):
+        players, _ = _synthetic_league()
+        squad = _legal_squad(players)
+        club_counts = players.loc[squad].team.value_counts()
+        out_id = next(p for p in squad if int(players.element_type[p]) == 3)
+        in_id = next(p for p in players.index
+                     if p not in squad and int(players.element_type[p]) == 3
+                     and club_counts.get(players.team[p], 0) < 3)
+        players["p_available"] = 0.1
+        players.loc[in_id, "p_available"] = 1.0
+        rates = {p: (2.1 if int(players.element_type[p]) == 3 else 0.1)
+                 for p in squad}
+        rates[out_id] = 2.0
+        rates[in_id] = 4.0
+        rows = _advice_rows(rates)
+        advice = optimize.analyse_transfers(
+            rows, players, squad, bank=20.0, free_transfers=0,
+            cfg=_cfg(hit_policy="emergency_only", min_transfer_gain=3.0))
+        assert advice.out_id == out_id
+        assert advice.recommend and advice.hit
+        assert advice.candidates[0].net_gain == pytest.approx(6.0)
+
+    def test_click_comparison_uses_same_position_and_affordable_budget(self):
+        players = _advice_players()
+        rows = _advice_rows({1: 2.0, 2: 4.0, 3: 3.8, 4: 3.6, 5: 3.4, 6: 9.0})
+        cfg = _cfg(outlook_matches=5, comparison_count=8)
+        advice = optimize.analyse_transfers(rows, players, [1], 0.5, 1, cfg)
+        teams = pd.DataFrame({
+            "short_name": {team: f"T{team}" for team in range(1, 7)}
+        }).rename_axis("id")
+        comparisons = report.player_comparisons(
+            cfg, rows, players, teams, [2], [1], 0.5, {1: 6.0}, advice)
+        comparison = comparisons["2"]
+        assert comparison["selected_rank"] == 1
+        assert all(row["position"] == "MID" for row in comparison["rows"])
+        assert all(row["price"] <= comparison["budget"] for row in comparison["rows"])
+        assert all(row["id"] != 6 for row in comparison["rows"])
 
 
 # ------------------------------------------------------------------ calendar
@@ -481,6 +799,12 @@ class TestCalendarFeed:
         assert "TRIGGER:-PT180M" in ics    # 3h
         assert ics.count("BEGIN:VALARM") == 3
 
+    def test_default_calendar_has_only_the_24_hour_reminder(self):
+        from fplbot import calendar_feed
+        ics = calendar_feed.build_ics(self._events([100.0]))
+        assert "TRIGGER:-PT1440M" in ics
+        assert ics.count("BEGIN:VALARM") == 1
+
     def test_uid_is_stable_across_rebuilds(self):
         """Subscribers must update the event, not accumulate duplicates."""
         from fplbot import calendar_feed
@@ -515,6 +839,23 @@ class TestCalendarFeed:
         ics = calendar_feed.build_ics([])
         assert "BEGIN:VCALENDAR" in ics and "END:VCALENDAR" in ics
         assert "BEGIN:VEVENT" not in ics
+
+
+class TestChipSignals:
+    def test_flags_double_and_short_blank_without_choosing_a_chip(self):
+        players = pd.DataFrame([
+            {"id": pid, "team": pid, "p_available": 1.0}
+            for pid in range(1, 16)
+        ]).set_index("id")
+        rows = []
+        for team in range(1, 11):
+            rows.append({"team": team, "gw": 5, "opponent": team + 1,
+                         "is_home": True})
+        rows.append({"team": 1, "gw": 5, "opponent": 20, "is_home": False})
+        signals = report.chip_signals(
+            _cfg(), pd.DataFrame(rows), players, list(players.index), [5])
+        assert any("Double Gameweek" in signal for signal in signals)
+        assert any("Free Hit" in signal and "10 คน" in signal for signal in signals)
 
 
 # -------------------------------------------------------------- squad alerts
@@ -596,3 +937,90 @@ class TestSquadAlerts:
         players = self._players([{"id": 1, "name": "A"}])
         flags, alerts = squad_alerts(players, [1, 999], xi=[1, 999], captain=999)
         assert flags == [] and alerts == []
+
+
+class TestBacktestPipeline:
+    def _cfg(self, tmp_path) -> Config:
+        return Config(raw={
+            "entry": {"team_id": 1}, "planning": {"horizon": 1},
+            "output": {"data_dir": str(tmp_path / "data"),
+                       "site_dir": str(tmp_path / "site")},
+        })
+
+    def test_scores_only_latest_valid_pre_deadline_projection(self, local_tmp_path):
+        cfg = self._cfg(local_tmp_path)
+        now = datetime.now(timezone.utc)
+        folder = cfg.data_dir / "projections"
+        folder.mkdir(parents=True)
+
+        def save(name, gw, built, deadline, model_ep):
+            payload = {
+                "schema_version": 1, "model_version": "test", "gw": gw,
+                "built_at": built.isoformat(), "deadline": deadline.isoformat(),
+                "players": [{"player_id": 7, "name": "Seven", "position": "MID",
+                             "model_ep": model_ep, "fpl_ep_next": 4.0}],
+            }
+            (folder / name).write_text(json.dumps(payload), encoding="utf-8")
+
+        deadline = now - timedelta(days=1)
+        save("gw1-old.json", 1, now - timedelta(days=3), deadline, 2.0)
+        save("gw1-latest.json", 1, now - timedelta(days=2), deadline, 5.0)
+        save("gw2-invalid.json", 2, now, deadline, 99.0)
+
+        def history(_pid):
+            return {"history": [{"round": 1, "total_points": 6}]}
+
+        result = backtest.evaluate_projections(cfg, history, now=now)
+        assert result["gameweeks"] == 1
+        assert result["players"] == 1
+        assert result["metrics"]["model"]["mae"] == pytest.approx(1.0)
+        assert result["metrics"]["fpl"]["mae"] == pytest.approx(2.0)
+
+    def test_offline_client_uses_latest_available_snapshot(self, local_tmp_path):
+        cfg = self._cfg(local_tmp_path)
+        old = cfg.data_dir / "snapshots" / "2020-01-01"
+        old.mkdir(parents=True)
+        (old / "bootstrap.json").write_text("{}", encoding="utf-8")
+        client = FPLClient(cfg, offline=True)
+        assert client.snapshot_dir == old
+
+    def test_web_build_subprocess_can_import_the_src_package(self, local_tmp_path):
+        project = local_tmp_path / "project"
+        env = build_environment(project)
+        assert str(project.resolve() / "src") in env["PYTHONPATH"].split(os.pathsep)
+        assert env["PYTHONIOENCODING"] == "utf-8"
+
+    def test_deployment_url_can_be_supplied_by_the_pages_workflow(
+            self, local_tmp_path, monkeypatch):
+        config_path = local_tmp_path / "config.yaml"
+        config_path.write_text("entry:\n  team_id: 1\n", encoding="utf-8")
+        monkeypatch.setenv("FPL_SITE_URL", "https://example.github.io/fpl-assistant/")
+        cfg = load_config(config_path)
+        assert cfg.get("notify", "site_url") == "https://example.github.io/fpl-assistant"
+
+    def test_dashboard_render_smoke_writes_html_and_machine_summary(self, local_tmp_path):
+        cfg = self._cfg(local_tmp_path)
+        context = {
+            "title": "Test FPL", "gw": 5, "horizon": 1, "horizon_gws": [5],
+            "built_at": "วันนี้", "deadline_human": "12h", "deadline_local": "คืนนี้",
+            "hours_left": 12.0, "entry": {"total_points": 100, "rank_human": "1,000",
+                                            "last_gw_points": 50},
+            "free_transfers": 2, "bank": 0.5, "squad_value": 100.0,
+            "this_gw_ep": 55.0, "action": {"headline": "เก็บ transfer",
+                                               "detail": "ทดสอบ", "moves": []},
+            "pitch_rows": [], "bench_gk": [], "bench_outfield": [], "formation": "3-4-3",
+            "captains": [], "transfer_out": None, "transfer_candidates": [],
+            "outlook_matches": 5, "plan": [], "plan_notes": "",
+            "fixture_grid": [], "flags": [], "alerts": [], "chip_signals": [],
+            "player_comparisons": {}, "site_url": "", "remind_hours": [24],
+            "model_version": "test", "solver_status": "Optimal",
+            "deadline_iso": (datetime.now(timezone.utc) + timedelta(hours=12)).isoformat(),
+            "captain_name": "—",
+        }
+        index = report.render(context, cfg)
+        assert index.exists()
+        html = index.read_text(encoding="utf-8")
+        assert "Test FPL" in html
+        assert "p.form.toFixed(1)" in html, "comparison rows must match all eight headers"
+        summary = json.loads((cfg.site_dir / "summary.json").read_text(encoding="utf-8"))
+        assert summary["gw"] == 5

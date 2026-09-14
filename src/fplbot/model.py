@@ -22,6 +22,14 @@ from .config import (ASSIST_POINTS, CLEAN_SHEET_POINTS, DEFCON_POINTS,
 from .features import per90, positional_prior, shrink
 
 
+def blend_recent_form(model_ep: pd.Series, recent_form: pd.Series,
+                      availability: pd.Series, weight: float) -> pd.Series:
+    """Blend FPL's recent points form into the fixture-based estimate."""
+    form = pd.to_numeric(recent_form, errors="coerce").fillna(model_ep).clip(0.0, 15.0)
+    form_ep = form * availability.clip(0.0, 1.0)
+    return ((1.0 - weight) * model_ep + weight * form_ep).clip(lower=0.0)
+
+
 def build_rates(players: pd.DataFrame, cfg: Config) -> pd.DataFrame:
     """Per-90 rates we actually believe, after shrinkage."""
     k = float(cfg.get("model", "prior_minutes", default=360))
@@ -105,9 +113,11 @@ def expected_points(players: pd.DataFrame, teams: pd.DataFrame,
     rates = build_rates(players, cfg)
     s = opponent_multipliers(schedule, teams, cfg)
 
+    if "form" not in rates:
+        rates["form"] = 0.0
     cols = ["element_type", "exp_minutes", "p_60plus", "p_any_minutes", "p_start",
             "goal_rate", "assist_rate", "dc90", "bps90", "saves90", "yellow90",
-            "price", "name", "team_name", "selected_by_percent", "position"]
+            "price", "name", "team_name", "selected_by_percent", "position", "form"]
     s = s.merge(rates[cols], left_on="player_id", right_index=True, how="left")
     s = s.dropna(subset=["element_type"])
     s["element_type"] = s.element_type.astype(int)
@@ -157,9 +167,13 @@ def expected_points(players: pd.DataFrame, teams: pd.DataFrame,
     # ---- discipline -------------------------------------------------------
     s["ep_cards"] = s.yellow90 * minutes_share * YELLOW_CARD_POINTS
 
-    s["ep"] = (s.ep_minutes + s.ep_goals + s.ep_assists + s.ep_clean_sheet
-               + s.ep_defcon + s.ep_bonus + s.ep_saves + s.ep_cards + s.ep_conceded)
-    s["ep"] = s.ep.clip(lower=0.0)
+    s["ep_model"] = (s.ep_minutes + s.ep_goals + s.ep_assists + s.ep_clean_sheet
+                     + s.ep_defcon + s.ep_bonus + s.ep_saves + s.ep_cards + s.ep_conceded)
+    form_weight = float(cfg.get("model", "recent_form_weight", default=0.15))
+    # FPL form is recent points per match. Keep it as a small, availability-
+    # adjusted signal so a short hot streak can move a close selection without
+    # replacing the fixture and underlying-stat model.
+    s["ep"] = blend_recent_form(s.ep_model, s["form"], s.p_any_minutes, form_weight)
 
     s = _apply_strategy(s, cfg)
     return s

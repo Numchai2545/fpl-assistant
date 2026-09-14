@@ -1,0 +1,305 @@
+/* Sports analytics UI — the whole stylesheet.
+   One file, one definition per rule. It used to be an inline <style> block in
+   template.html plus this file layered on top, which meant every colour token
+   was declared twice and the two disagreed; editing a colour meant finding
+   which of the two won. */
+
+/* ---- design tokens ---------------------------------------------------- */
+:root{
+  --ground:#F5F7FC; --surface:#FFFFFF; --surface-2:#F0F3F9; --surface-3:#E3E8F1;
+  --ink:#111827; --ink-2:#526074; --ink-3:#8491A5;
+  --rule:#E0E5EE; --rule-strong:#CAD2DF;
+  --accent:#5B5FEF; --accent-soft:#ECECFF;
+  --good:#078B72; --good-soft:#DFF7F0;
+  --warn:#B15C08; --warn-soft:#FFF0D9;
+  --crit:#C4314B; --crit-soft:#FDE7EB;
+  --fdr2:#087F70; --fdr3:#64748B; --fdr4:#D15B70; --fdr5:#9F2440; --fdr-ink:#FFFFFF;
+  --shadow:0 10px 32px rgba(30,41,59,.07);
+  --shadow-raised:0 22px 55px rgba(30,41,59,.13);
+  --radius:22px;
+}
+
+/* Dark is defined twice on purpose: once for the system preference, once for
+   an explicit data-theme="dark". Miss the second and a manual theme toggle
+   silently keeps the light palette. */
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ground:#07111F; --surface:#0D1B2B; --surface-2:#142538; --surface-3:#203349;
+  --ink:#F1F6FC; --ink-2:#B3C0CF; --ink-3:#78889A;
+  --rule:#21354B; --rule-strong:#314963;
+  --accent:#70A2FF; --accent-soft:#162E52;
+  --good:#54D2BE; --good-soft:#113A34;
+  --warn:#F4B25C; --warn-soft:#3B2A13;
+  --crit:#FF879D; --crit-soft:#421923;
+  --fdr2:#2CA892; --fdr3:#65758A; --fdr4:#D8667C; --fdr5:#F08AA0; --fdr-ink:#07111F;
+  --shadow:0 18px 45px rgba(0,0,0,.25);
+  --shadow-raised:0 25px 65px rgba(0,0,0,.45);
+}}
+:root[data-theme="dark"]{
+  --ground:#07111F; --surface:#0D1B2B; --surface-2:#142538; --surface-3:#203349;
+  --ink:#F1F6FC; --ink-2:#B3C0CF; --ink-3:#78889A;
+  --rule:#21354B; --rule-strong:#314963;
+  --accent:#70A2FF; --accent-soft:#162E52;
+  --good:#54D2BE; --good-soft:#113A34;
+  --warn:#F4B25C; --warn-soft:#3B2A13;
+  --crit:#FF879D; --crit-soft:#421923;
+  --fdr2:#2CA892; --fdr3:#65758A; --fdr4:#D8667C; --fdr5:#F08AA0; --fdr-ink:#07111F;
+  --shadow:0 18px 45px rgba(0,0,0,.25);
+  --shadow-raised:0 25px 65px rgba(0,0,0,.45);
+}
+
+/* ---- base ------------------------------------------------------------- */
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;color:var(--ink);line-height:1.65;font-size:15px;
+  background:radial-gradient(circle at 90% -8%,color-mix(in srgb,var(--accent) 14%,transparent),transparent 30rem),radial-gradient(circle at -8% 22%,color-mix(in srgb,var(--good) 8%,transparent),transparent 24rem),var(--ground);
+  font-family:"Noto Sans Thai",system-ui,-apple-system,"Segoe UI",sans-serif;
+  -webkit-font-smoothing:antialiased;padding-bottom:env(safe-area-inset-bottom)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 16px 72px}
+h1,h2,h3,.disp{font-family:"Manrope","Noto Sans Thai",sans-serif;text-wrap:balance;margin:0;letter-spacing:-.02em}
+.mono,.num{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+a{color:var(--accent)}
+button:focus-visible,summary:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+
+/* ---- header ----------------------------------------------------------- */
+header{margin:0 -16px;padding:16px;
+  background:color-mix(in srgb,var(--surface) 84%,transparent);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:14px;
+  position:sticky;top:0;z-index:10;border-bottom:1px solid color-mix(in srgb,var(--rule) 76%,transparent)}
+.brandline{display:flex;align-items:center;gap:11px;min-width:0}
+.appmark{width:44px;height:44px;border-radius:15px;flex:none;color:#fff;
+  background:linear-gradient(145deg,var(--accent),#16A394);display:grid;place-items:center;font:800 14px "Manrope",sans-serif;
+  box-shadow:0 8px 20px color-mix(in srgb,var(--accent) 26%,transparent)}
+.brand{min-width:0}
+.brand .eyebrow{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+.brand h1{font-size:clamp(18px,4.5vw,25px);font-weight:800;line-height:1.15;margin-top:3px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.countdown{text-align:right;padding:8px 10px;border:1px solid var(--rule);background:var(--surface);
+  border-radius:12px;box-shadow:var(--shadow)}
+.countdown .lab{font-size:9.5px;letter-spacing:.04em;color:var(--ink-3);font-weight:600}
+.countdown .val{font-family:"IBM Plex Mono",monospace;font-size:17px;font-weight:600;line-height:1.2;color:var(--accent)}
+.countdown .sub{display:none;font-size:12px;color:var(--ink-2)}
+.countdown.urgent .val{color:var(--crit)}
+.header-actions{display:flex;align-items:center;gap:8px}
+.iconbtn{width:44px;height:44px;border:1px solid var(--rule);border-radius:14px;background:var(--surface);
+  color:var(--ink);display:grid;place-items:center;cursor:pointer;box-shadow:var(--shadow);font-size:19px}
+.theme-sun{display:none}:root[data-theme="dark"] .theme-sun{display:inline}:root[data-theme="dark"] .theme-moon{display:none}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .theme-sun{display:inline}:root:not([data-theme="light"]) .theme-moon{display:none}}
+
+.webtools{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:14px 0 0;justify-content:space-between;min-width:0}
+.webtools form{margin:0;display:flex;gap:8px;flex-wrap:wrap}
+.webtools .stamp{order:-1;font-size:12px;color:var(--ink-3);max-width:50%;line-height:1.35;overflow-wrap:anywhere}
+.refreshbtn{border:0;cursor:pointer;font:700 13px "Noto Sans Thai",sans-serif;gap:8px;box-shadow:0 10px 24px color-mix(in srgb,var(--accent) 24%,transparent)}
+.refreshbtn:disabled{cursor:wait;opacity:.76}.refreshbtn.loading .refreshicon{animation:spin .85s linear infinite}
+.refreshicon{font:700 19px/1 "Manrope",sans-serif}.installbtn{border:1px solid var(--rule);background:var(--surface);color:var(--ink);gap:7px}
+.refresh-status{flex:1 0 100%;padding:10px 13px;border-radius:12px;font-size:12.5px;font-weight:500}
+.refresh-status.working{background:var(--accent-soft);color:var(--accent)}
+.refresh-status.success{background:var(--good-soft);color:var(--good)}
+.refresh-status.error{background:var(--crit-soft);color:var(--crit);white-space:pre-wrap}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ---- stat tiles ------------------------------------------------------- */
+.overview-label{margin:22px 0 8px;font-weight:700;font-size:12px;color:var(--ink-3);
+  letter-spacing:.08em;text-transform:uppercase}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:0}
+.tile{padding:15px;border:1px solid color-mix(in srgb,var(--rule) 82%,transparent);border-radius:16px;background:color-mix(in srgb,var(--surface) 94%,transparent);box-shadow:var(--shadow)}
+.tile dt{font-size:11px;letter-spacing:.04em;color:var(--ink-3);font-weight:600;margin-bottom:2px}
+.tile dd{margin:0;font-family:"IBM Plex Mono",monospace;font-size:22px;font-weight:600;line-height:1.2}
+.tile small{display:block;font-family:"Noto Sans Thai",sans-serif;font-size:12px;color:var(--ink-2);font-weight:400}
+.tile:last-child{grid-column:1/-1;background:linear-gradient(135deg,var(--accent-soft),var(--surface))}
+.tile:last-child dd{font-size:28px;color:var(--accent)}
+
+/* ---- action banner ---------------------------------------------------- */
+.action{border:1px solid color-mix(in srgb,var(--accent) 14%,var(--rule));border-radius:var(--radius);padding:22px;margin-top:14px;min-width:0;
+  background:linear-gradient(145deg,var(--surface),color-mix(in srgb,var(--accent-soft) 42%,var(--surface)));
+  box-shadow:var(--shadow-raised);position:relative;overflow:hidden}
+.action .lab{font-size:11.5px;letter-spacing:.04em;color:var(--accent);font-weight:700;font-family:"Noto Sans Thai",sans-serif}
+.action .headline{font-family:"Manrope","Noto Sans Thai",sans-serif;font-size:clamp(20px,5vw,26px);font-weight:800;
+  margin:5px 0 0;line-height:1.35;overflow-wrap:anywhere}
+.action .detail{color:var(--ink-2);font-size:14px;margin-top:7px;overflow-wrap:anywhere}
+.move{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.move .swap{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;font-size:13.5px;font-weight:500;
+  background:var(--surface);border:1px solid var(--rule);border-radius:999px}
+.move .out{color:var(--crit)} .move .in{color:var(--good)} .move .arr{color:var(--ink-3)}
+
+/* alerts: the thing that actually costs points when a deadline is missed */
+.action.alert{border:1px solid var(--crit);background:var(--crit-soft);box-shadow:none}
+.action.alert .lab{color:var(--crit)}
+.alertlist{margin:8px 0 0;padding-left:18px;display:grid;gap:5px}
+.alertlist li{font-size:14.5px;font-weight:500}
+
+section{padding-block:30px 4px}
+section>h2{font-size:19px;font-weight:700;margin-bottom:3px}
+section>.sub{color:var(--ink-2);font-size:13.5px;margin:0 0 16px}
+
+/* ---- tables ----------------------------------------------------------- */
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--rule);
+  border-radius:12px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:560px}
+th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--rule);white-space:nowrap}
+thead th{position:sticky;top:0;background:var(--surface);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--ink-3);font-weight:700;border-bottom:1px solid var(--rule-strong);font-family:"Noto Sans Thai",sans-serif;z-index:1}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:var(--surface-2)}
+td.r,th.r{text-align:right;font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
+.pname{font-weight:600}
+.pmeta{color:var(--ink-3);font-size:11.5px;font-family:"IBM Plex Mono",monospace}
+.pos{display:inline-block;min-width:34px;text-align:center;font-size:10.5px;font-weight:600;padding:2px 5px;border-radius:4px;
+  background:var(--surface-3);color:var(--ink-2);font-family:"IBM Plex Mono",monospace}
+.selectedrow{background:var(--accent-soft)}
+
+/* single-series meter: one hue, value always labelled */
+.meter{display:flex;align-items:center;gap:8px;justify-content:flex-end}
+.meter .track{width:52px;height:5px;border-radius:3px;background:var(--surface-3);overflow:hidden;flex:none}
+.meter .fill{display:block;height:100%;border-radius:3px;background:var(--accent)}
+
+/* fdr cells: diverging ramp, number always printed so colour is never alone */
+.fdr{display:inline-block;min-width:58px;text-align:center;padding:3px 6px;border-radius:4px;
+  font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:600;color:var(--fdr-ink);line-height:1.35}
+.d1,.d2{background:var(--fdr2)} .d3{background:var(--fdr3)} .d4{background:var(--fdr4)} .d5{background:var(--fdr5)}
+.blank{background:var(--surface-3);color:var(--ink-3)}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11.5px;color:var(--ink-2);margin-top:10px;align-items:center}
+.legend i{width:10px;height:10px;border-radius:2px;display:inline-block;margin-right:5px;vertical-align:-1px}
+
+/* ---- pitch ------------------------------------------------------------
+   The pitch is green in both themes, so every card on it is a fixed light
+   surface with its own hardcoded ink. Using --ink here would make the text
+   near-invisible in dark mode: the card stays white, the token does not. */
+.pitch{border:1px solid rgba(255,255,255,.16);border-radius:26px;padding:26px 10px 19px;
+  background:linear-gradient(rgba(255,255,255,.035) 50%,transparent 50%),linear-gradient(155deg,#159078,#087263);
+  background-size:100% 92px,100% 100%;box-shadow:var(--shadow-raised);position:relative;overflow:hidden}
+.row{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.pitch>.row{flex-wrap:nowrap;gap:5px}
+/* min-width, not width: a min-width here outranks any width the breakpoints
+   set, which is what used to push the document wider than a phone screen. */
+.card{min-width:0;width:clamp(62px,19vw,112px);padding:8px 6px;text-align:center;
+  border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.94);
+  border-radius:10px;box-shadow:0 5px 12px rgba(0,40,35,.13)}
+.card.player-open{color:#102033;font:inherit;line-height:inherit;cursor:pointer}
+.card.player-open:hover{border-color:#5B5FEF;background:#fff;transform:translateY(-2px)}
+.card.player-open{transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}
+.card.cap{border:2px solid #FFE066}
+.card .nm{font-weight:600;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .ep{font-family:"IBM Plex Mono",monospace;font-size:13px;font-weight:600;color:#087F70;line-height:1.3}
+.card .op{font-size:9.5px;color:#526277;font-family:"IBM Plex Mono",monospace}
+.card .slot{font-family:"IBM Plex Mono",monospace;font-size:9.5px;font-weight:600;color:#526277;
+  letter-spacing:.06em;margin-bottom:1px}
+.card .badge{display:inline-block;font-size:9.5px;font-weight:700;background:#2563EB;color:#fff;
+  border-radius:3px;padding:0 4px;margin-left:3px;vertical-align:1px;font-family:"IBM Plex Mono",monospace}
+.card.gkslot{background:rgba(255,255,255,.82)}
+.benchrow{border-top:1px dashed rgba(255,255,255,.35);margin-top:14px;padding-top:14px}
+.benchrow .lab{text-align:center;font-size:11px;letter-spacing:.03em;color:rgba(255,255,255,.82);font-weight:600;margin-bottom:9px}
+.benchrow .row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.benchrow .card{width:auto;position:relative}
+
+/* ---- collapsible insight panels --------------------------------------- */
+.insight{margin-top:14px;border:1px solid var(--rule);border-radius:var(--radius);
+  background:var(--surface);box-shadow:var(--shadow);overflow:hidden}
+.insight summary{list-style:none;min-height:72px;display:grid;grid-template-columns:44px 1fr 28px;
+  gap:12px;align-items:center;padding:13px 15px;cursor:pointer}
+.insight summary::-webkit-details-marker{display:none}
+.summary-icon{width:44px;height:44px;border-radius:13px;background:var(--accent-soft);color:var(--accent);
+  display:grid;place-items:center;font-weight:700;font-size:11px;font-family:"IBM Plex Mono",monospace}
+.insight summary strong{display:block;font:700 16px "Noto Sans Thai",sans-serif}
+.insight summary:hover{background:var(--surface-2)}
+.insight summary small{display:block;color:var(--ink-2);font-size:12px}
+.chevron{font-size:24px;color:var(--ink-3);transition:transform .2s;text-align:center}
+.insight[open] .chevron{transform:rotate(180deg)}
+.insight-body{padding:0 15px 16px;border-top:1px solid var(--rule)}
+.insight-body>.sub{color:var(--ink-2);font-size:13px;margin:13px 0}
+
+/* ---- horizon plan ----------------------------------------------------- */
+.plan{display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:12px;overflow:hidden}
+.pweek{background:var(--surface);padding:13px 16px;display:grid;grid-template-columns:62px 1fr auto;gap:0 14px;align-items:center}
+.pweek .gw{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:13px;color:var(--accent)}
+.pweek .what{font-size:13.5px;overflow-wrap:anywhere}
+.pweek .what .muted{color:var(--ink-3)}
+.pweek .epbar{display:flex;align-items:center;gap:9px;justify-content:flex-end}
+.pweek .epbar .track{width:74px;height:6px;background:var(--surface-3);border-radius:3px;overflow:hidden;flex:none}
+.pweek .epbar .fill{display:block;height:100%;background:var(--accent);border-radius:3px}
+.pweek .epbar .v{font-family:"IBM Plex Mono",monospace;font-size:13px;font-weight:600;min-width:42px;text-align:right}
+
+/* ---- flags ------------------------------------------------------------ */
+.flags{display:grid;gap:8px}
+.flag{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:baseline;background:var(--surface);
+  border:1px solid var(--rule);border-left:3px solid var(--warn);border-radius:7px;padding:11px 14px;font-size:13.5px}
+.flag.crit{border-left-color:var(--crit)}
+.flag .tag{font-size:10.5px;font-weight:700;letter-spacing:.03em;padding:2px 7px;border-radius:4px;
+  background:var(--warn-soft);color:var(--warn);white-space:nowrap;font-family:"Noto Sans Thai",sans-serif}
+.flag.crit .tag{background:var(--crit-soft);color:var(--crit)}
+
+/* ---- calendar subscription: the one reminder that survives everything -- */
+.subscribe{display:flex;flex-wrap:wrap;gap:14px 18px;align-items:center;background:var(--surface);
+  border:1px solid var(--rule);border-radius:8px;padding:16px 18px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;
+  background:var(--accent);color:#fff;text-decoration:none;
+  font-family:"Noto Sans Thai",sans-serif;font-weight:700;font-size:14px;padding:10px 17px;
+  border-radius:12px;white-space:nowrap;flex:none}
+.btn:hover{filter:brightness(1.08)}
+.subscribe .how{font-size:12.5px;color:var(--ink-2);line-height:1.75;flex:1 1 240px}
+.subscribe .how b{color:var(--ink)}
+.feedurl{font-family:"IBM Plex Mono",monospace;font-size:11.5px;background:var(--surface-2);
+  padding:2px 6px;border-radius:4px;word-break:break-all;color:var(--ink-2)}
+footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:var(--ink-3);font-size:12px}
+
+/* ---- fixture grid player chips ---------------------------------------- */
+.playerlist{display:flex;flex-wrap:wrap;gap:5px;min-width:180px}
+.playerlink{border:1px solid var(--rule);background:var(--surface-2);color:var(--ink);border-radius:5px;
+  padding:3px 7px;cursor:pointer;font:600 12px "Noto Sans Thai",sans-serif}
+.playerlink:hover{border-color:var(--accent);background:var(--accent-soft)}
+
+/* ---- comparison modal: bottom sheet on a phone, centred on a desktop --- */
+.modalback{position:fixed;inset:0;z-index:20;display:grid;place-items:end center;padding:0;
+  background:rgba(5,14,25,.64);backdrop-filter:blur(4px)}
+.modalback[hidden]{display:none}
+.modal{background:var(--surface);color:var(--ink);width:100%;max-width:940px;max-height:88dvh;
+  overflow:auto;border-radius:22px 22px 0 0;padding:18px 16px;box-shadow:var(--shadow-raised)}
+.modalhead{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:14px}
+.modalhead h2{font-size:19px}
+.closebtn{border:0;background:var(--surface-2);color:var(--ink);min-width:44px;min-height:44px;
+  border-radius:12px;cursor:pointer;font-size:18px}
+.comparefilters{display:flex;gap:7px;overflow-x:auto;padding:3px 0 12px}
+.filterbtn{min-height:38px;border:1px solid var(--rule);border-radius:999px;background:var(--surface);
+  color:var(--ink-2);padding:7px 12px;white-space:nowrap;font-weight:600;cursor:pointer;
+  font-family:"Noto Sans Thai",sans-serif;font-size:12.5px}
+.filterbtn[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.comparetable table{min-width:880px}
+.comparetable th:nth-child(4),.comparetable td:nth-child(4){min-width:300px;white-space:normal}
+.swipehint{display:none;color:var(--ink-3);font-size:11px;margin:-4px 0 7px}
+
+/* ---- breakpoints ------------------------------------------------------ */
+@media(max-width:560px){
+  .pweek{grid-template-columns:52px 1fr}
+  .pweek .epbar{grid-column:2;justify-content:flex-start;margin-top:6px}
+  .comparefilters{flex-wrap:wrap;overflow-x:visible}
+  .filterbtn{flex:1 0 calc(50% - 7px)}
+  .comparetable{box-shadow:inset -14px 0 14px -16px var(--ink)}
+  .swipehint{display:block}
+}
+@media(max-width:520px){
+  .countdown{display:none}.header-actions{gap:0}
+  .brand h1{font-size:18px}
+  .webtools{display:flex;flex-direction:column;align-items:stretch}
+  .webtools .stamp{max-width:none}
+  .webtools form{display:grid;grid-template-columns:1fr auto;width:100%}
+  .refreshbtn{width:100%;justify-content:center;padding-inline:13px}.installbtn{padding-inline:13px}
+  .card{width:clamp(54px,17vw,72px)}
+  .pitch{padding-inline:8px}
+  .pitch>.row{gap:4px}
+}
+@media(min-width:720px){
+  .wrap{padding-inline:24px}
+  header{margin-inline:-24px;padding-inline:24px}
+  .countdown .sub{display:block}
+  .tiles{grid-template-columns:repeat(5,1fr)}
+  .tile:last-child{grid-column:auto}
+  .modalback{place-items:center;padding:24px}
+  .modal{border-radius:22px;padding:22px}
+}
+@media(min-width:980px){
+  .top-summary{display:grid;grid-template-columns:1fr 1.12fr;gap:18px;align-items:start}
+  .top-summary .tiles{grid-template-columns:repeat(2,1fr)}
+  .top-summary .tile:last-child{grid-column:1/-1}
+  .top-summary .action{margin-top:0}
+  .pitch{padding-inline:48px}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}

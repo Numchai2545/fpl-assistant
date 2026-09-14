@@ -4,303 +4,154 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Gnum United — FPL Assistant</title>
-<meta name="description" content="แต้มที่คาดว่าจะได้ ตัวเลือกกัปตัน และแผนเปลี่ยนตัว 6 วีคข้างหน้า">
+<meta name="description" content="วิเคราะห์ทีม ตัวเลือกกัปตัน และ Candidate สำหรับการตัดสินใจก่อน deadline">
 <link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#1A1420" media="(prefers-color-scheme: dark)">
-<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0B1829" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#F5F7FC" media="(prefers-color-scheme: light)">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="FPL">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
-<style>
-:root{
-  --ground:#F6F4F8; --surface:#FFFFFF; --surface-2:#EFEAF2; --surface-3:#E5DEEA;
-  --ink:#1F1426; --ink-2:#564B5E; --ink-3:#8A7F92;
-  --rule:#E2DAE8; --rule-strong:#CBBDD4;
-  --accent:#6D28A8; --accent-soft:#F0E6F7;
-  --good:#0E7C72; --good-soft:#DFF0ED;
-  --warn:#9A5B08; --warn-soft:#FAEEDC;
-  --crit:#A01F35; --crit-soft:#FAE3E7;
-  --fdr2:#0E7C72; --fdr3:#9CA3AF; --fdr4:#C25068; --fdr5:#8C1D33; --fdr-ink:#FFFFFF;
-  --shadow:0 1px 2px rgba(31,20,38,.05),0 10px 28px -20px rgba(31,20,38,.35);
-}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --ground:#131018; --surface:#1C1724; --surface-2:#261F30; --surface-3:#32283E;
-  --ink:#F0EAF4; --ink-2:#B7ACC0; --ink-3:#877C92;
-  --rule:#302739; --rule-strong:#44374F;
-  --accent:#C79BE8; --accent-soft:#2B1D38;
-  --good:#45C2A4; --good-soft:#123029;
-  --warn:#E0A64E; --warn-soft:#33260F;
-  --crit:#EE8A9E; --crit-soft:#3A1721;
-  --fdr2:#45C2A4; --fdr3:#737B85; --fdr4:#D4687E; --fdr5:#EE8A9E; --fdr-ink:#141018;
-  --shadow:0 1px 2px rgba(0,0,0,.5),0 10px 28px -20px rgba(0,0,0,.9);
-}}
-:root[data-theme="dark"]{
-  --ground:#131018; --surface:#1C1724; --surface-2:#261F30; --surface-3:#32283E;
-  --ink:#F0EAF4; --ink-2:#B7ACC0; --ink-3:#877C92;
-  --rule:#302739; --rule-strong:#44374F;
-  --accent:#C79BE8; --accent-soft:#2B1D38;
-  --good:#45C2A4; --good-soft:#123029;
-  --warn:#E0A64E; --warn-soft:#33260F;
-  --crit:#EE8A9E; --crit-soft:#3A1721;
-  --fdr2:#45C2A4; --fdr3:#737B85; --fdr4:#D4687E; --fdr5:#EE8A9E; --fdr-ink:#141018;
-  --shadow:0 1px 2px rgba(0,0,0,.5),0 10px 28px -20px rgba(0,0,0,.9);
-}
-*{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--ground);color:var(--ink);
-  font-family:"IBM Plex Sans Thai","IBM Plex Sans",system-ui,-apple-system,sans-serif;font-size:15px;line-height:1.7;
-  -webkit-font-smoothing:antialiased;padding-bottom:env(safe-area-inset-bottom)}
-.wrap{max-width:1000px;margin:0 auto;padding-left:18px;padding-right:18px;padding-block:0 60px}
-h1,h2,h3,.disp{font-family:"Bai Jamjuree","IBM Plex Sans Thai",sans-serif;text-wrap:balance;margin:0}
-.mono,.num{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
-a{color:var(--accent)}
-
-/* header */
-header{padding-block:26px 20px;display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between;border-bottom:2px solid var(--ink)}
-.brand .eyebrow{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
-.brand h1{font-size:clamp(22px,4.6vw,30px);font-weight:700;line-height:1.15;margin-top:3px}
-.countdown{text-align:right}
-.countdown .lab{font-size:11.5px;letter-spacing:.04em;color:var(--ink-3);font-weight:600}
-.countdown .val{font-family:"IBM Plex Mono",monospace;font-size:clamp(20px,4.4vw,26px);font-weight:600;line-height:1.2;color:var(--accent)}
-.countdown .sub{font-size:12px;color:var(--ink-2)}
-.countdown.urgent .val{color:var(--crit)}
-
-/* tiles */
-.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0;margin:0}
-.tile{padding:14px 14px 15px 0;border-bottom:1px solid var(--rule)}
-.tile dt{font-size:11px;letter-spacing:.04em;color:var(--ink-3);font-weight:600;margin-bottom:2px}
-.tile dd{margin:0;font-family:"IBM Plex Mono",monospace;font-size:21px;font-weight:600;line-height:1.2}
-.tile small{display:block;font-family:"IBM Plex Sans Thai",sans-serif;font-size:12px;color:var(--ink-2);font-weight:400}
-
-/* action banner */
-.action{background:var(--surface);border:1px solid var(--rule-strong);border-left:4px solid var(--accent);
-  border-radius:8px;padding:18px 20px;margin:26px 0 0;box-shadow:var(--shadow)}
-.action .lab{font-size:11.5px;letter-spacing:.05em;color:var(--accent);font-weight:600;font-family:"Bai Jamjuree",sans-serif}
-.action .headline{font-family:"Bai Jamjuree",sans-serif;font-size:clamp(17px,3.4vw,21px);font-weight:600;margin:5px 0 0;line-height:1.35}
-.action .detail{color:var(--ink-2);font-size:14px;margin-top:7px}
-.move{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
-.move .swap{display:inline-flex;align-items:center;gap:8px;background:var(--surface-2);border-radius:6px;padding:7px 12px;font-size:13.5px;font-weight:500}
-.move .out{color:var(--crit)} .move .in{color:var(--good)} .move .arr{color:var(--ink-3)}
-
-section{padding-block:30px 4px}
-section>h2{font-size:19px;font-weight:700;margin-bottom:3px}
-section>.sub{color:var(--ink-2);font-size:13.5px;margin:0 0 16px}
-
-/* tables */
-.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--rule);border-radius:8px;background:var(--surface)}
-table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:560px}
-th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--rule);white-space:nowrap}
-thead th{position:sticky;top:0;background:var(--surface);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
-  color:var(--ink-3);font-weight:600;border-bottom:1px solid var(--rule-strong);font-family:"Bai Jamjuree",sans-serif;z-index:1}
-tbody tr:last-child td{border-bottom:0}
-tbody tr:hover{background:var(--surface-2)}
-td.r,th.r{text-align:right;font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
-.pname{font-weight:600}
-.pmeta{color:var(--ink-3);font-size:11.5px;font-family:"IBM Plex Mono",monospace}
-.pos{display:inline-block;min-width:34px;text-align:center;font-size:10.5px;font-weight:600;padding:2px 5px;border-radius:4px;
-  background:var(--surface-3);color:var(--ink-2);font-family:"IBM Plex Mono",monospace}
-
-/* single-series meter: one hue, value always labelled */
-.meter{display:flex;align-items:center;gap:8px;justify-content:flex-end}
-.meter .track{width:52px;height:5px;border-radius:3px;background:var(--surface-3);overflow:hidden;flex:none}
-.meter .fill{display:block;height:100%;border-radius:3px;background:var(--accent)}
-
-/* fdr cells: diverging ramp, number always printed so colour is never alone */
-.fdr{display:inline-block;min-width:58px;text-align:center;padding:3px 6px;border-radius:4px;
-  font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:600;color:var(--fdr-ink);line-height:1.35}
-.d1,.d2{background:var(--fdr2)} .d3{background:var(--fdr3)} .d4{background:var(--fdr4)} .d5{background:var(--fdr5)}
-.blank{background:var(--surface-3);color:var(--ink-3)}
-.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11.5px;color:var(--ink-2);margin-top:10px;align-items:center}
-.legend i{width:10px;height:10px;border-radius:2px;display:inline-block;margin-right:5px;vertical-align:-1px}
-
-/* pitch */
-.pitch{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:18px 14px}
-.row{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
-.card{background:var(--surface-2);border:1px solid var(--rule);border-radius:7px;padding:8px 9px;min-width:86px;text-align:center}
-.card.cap{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
-.card .nm{font-weight:600;font-size:12.5px;overflow:hidden;text-overflow:ellipsis}
-.card .ep{font-family:"IBM Plex Mono",monospace;font-size:14px;font-weight:600;color:var(--accent);line-height:1.3}
-.card .op{font-size:10.5px;color:var(--ink-3);font-family:"IBM Plex Mono",monospace}
-.card .badge{display:inline-block;font-size:9.5px;font-weight:700;background:var(--accent);color:var(--surface);
-  border-radius:3px;padding:0 4px;margin-left:3px;vertical-align:1px;font-family:"IBM Plex Mono",monospace}
-.benchrow{border-top:1px dashed var(--rule-strong);margin-top:14px;padding-top:14px}
-.benchrow .lab{text-align:center;font-size:11px;letter-spacing:.03em;color:var(--ink-3);font-weight:600;margin-bottom:9px}
-.benchrow .row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
-.benchrow .card{min-width:0;position:relative}
-.card .slot{font-family:"IBM Plex Mono",monospace;font-size:9.5px;font-weight:600;color:var(--ink-3);
-  letter-spacing:.06em;margin-bottom:1px}
-.card.gkslot{background:var(--surface-3)}
-
-/* alerts: the thing that actually costs points when a deadline is missed */
-.action.alert{border-left-color:var(--crit);background:var(--crit-soft)}
-.action.alert .lab{color:var(--crit)}
-.alertlist{margin:8px 0 0;padding-left:18px;display:grid;gap:5px}
-.alertlist li{font-size:14.5px;font-weight:500}
-
-/* plan */
-.plan{display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:8px;overflow:hidden}
-.pweek{background:var(--surface);padding:13px 16px;display:grid;grid-template-columns:62px 1fr auto;gap:0 14px;align-items:center}
-.pweek .gw{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:13px;color:var(--accent)}
-.pweek .what{font-size:13.5px}
-.pweek .what .muted{color:var(--ink-3)}
-.pweek .epbar{display:flex;align-items:center;gap:9px;justify-content:flex-end}
-.pweek .epbar .track{width:74px;height:6px;background:var(--surface-3);border-radius:3px;overflow:hidden}
-.pweek .epbar .fill{display:block;height:100%;background:var(--accent);border-radius:3px}
-.pweek .epbar .v{font-family:"IBM Plex Mono",monospace;font-size:13px;font-weight:600;min-width:42px;text-align:right}
-@media(max-width:560px){.pweek{grid-template-columns:52px 1fr}.pweek .epbar{grid-column:2;justify-content:flex-start;margin-top:6px}}
-
-/* flags */
-.flags{display:grid;gap:8px}
-.flag{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:baseline;background:var(--surface);
-  border:1px solid var(--rule);border-left:3px solid var(--warn);border-radius:7px;padding:11px 14px;font-size:13.5px}
-.flag.crit{border-left-color:var(--crit)}
-.flag .tag{font-size:10.5px;font-weight:700;letter-spacing:.03em;padding:2px 7px;border-radius:4px;
-  background:var(--warn-soft);color:var(--warn);white-space:nowrap;font-family:"Bai Jamjuree",sans-serif}
-.flag.crit .tag{background:var(--crit-soft);color:var(--crit)}
-
-/* tabs */
-.tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
-.tabs button{font:inherit;font-size:12.5px;font-weight:600;padding:6px 13px;border-radius:999px;cursor:pointer;
-  border:1px solid var(--rule-strong);background:var(--surface);color:var(--ink-2);font-family:"Bai Jamjuree",sans-serif}
-.tabs button[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:var(--surface)}
-.tabs button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-
-
-/* calendar subscription: the one reminder that survives everything else */
-.subscribe{display:flex;flex-wrap:wrap;gap:14px 18px;align-items:center;background:var(--surface);
-  border:1px solid var(--rule);border-radius:8px;padding:16px 18px}
-.btn{display:inline-block;background:var(--accent);color:var(--surface);text-decoration:none;
-  font-family:"Bai Jamjuree",sans-serif;font-weight:600;font-size:14.5px;padding:10px 20px;
-  border-radius:6px;white-space:nowrap;flex:none}
-.btn:hover{filter:brightness(1.08)}
-.subscribe .how{font-size:12.5px;color:var(--ink-2);line-height:1.75;flex:1 1 240px}
-.subscribe .how b{color:var(--ink)}
-.feedurl{font-family:"IBM Plex Mono",monospace;font-size:11.5px;background:var(--surface-2);
-  padding:2px 6px;border-radius:4px;word-break:break-all;color:var(--ink-2)}
-footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:var(--ink-3);font-size:12px}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="sports-ui.css">
 </head>
-<body data-palette="#6D28A8,#0E7C72,#C25068">
+<body>
 <div class="wrap">
 
 <header>
-  <div class="brand">
-    <div class="eyebrow">Gameweek 5 &middot; built อาทิตย์ 13 ก.ย. 2569, 19:16 น.</div>
-    <h1>Gnum United — FPL Assistant</h1>
+  <div class="brandline">
+    <div class="appmark">FPL</div>
+    <div class="brand">
+      <div class="eyebrow">Gameweek 5 &middot; Analytics</div>
+      <h1>Gnum United — FPL Assistant</h1>
+    </div>
   </div>
-  <div class="countdown ">
-    <div class="lab">ปิดจัดตัวใน</div>
-    <div class="val" id="cd" data-deadline="2026-09-18T17:30:00+00:00">5d 5h</div>
-    <div class="sub">เสาร์ 19 ก.ย. 2569, 00:30 น.</div>
+  <div class="header-actions">
+    <div class="countdown ">
+      <div class="lab">ปิดจัดตัวใน</div>
+      <div class="val" id="cd" data-deadline="2026-09-18T17:30:00+00:00">4d 1h</div>
+      <div class="sub">เสาร์ 19 ก.ย. 2569, 00:30 น.</div>
+    </div>
+    <button class="iconbtn" type="button" id="theme-toggle" aria-label="เปลี่ยนธีม" title="เปลี่ยนธีม">
+      <span class="theme-sun" aria-hidden="true">☀</span><span class="theme-moon" aria-hidden="true">☾</span>
+    </button>
   </div>
 </header>
 
+<div class="webtools">
+  <form method="post" action="/refresh" id="refresh-form">
+    <button class="btn refreshbtn" type="submit" id="refresh-btn"><span class="refreshicon" aria-hidden="true">↻</span><span class="refresh-label">อัปเดตข้อมูลล่าสุด</span></button>
+    <button class="btn installbtn" type="button" id="install-btn" hidden><span aria-hidden="true">↓</span> ติดตั้งแอป</button>
+  </form>
+  <span class="stamp">ข้อมูลชุดนี้สร้างเมื่อ จันทร์ 14 ก.ย. 2569, 23:22 น.</span>
+  <div class="refresh-status" id="refresh-status" role="status" aria-live="polite" hidden></div>
+</div>
+
+<div class="overview-label">ภาพรวมก่อนตัดสินใจ</div>
+<div class="top-summary">
 <dl class="tiles">
-  <div class="tile"><dt>แต้มรวม</dt><dd>252<small>อันดับ 1,756,735</small></dd></div>
-  <div class="tile"><dt>วีคที่แล้ว</dt><dd>42<small>GW4</small></dd></div>
+  <div class="tile"><dt>แต้มรวม</dt><dd>274<small>อันดับ 2,065,301</small></dd></div>
+  <div class="tile"><dt>วีคที่แล้ว</dt><dd>60<small>GW4</small></dd></div>
   <div class="tile"><dt>เปลี่ยนตัวฟรี</dt><dd>3<small>เก็บได้สูงสุด 5</small></dd></div>
   <div class="tile"><dt>เงินเหลือ</dt><dd>0.3<small>มูลค่าทีม 100.0m</small></dd></div>
-  <div class="tile"><dt>คาดการณ์ GW5</dt><dd>53<small>แต้มที่คาดว่าจะได้</small></dd></div>
+  <div class="tile"><dt>คาดการณ์ GW5</dt><dd>55<small>แต้มที่คาดว่าจะได้</small></dd></div>
 </dl>
 
 
 <div class="action">
-  <div class="lab">ทำแค่นี้ก่อนหมดเวลา</div>
-  <p class="headline">เปลี่ยนตัว 3 คน · กัปตัน Haaland</p>
+  <div class="lab">คำแนะนำสำหรับประกอบการตัดสินใจ</div>
+  <p class="headline">พิจารณา Ampadu → Groß · กัปตัน Haaland</p>
   <div class="move">
-    <span class="swap"><span class="out">Gabriel</span><span class="arr">&rarr;</span><span class="in">Khalaili</span></span>
-    <span class="swap"><span class="out">Ampadu</span><span class="arr">&rarr;</span><span class="in">Tavernier</span></span>
-    <span class="swap"><span class="out">Cherki</span><span class="arr">&rarr;</span><span class="in">Saka</span></span>
+    <span class="swap"><span class="out">Ampadu</span><span class="arr">&rarr;</span><span class="in">Groß</span></span>
   </div>
-  <p class="detail">ใช้ 3 จาก 3 ครั้งที่มี ไม่เสียแต้ม. คาดการณ์ 53 แต้มใน GW5</p>
+  <p class="detail">เพิ่ม 15.0 แต้มใน 5 นัดและไม่เสียแต้ม. คาดการณ์ 55 แต้มใน GW5. ราคา: Groß มีแรงซื้อสูงและเสี่ยงขึ้นราคา</p>
+</div>
 </div>
 
 <section>
   <h2>ทีมของคุณสำหรับ GW5</h2>
-  <p class="sub">เรียงตามแต้มที่คาดว่าจะได้ · C คือกัปตัน, V คือรองกัปตัน</p>
+  <p class="sub">แผน 3-5-2 เลือกใหม่ตาม EP ฟอร์ม และโปรแกรม · กดชื่อนักเตะเพื่อเทียบตัวเลือกตำแหน่งเดียวกัน</p>
   <div class="pitch">
     <div class="row">
-      <div class="card ">
+      <button type="button" class="card player-open " data-player="496">
         <div class="nm">Kinsky</div>
-        <div class="ep">3.6</div>
+        <div class="ep">3.8</div>
         <div class="op">AVL (H)</div>
-      </div>
+      </button>
     </div>
     <div class="row">
-      <div class="card ">
-        <div class="nm">Khalaili</div>
-        <div class="ep">3.7</div>
-        <div class="op">LEE (A)</div>
-      </div>
-      <div class="card ">
+      <button type="button" class="card player-open " data-player="4">
+        <div class="nm">Gabriel</div>
+        <div class="ep">3.2</div>
+        <div class="op">BHA (A)</div>
+      </button>
+      <button type="button" class="card player-open " data-player="173">
         <div class="nm">Thomas</div>
-        <div class="ep">3.0</div>
+        <div class="ep">3.2</div>
         <div class="op">NFO (A)</div>
-      </div>
-      <div class="card ">
+      </button>
+      <button type="button" class="card player-open " data-player="418">
         <div class="nm">Maguire</div>
-        <div class="ep">2.6</div>
+        <div class="ep">2.4</div>
         <div class="op">FUL (A)</div>
-      </div>
+      </button>
     </div>
     <div class="row">
-      <div class="card ">
-        <div class="nm">B.Fernandes<span class="badge">V</span></div>
+      <button type="button" class="card player-open " data-player="124">
+        <div class="nm">Groß<span class="badge">V</span></div>
+        <div class="ep">5.6</div>
+        <div class="op">ARS (H)</div>
+      </button>
+      <button type="button" class="card player-open " data-player="426">
+        <div class="nm">B.Fernandes</div>
         <div class="ep">5.6</div>
         <div class="op">FUL (A)</div>
-      </div>
-      <div class="card ">
-        <div class="nm">Tavernier</div>
-        <div class="ep">5.3</div>
-        <div class="op">LIV (H)</div>
-      </div>
-      <div class="card ">
-        <div class="nm">Saka</div>
-        <div class="ep">5.0</div>
-        <div class="op">BHA (A)</div>
-      </div>
-      <div class="card ">
+      </button>
+      <button type="button" class="card player-open " data-player="15">
         <div class="nm">Ødegaard</div>
-        <div class="ep">3.9</div>
+        <div class="ep">4.4</div>
         <div class="op">BHA (A)</div>
-      </div>
-      <div class="card ">
+      </button>
+      <button type="button" class="card player-open " data-player="399">
+        <div class="nm">Cherki</div>
+        <div class="ep">4.2</div>
+        <div class="op">SUN (H)</div>
+      </button>
+      <button type="button" class="card player-open " data-player="544">
         <div class="nm">Xhaka</div>
-        <div class="ep">3.4</div>
+        <div class="ep">3.6</div>
         <div class="op">MCI (A)</div>
-      </div>
+      </button>
     </div>
     <div class="row">
-      <div class="card cap">
+      <button type="button" class="card player-open cap" data-player="411">
         <div class="nm">Haaland<span class="badge">C</span></div>
-        <div class="ep">5.9</div>
+        <div class="ep">6.6</div>
         <div class="op">SUN (H)</div>
-      </div>
-      <div class="card ">
+      </button>
+      <button type="button" class="card player-open " data-player="165">
         <div class="nm">João Pedro</div>
-        <div class="ep">4.7</div>
+        <div class="ep">5.4</div>
         <div class="op">BRE (A)</div>
-      </div>
+      </button>
     </div>
     <div class="benchrow">
       <div class="lab">ตัวสำรอง &middot; เรียงตามลำดับที่จะถูกเปลี่ยนเข้า</div>
       <div class="row benchgrid">
-        <div class="card gkslot"><div class="slot">GK</div><div class="nm">Dubravka</div><div class="ep">0.4</div><div class="op">AVL (H)</div></div>
-        <div class="card"><div class="slot">1</div><div class="nm">Igor Jesus</div><div class="ep">2.7</div><div class="op">COV (H)</div></div>
-        <div class="card"><div class="slot">2</div><div class="nm">Greaves</div><div class="ep">2.4</div><div class="op">EVE (A)</div></div>
-        <div class="card"><div class="slot">3</div><div class="nm">Mendy</div><div class="ep">1.1</div><div class="op">NEW (A)</div></div>
+        <button type="button" class="card player-open gkslot" data-player="497"><div class="slot">GK</div><div class="nm">Dubravka</div><div class="ep">0.2</div><div class="op">AVL (H)</div></button>
+        <button type="button" class="card player-open" data-player="491"><div class="slot">1</div><div class="nm">Igor Jesus</div><div class="ep">2.5</div><div class="op">COV (H)</div></button>
+        <button type="button" class="card player-open" data-player="306"><div class="slot">2</div><div class="nm">Greaves</div><div class="ep">2.2</div><div class="op">EVE (A)</div></button>
+        <button type="button" class="card player-open" data-player="586"><div class="slot">3</div><div class="nm">Mendy</div><div class="ep">1.3</div><div class="op">NEW (A)</div></button>
       </div>
     </div>
   </div>
 </section>
 
-<section>
-  <h2>ตัวเลือกกัปตัน</h2>
+<details class="insight">
+  <summary><span class="summary-icon">C</span><span><strong>ตัวเลือกกัปตัน</strong><small>ดูคะแนนคาดการณ์ก่อนคูณสอง</small></span><span class="chevron">⌄</span></summary>
+  <div class="insight-body">
   <p class="sub">แต้มที่คาดว่าจะได้ ก่อนคูณสอง</p>
   <div class="scroll"><table>
     <thead><tr><th>ผู้เล่น</th><th>คู่แข่ง</th><th class="r">xG</th><th class="r">xA</th><th class="r">Bonus</th><th class="r">EP</th></tr></thead>
@@ -308,589 +159,127 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
       <tr>
         <td><span class="pos">FWD</span> <span class="pname">Haaland</span> <span class="pmeta">MCI</span></td>
         <td class="pmeta">SUN (H)</td>
-        <td class="r">0.74</td>
-        <td class="r">0.08</td>
-        <td class="r">0.71</td>
-        <td class="r"><span class="meter"><span class="track"><span class="fill" style="width:100%"></span></span><b>5.9</b></span></td>
+        <td class="r">0.79</td>
+        <td class="r">0.07</td>
+        <td class="r">0.97</td>
+        <td class="r"><span class="meter"><span class="track"><span class="fill" style="width:100%"></span></span><b>6.6</b></span></td>
+      </tr>
+      <tr>
+        <td><span class="pos">MID</span> <span class="pname">Groß</span> <span class="pmeta">BHA</span></td>
+        <td class="pmeta">ARS (H)</td>
+        <td class="r">0.32</td>
+        <td class="r">0.23</td>
+        <td class="r">0.75</td>
+        <td class="r"><span class="meter"><span class="track"><span class="fill" style="width:85%"></span></span><b>5.6</b></span></td>
       </tr>
       <tr>
         <td><span class="pos">MID</span> <span class="pname">B.Fernandes</span> <span class="pmeta">MUN</span></td>
         <td class="pmeta">FUL (A)</td>
-        <td class="r">0.37</td>
-        <td class="r">0.15</td>
-        <td class="r">1.03</td>
-        <td class="r"><span class="meter"><span class="track"><span class="fill" style="width:94%"></span></span><b>5.6</b></span></td>
-      </tr>
-      <tr>
-        <td><span class="pos">MID</span> <span class="pname">Tavernier</span> <span class="pmeta">BOU</span></td>
-        <td class="pmeta">LIV (H)</td>
-        <td class="r">0.34</td>
-        <td class="r">0.14</td>
-        <td class="r">0.94</td>
-        <td class="r"><span class="meter"><span class="track"><span class="fill" style="width:90%"></span></span><b>5.3</b></span></td>
-      </tr>
-      <tr>
-        <td><span class="pos">MID</span> <span class="pname">Saka</span> <span class="pmeta">ARS</span></td>
-        <td class="pmeta">BHA (A)</td>
-        <td class="r">0.36</td>
-        <td class="r">0.07</td>
-        <td class="r">0.72</td>
-        <td class="r"><span class="meter"><span class="track"><span class="fill" style="width:85%"></span></span><b>5.0</b></span></td>
+        <td class="r">0.33</td>
+        <td class="r">0.16</td>
+        <td class="r">0.91</td>
+        <td class="r"><span class="meter"><span class="track"><span class="fill" style="width:84%"></span></span><b>5.6</b></span></td>
       </tr>
       <tr>
         <td><span class="pos">FWD</span> <span class="pname">João Pedro</span> <span class="pmeta">CHE</span></td>
         <td class="pmeta">BRE (A)</td>
         <td class="r">0.43</td>
         <td class="r">0.11</td>
-        <td class="r">0.84</td>
-        <td class="r"><span class="meter"><span class="track"><span class="fill" style="width:80%"></span></span><b>4.7</b></span></td>
+        <td class="r">0.95</td>
+        <td class="r"><span class="meter"><span class="track"><span class="fill" style="width:81%"></span></span><b>5.4</b></span></td>
       </tr>
       <tr>
         <td><span class="pos">MID</span> <span class="pname">Ødegaard</span> <span class="pmeta">ARS</span></td>
         <td class="pmeta">BHA (A)</td>
         <td class="r">0.16</td>
-        <td class="r">0.13</td>
-        <td class="r">0.65</td>
-        <td class="r"><span class="meter"><span class="track"><span class="fill" style="width:67%"></span></span><b>3.9</b></span></td>
+        <td class="r">0.12</td>
+        <td class="r">0.66</td>
+        <td class="r"><span class="meter"><span class="track"><span class="fill" style="width:67%"></span></span><b>4.4</b></span></td>
+      </tr>
+      <tr>
+        <td><span class="pos">MID</span> <span class="pname">Cherki</span> <span class="pmeta">MCI</span></td>
+        <td class="pmeta">SUN (H)</td>
+        <td class="r">0.17</td>
+        <td class="r">0.25</td>
+        <td class="r">0.42</td>
+        <td class="r"><span class="meter"><span class="track"><span class="fill" style="width:63%"></span></span><b>4.2</b></span></td>
       </tr>
     </tbody>
   </table></div>
-</section>
-
-<section>
-  <h2>ตัวที่น่าซื้อ</h2>
-  <p class="sub">แต้มที่คาดว่าจะได้สูงสุดใน 6 วีคข้างหน้า แยกตามตำแหน่ง (ไม่รวมคนที่คุณมีอยู่แล้ว)</p>
-  <div class="tabs" role="tablist">
-    <button role="tab" data-pos="GKP" aria-selected="false">GKP</button>
-    <button role="tab" data-pos="DEF" aria-selected="false">DEF</button>
-    <button role="tab" data-pos="MID" aria-selected="true">MID</button>
-    <button role="tab" data-pos="FWD" aria-selected="false">FWD</button>
   </div>
-  <div class="scroll target-panel" data-pos="GKP" hidden><table>
-    <thead><tr><th>ผู้เล่น</th><th class="r">£</th><th class="r">%ถือครอง</th><th class="r">แนวโน้ม</th><th class="r">GW5</th><th class="r">6 วีค</th><th class="r">EP / £m</th></tr></thead>
+</details>
+
+<details class="insight">
+  <summary><span class="summary-icon">SWAP</span><span><strong>Candidate สำหรับจุดอ่อนหลัก</strong><small>ดูตัวแทนที่อยู่ในงบและตำแหน่งเดียวกัน</small></span><span class="chevron">⌄</span></summary>
+  <div class="insight-body">
+  <p class="sub">
+    เทียบตัวแทนตำแหน่ง MID กับ <b>Ampadu</b>
+    (ราคาขาย £5.4m · EP 5 นัด 11.2)
+    · เรียงจากผลต่าง EP โดยไม่ใช้ ownership จัดอันดับ
+  </p>
+  <div class="scroll"><table>
+    <thead><tr><th>#</th><th>ผู้เล่น</th><th class="r">£</th><th class="r">%ถือครอง</th><th>โปรแกรม 5 นัด</th><th class="r">GW5</th><th class="r">EP 5 นัด</th><th class="r">ผลต่างสุทธิ</th><th class="r">โอกาสลง</th></tr></thead>
     <tbody>
-      <tr>
-        <td><span class="pname">Tzolakis</span> <span class="pmeta">HUL</span></td>
-        <td class="r">4.6</td>
-        <td class="r">10.3</td>
-        <td class="r" style="color:var(--ink-3)">
-          –</td>
-        <td class="r">3.9</td>
-        <td class="r"><b>24.5</b></td>
-        <td class="r">5.33</td>
-      </tr>
-      <tr>
-        <td><span class="pname">Martinez</span> <span class="pmeta">CHE</span></td>
-        <td class="r">5.0</td>
-        <td class="r">5.1</td>
-        <td class="r" style="color:var(--ink-3)">
-          –</td>
-        <td class="r">3.7</td>
-        <td class="r"><b>22.8</b></td>
-        <td class="r">4.57</td>
-      </tr>
-      <tr>
-        <td><span class="pname">Trafford</span> <span class="pmeta">LEE</span></td>
-        <td class="r">5.0</td>
-        <td class="r">5.4</td>
-        <td class="r" style="color:var(--ink-3)">
-          –</td>
-        <td class="r">4.0</td>
-        <td class="r"><b>22.6</b></td>
-        <td class="r">4.52</td>
-      </tr>
-      <tr>
-        <td><span class="pname">Suzuki</span> <span class="pmeta">AVL</span></td>
-        <td class="r">5.0</td>
-        <td class="r">1.8</td>
-        <td class="r" style="color:var(--ink-3)">
-          –</td>
-        <td class="r">3.5</td>
-        <td class="r"><b>22.1</b></td>
-        <td class="r">4.42</td>
-      </tr>
-      <tr>
-        <td><span class="pname">Pickford</span> <span class="pmeta">EVE</span></td>
-        <td class="r">5.5</td>
-        <td class="r">8.7</td>
-        <td class="r" style="color:var(--ink-3)">
-          –</td>
-        <td class="r">3.9</td>
-        <td class="r"><b>22.0</b></td>
-        <td class="r">4.00</td>
-      </tr>
-      <tr>
-        <td><span class="pname">Kelleher</span> <span class="pmeta">BRE</span></td>
-        <td class="r">5.0</td>
-        <td class="r">6.6</td>
-        <td class="r" style="color:var(--ink-3)">
-          –</td>
-        <td class="r">3.8</td>
-        <td class="r"><b>21.8</b></td>
-        <td class="r">4.37</td>
-      </tr>
-      <tr>
-        <td><span class="pname">Scherpen</span> <span class="pmeta">IPS</span></td>
-        <td class="r">4.5</td>
-        <td class="r">0.6</td>
-        <td class="r" style="color:var(--ink-3)">
-          –</td>
-        <td class="r">3.5</td>
-        <td class="r"><b>21.8</b></td>
-        <td class="r">4.84</td>
-      </tr>
-      <tr>
-        <td><span class="pname">Raya</span> <span class="pmeta">ARS</span></td>
-        <td class="r">6.0</td>
-        <td class="r">39.4</td>
-        <td class="r" style="color:var(--ink-3)">
-          –</td>
-        <td class="r">3.4</td>
-        <td class="r"><b>21.7</b></td>
-        <td class="r">3.62</td>
-      </tr>
-      <tr>
-        <td><span class="pname">Horníček</span> <span class="pmeta">NEW</span></td>
-        <td class="r">5.0</td>
-        <td class="r">1.4</td>
-        <td class="r" style="color:var(--ink-3)">
-          –</td>
-        <td class="r">3.8</td>
-        <td class="r"><b>21.6</b></td>
-        <td class="r">4.31</td>
-      </tr>
-      <tr>
-        <td><span class="pname">Lammens</span> <span class="pmeta">MUN</span></td>
-        <td class="r">4.9</td>
-        <td class="r">11.3</td>
-        <td class="r" style="color:var(--ink-3)">
-          –</td>
-        <td class="r">3.3</td>
-        <td class="r"><b>21.0</b></td>
-        <td class="r">4.29</td>
-      </tr>
-    </tbody>
-  </table></div>
-  <div class="scroll target-panel" data-pos="DEF" hidden><table>
-    <thead><tr><th>ผู้เล่น</th><th class="r">£</th><th class="r">%ถือครอง</th><th class="r">แนวโน้ม</th><th class="r">GW5</th><th class="r">6 วีค</th><th class="r">EP / £m</th></tr></thead>
-    <tbody>
-      <tr>
-        <td><span class="pname">Khalaili</span> <span class="pmeta">CRY</span></td>
-        <td class="r">5.0</td>
-        <td class="r">0.3</td>
-        <td class="r" style="color:var(--ink-3)">
-          –</td>
-        <td class="r">3.7</td>
-        <td class="r"><b>25.5</b></td>
-        <td class="r">5.11</td>
-      </tr>
-      <tr>
-        <td><span class="pname">Davis</span> <span class="pmeta">IPS</span></td>
-        <td class="r">4.0</td>
-        <td class="r">5.5</td>
-        <td class="r" style="color:var(--ink-3)">
-          –</td>
-        <td class="r">3.5</td>
-        <td class="r"><b>24.8</b></td>
-        <td class="r">6.20</td>
-      </tr>
-      <tr>
-        <td><span class="pname">Guéhi</span> <span class="pmeta">MCI</span></td>
-        <td class="r">6.0</td>
-        <td class="r">18.5</td>
-        <td class="r" style="color:var(--ink-3)">
-          –</td>
-        <td class="r">4.5</td>
-        <td class="r"><b>23.7</b></td>
-        <td class="r">3.94</td>
-      </tr>
-      <tr>
-        <td><span class="pname">De Cuyper</span> <span class="pmeta">BHA</span></td>
-        <td class="r">4.8</td>
-        <td class="r">22.0</td>
-        <td class="r" style="color:var(--ink-3)">
-          –</td>
-        <td class="r">4.6</td>
-        <td class="r"><b>23.6</b></td>
-        <td class="r">4.92</td>
-      </tr>
-      <tr>
-        <td><span class="pname">Mukiele</span> <span class="pmeta">SUN</span></td>
-        <td class="r">5.5</td>
-        <td class="r">2.1</td>
-        <td class="r" style="color:var(--ink-3)">
-          –</td>
-        <td class="r">3.4</td>
-        <td class="r"><b>23.3</b></td>
-        <td class="r">4.23</td>
-      </tr>
-      <tr>
-        <td><span class="pname">Hall</span> <span class="pmeta">NEW</span></td>
-        <td class="r">5.2</td>
-        <td class="r">14.2</td>
-        <td class="r" style="color:var(--ink-3)">
-          –</td>
-        <td class="r">4.3</td>
-        <td class="r"><b>22.9</b></td>
-        <td class="r">4.41</td>
-      </tr>
-      <tr>
-        <td><span class="pname">Tarkowski</span> <span class="pmeta">EVE</span></td>
-        <td class="r">6.0</td>
-        <td class="r">12.0</td>
-        <td class="r" style="color:var(--ink-3)">
-          –</td>
-        <td class="r">4.2</td>
-        <td class="r"><b>22.6</b></td>
-        <td class="r">3.76</td>
-      </tr>
-      <tr>
-        <td><span class="pname">Silva</span> <span class="pmeta">BOU</span></td>
-        <td class="r">5.0</td>
-        <td class="r">0.4</td>
-        <td class="r" style="color:var(--ink-3)">
-          –</td>
-        <td class="r">4.2</td>
-        <td class="r"><b>22.3</b></td>
-        <td class="r">4.47</td>
-      </tr>
-      <tr>
-        <td><span class="pname">Egan</span> <span class="pmeta">HUL</span></td>
-        <td class="r">4.1</td>
-        <td class="r">6.5</td>
-        <td class="r" style="color:var(--ink-3)">
-          –</td>
-        <td class="r">3.2</td>
-        <td class="r"><b>22.0</b></td>
-        <td class="r">5.36</td>
-      </tr>
-      <tr>
-        <td><span class="pname">Muharemović</span> <span class="pmeta">LEE</span></td>
-        <td class="r">5.0</td>
-        <td class="r">3.9</td>
-        <td class="r" style="color:var(--ink-3)">
-          –</td>
-        <td class="r">4.1</td>
-        <td class="r"><b>21.9</b></td>
-        <td class="r">4.38</td>
-      </tr>
-    </tbody>
-  </table></div>
-  <div class="scroll target-panel" data-pos="MID" ><table>
-    <thead><tr><th>ผู้เล่น</th><th class="r">£</th><th class="r">%ถือครอง</th><th class="r">แนวโน้ม</th><th class="r">GW5</th><th class="r">6 วีค</th><th class="r">EP / £m</th></tr></thead>
-    <tbody>
-      <tr>
-        <td><span class="pname">Saka</span> <span class="pmeta">ARS</span></td>
-        <td class="r">9.5</td>
-        <td class="r">11.5</td>
-        <td class="r" style="color:var(--ink-3)">
-          –</td>
-        <td class="r">5.0</td>
-        <td class="r"><b>32.5</b></td>
-        <td class="r">3.42</td>
-      </tr>
-      <tr>
-        <td><span class="pname">Tavernier</span> <span class="pmeta">BOU</span></td>
-        <td class="r">6.0</td>
-        <td class="r">4.2</td>
-        <td class="r" style="color:var(--ink-3)">
-          –</td>
-        <td class="r">5.3</td>
-        <td class="r"><b>30.1</b></td>
-        <td class="r">5.02</td>
-      </tr>
-      <tr>
-        <td><span class="pname">Mbeumo</span> <span class="pmeta">MUN</span></td>
-        <td class="r">7.9</td>
-        <td class="r">23.6</td>
-        <td class="r" style="color:var(--ink-3)">
-          –</td>
-        <td class="r">4.5</td>
-        <td class="r"><b>29.4</b></td>
-        <td class="r">3.73</td>
-      </tr>
-      <tr>
-        <td><span class="pname">Rogers</span> <span class="pmeta">CHE</span></td>
-        <td class="r">7.7</td>
-        <td class="r">35.5</td>
-        <td class="r" style="color:var(--good)">
-          ▲</td>
-        <td class="r">4.4</td>
-        <td class="r"><b>28.5</b></td>
-        <td class="r">3.70</td>
-      </tr>
-      <tr>
-        <td><span class="pname">Gakpo</span> <span class="pmeta">LIV</span></td>
-        <td class="r">7.2</td>
-        <td class="r">12.2</td>
-        <td class="r" style="color:var(--ink-3)">
-          –</td>
-        <td class="r">4.4</td>
-        <td class="r"><b>28.2</b></td>
-        <td class="r">3.92</td>
-      </tr>
-      <tr>
-        <td><span class="pname">Palmer</span> <span class="pmeta">CHE</span></td>
-        <td class="r">9.7</td>
-        <td class="r">26.8</td>
-        <td class="r" style="color:var(--ink-3)">
-          –</td>
-        <td class="r">4.3</td>
-        <td class="r"><b>27.7</b></td>
-        <td class="r">2.86</td>
-      </tr>
-      <tr>
-        <td><span class="pname">Gibbs-White</span> <span class="pmeta">NFO</span></td>
-        <td class="r">7.9</td>
-        <td class="r">9.7</td>
-        <td class="r" style="color:var(--ink-3)">
-          –</td>
-        <td class="r">4.8</td>
-        <td class="r"><b>26.7</b></td>
-        <td class="r">3.38</td>
-      </tr>
-      <tr>
-        <td><span class="pname">Scott</span> <span class="pmeta">BOU</span></td>
-        <td class="r">6.1</td>
-        <td class="r">5.9</td>
-        <td class="r" style="color:var(--ink-3)">
-          –</td>
-        <td class="r">4.6</td>
-        <td class="r"><b>26.4</b></td>
-        <td class="r">4.33</td>
-      </tr>
-      <tr>
-        <td><span class="pname">Schade</span> <span class="pmeta">BRE</span></td>
-        <td class="r">6.0</td>
-        <td class="r">4.3</td>
-        <td class="r" style="color:var(--good)">
-          ▲</td>
-        <td class="r">4.6</td>
-        <td class="r"><b>26.3</b></td>
-        <td class="r">4.38</td>
-      </tr>
-      <tr>
-        <td><span class="pname">Szoboszlai</span> <span class="pmeta">LIV</span></td>
-        <td class="r">7.0</td>
-        <td class="r">37.9</td>
-        <td class="r" style="color:var(--crit)">
-          ▼</td>
-        <td class="r">4.1</td>
-        <td class="r"><b>26.1</b></td>
-        <td class="r">3.73</td>
-      </tr>
-    </tbody>
-  </table></div>
-  <div class="scroll target-panel" data-pos="FWD" hidden><table>
-    <thead><tr><th>ผู้เล่น</th><th class="r">£</th><th class="r">%ถือครอง</th><th class="r">แนวโน้ม</th><th class="r">GW5</th><th class="r">6 วีค</th><th class="r">EP / £m</th></tr></thead>
-    <tbody>
-      <tr>
-        <td><span class="pname">Isak</span> <span class="pmeta">LIV</span></td>
-        <td class="r">9.1</td>
-        <td class="r">22.6</td>
-        <td class="r" style="color:var(--ink-3)">
-          –</td>
-        <td class="r">4.2</td>
-        <td class="r"><b>27.0</b></td>
-        <td class="r">2.97</td>
-      </tr>
-      <tr>
-        <td><span class="pname">Barry</span> <span class="pmeta">EVE</span></td>
+      <tr style="background:var(--good-soft)">
+        <td class="r">1</td>
+        <td><span class="pname">Groß</span> <span class="pmeta">BHA</span> <span class="pos">แนะนำ</span> <span class="pos">ราคาเสี่ยงขึ้น</span></td>
         <td class="r">5.6</td>
-        <td class="r">6.3</td>
-        <td class="r" style="color:var(--ink-3)">
-          –</td>
-        <td class="r">4.4</td>
-        <td class="r"><b>24.7</b></td>
-        <td class="r">4.41</td>
+        <td class="r">17.5</td>
+        <td style="white-space:normal"><span class="pmeta">GW5 ARS (H) [4] · GW6 SUN (A) [3] · GW7 CRY (H) [3] · GW8 LIV (A) [4] · GW9 MCI (A) [5]</span></td>
+        <td class="r">5.6</td>
+        <td class="r"><b>26.3</b></td>
+        <td class="r" style="color:var(--good)">+15.0</td>
+        <td class="r">100%</td>
       </tr>
       <tr>
-        <td><span class="pname">Gonzalo</span> <span class="pmeta">FUL</span></td>
-        <td class="r">6.0</td>
-        <td class="r">3.8</td>
-        <td class="r" style="color:var(--ink-3)">
-          –</td>
-        <td class="r">4.0</td>
-        <td class="r"><b>22.3</b></td>
-        <td class="r">3.71</td>
-      </tr>
-      <tr>
-        <td><span class="pname">Thiago</span> <span class="pmeta">BRE</span></td>
-        <td class="r">7.9</td>
-        <td class="r">10.3</td>
-        <td class="r" style="color:var(--ink-3)">
-          –</td>
-        <td class="r">4.0</td>
-        <td class="r"><b>22.2</b></td>
-        <td class="r">2.80</td>
-      </tr>
-      <tr>
-        <td><span class="pname">Calvert-Lewin</span> <span class="pmeta">LEE</span></td>
-        <td class="r">6.0</td>
-        <td class="r">22.0</td>
-        <td class="r" style="color:var(--ink-3)">
-          –</td>
-        <td class="r">3.8</td>
-        <td class="r"><b>21.4</b></td>
-        <td class="r">3.57</td>
-      </tr>
-      <tr>
-        <td><span class="pname">Wissa</span> <span class="pmeta">NEW</span></td>
-        <td class="r">6.2</td>
-        <td class="r">18.4</td>
-        <td class="r" style="color:var(--ink-3)">
-          –</td>
-        <td class="r">3.7</td>
-        <td class="r"><b>20.8</b></td>
-        <td class="r">3.36</td>
-      </tr>
-      <tr>
-        <td><span class="pname">Havertz</span> <span class="pmeta">ARS</span></td>
-        <td class="r">7.6</td>
-        <td class="r">8.0</td>
-        <td class="r" style="color:var(--ink-3)">
-          –</td>
-        <td class="r">3.2</td>
-        <td class="r"><b>20.7</b></td>
-        <td class="r">2.73</td>
-      </tr>
-      <tr>
-        <td><span class="pname">Evanilson</span> <span class="pmeta">BOU</span></td>
-        <td class="r">6.0</td>
-        <td class="r">3.3</td>
-        <td class="r" style="color:var(--ink-3)">
-          –</td>
-        <td class="r">3.5</td>
-        <td class="r"><b>19.9</b></td>
-        <td class="r">3.32</td>
-      </tr>
-      <tr>
-        <td><span class="pname">McBurnie</span> <span class="pmeta">HUL</span></td>
-        <td class="r">5.5</td>
-        <td class="r">1.9</td>
-        <td class="r" style="color:var(--ink-3)">
-          –</td>
-        <td class="r">3.0</td>
-        <td class="r"><b>19.0</b></td>
-        <td class="r">3.45</td>
-      </tr>
-      <tr>
-        <td><span class="pname">Emersonn</span> <span class="pmeta">IPS</span></td>
-        <td class="r">5.5</td>
-        <td class="r">2.0</td>
-        <td class="r" style="color:var(--ink-3)">
-          –</td>
-        <td class="r">2.9</td>
-        <td class="r"><b>18.8</b></td>
-        <td class="r">3.41</td>
-      </tr>
-    </tbody>
-  </table></div>
-</section>
-
-<section>
-  <h2>ตัวที่ควรขาย</h2>
-  <p class="sub">คนในทีมคุณที่ 6 วีคข้างหน้าดูอ่อนที่สุดเมื่อเทียบกับราคา</p>
-  <div class="scroll"><table>
-    <thead><tr><th>ผู้เล่น</th><th class="r">£</th><th class="r">6 วีค</th><th class="r">EP / £m</th><th>เหตุผล</th></tr></thead>
-    <tbody>
-      <tr>
-        <td><span class="pos">GKP</span> <span class="pname">Dubravka</span> <span class="pmeta">TOT</span></td>
-        <td class="r">4.0</td>
+        <td class="r">2</td>
+        <td><span class="pname">Janelt</span> <span class="pmeta">BRE</span></td>
+        <td class="r">5.0</td>
         <td class="r">2.4</td>
-        <td class="r">0.61</td>
-        <td style="white-space:normal;color:var(--ink-2)">ลงตัวจริงแค่ 0%</td>
+        <td style="white-space:normal"><span class="pmeta">GW5 CHE (H) [4] · GW6 AVL (A) [4] · GW7 LIV (H) [4] · GW8 HUL (A) [2] · GW9 NFO (H) [3]</span></td>
+        <td class="r">4.6</td>
+        <td class="r"><b>22.2</b></td>
+        <td class="r" style="color:var(--good)">+11.0</td>
+        <td class="r">100%</td>
       </tr>
       <tr>
-        <td><span class="pos">DEF</span> <span class="pname">Mendy</span> <span class="pmeta">HUL</span></td>
+        <td class="r">3</td>
+        <td><span class="pname">Mainoo</span> <span class="pmeta">MUN</span></td>
+        <td class="r">5.5</td>
+        <td class="r">1.5</td>
+        <td style="white-space:normal"><span class="pmeta">GW5 FUL (A) [3] · GW6 TOT (H) [3] · GW7 LEE (A) [3] · GW8 BOU (H) [3] · GW9 CHE (A) [4]</span></td>
         <td class="r">4.1</td>
-        <td class="r">7.6</td>
-        <td class="r">1.87</td>
-        <td style="white-space:normal;color:var(--ink-2)">มีปัญหาเรื่องความพร้อม, ลงตัวจริงแค่ 50%</td>
+        <td class="r"><b>21.3</b></td>
+        <td class="r" style="color:var(--good)">+10.0</td>
+        <td class="r">100%</td>
       </tr>
       <tr>
-        <td><span class="pos">FWD</span> <span class="pname">Igor Jesus</span> <span class="pmeta">NFO</span></td>
-        <td class="r">5.8</td>
-        <td class="r">15.0</td>
-        <td class="r">2.58</td>
-        <td style="white-space:normal;color:var(--ink-2)">โปรแกรมและฟอร์มสู้ตัวเลือกอื่นไม่ได้</td>
-      </tr>
-      <tr>
-        <td><span class="pos">DEF</span> <span class="pname">Greaves</span> <span class="pmeta">IPS</span></td>
-        <td class="r">4.0</td>
-        <td class="r">17.2</td>
-        <td class="r">4.31</td>
-        <td style="white-space:normal;color:var(--ink-2)">โปรแกรมและฟอร์มสู้ตัวเลือกอื่นไม่ได้</td>
-      </tr>
-      <tr>
-        <td><span class="pos">DEF</span> <span class="pname">Maguire</span> <span class="pmeta">MUN</span></td>
-        <td class="r">4.9</td>
-        <td class="r">18.5</td>
-        <td class="r">3.78</td>
-        <td style="white-space:normal;color:var(--ink-2)">โปรแกรมและฟอร์มสู้ตัวเลือกอื่นไม่ได้</td>
-      </tr>
-      <tr>
-        <td><span class="pos">MID</span> <span class="pname">Ampadu</span> <span class="pmeta">LEE</span></td>
-        <td class="r">5.4</td>
-        <td class="r">18.6</td>
-        <td class="r">3.44</td>
-        <td style="white-space:normal;color:var(--ink-2)">โปรแกรมและฟอร์มสู้ตัวเลือกอื่นไม่ได้</td>
+        <td class="r">4</td>
+        <td><span class="pname">King</span> <span class="pmeta">FUL</span></td>
+        <td class="r">5.5</td>
+        <td class="r">1.4</td>
+        <td style="white-space:normal"><span class="pmeta">GW5 MUN (H) [4] · GW6 IPS (A) [2] · GW7 HUL (H) [2] · GW8 COV (A) [2] · GW9 AVL (A) [4]</span></td>
+        <td class="r">4.5</td>
+        <td class="r"><b>21.2</b></td>
+        <td class="r" style="color:var(--good)">+9.9</td>
+        <td class="r">100%</td>
       </tr>
     </tbody>
   </table></div>
-</section>
-
-<section>
-  <h2>แผน 6 วีคข้างหน้า</h2>
-  <p class="sub">คำนวณทั้ง 6 วีคพร้อมกัน ไม่ใช่ตัดสินใจทีละวีค</p>
-  <div class="plan">
-    <div class="pweek">
-      <span class="gw">GW5</span>
-      <span class="what">Gabriel → Khalaili, Ampadu → Tavernier, Cherki → Saka<br>
-        <span class="muted">กัปตัน: Haaland &middot; มี 3 transfer</span></span>
-      <span class="epbar"><span class="track"><span class="fill" style="width:88%"></span></span><span class="v">53</span></span>
-    </div>
-    <div class="pweek">
-      <span class="gw">GW6</span>
-      <span class="what">Mendy → Davis<br>
-        <span class="muted">กัปตัน: B.Fernandes &middot; มี 1 transfer</span></span>
-      <span class="epbar"><span class="track"><span class="fill" style="width:98%"></span></span><span class="v">59</span></span>
-    </div>
-    <div class="pweek">
-      <span class="gw">GW7</span>
-      <span class="what">Maguire → De Cuyper<br>
-        <span class="muted">กัปตัน: Haaland &middot; มี 1 transfer</span></span>
-      <span class="epbar"><span class="track"><span class="fill" style="width:92%"></span></span><span class="v">55</span></span>
-    </div>
-    <div class="pweek">
-      <span class="gw">GW8</span>
-      <span class="what">Kinsky → Tzolakis<br>
-        <span class="muted">กัปตัน: B.Fernandes &middot; มี 1 transfer</span></span>
-      <span class="epbar"><span class="track"><span class="fill" style="width:100%"></span></span><span class="v">60</span></span>
-    </div>
-    <div class="pweek">
-      <span class="gw">GW9</span>
-      <span class="what">Xhaka → Scott<br>
-        <span class="muted">กัปตัน: Haaland &middot; มี 1 transfer</span></span>
-      <span class="epbar"><span class="track"><span class="fill" style="width:95%"></span></span><span class="v">57</span></span>
-    </div>
-    <div class="pweek">
-      <span class="gw">GW10</span>
-      <span class="what">เก็บ transfer ไว้<br>
-        <span class="muted">กัปตัน: B.Fernandes &middot; มี 0 transfer</span></span>
-      <span class="epbar"><span class="track"><span class="fill" style="width:100%"></span></span><span class="v">60</span></span>
-    </div>
+  <p class="sub" style="margin-top:10px">เกณฑ์แนะนำย้าย: เพิ่มอย่างน้อย 3.0 EP ใน 5 นัด หากไม่ถึงเกณฑ์ Candidate เป็นเพียง watchlist</p>
   </div>
-</section>
+</details>
 
-<section>
-  <h2>โปรแกรมการแข่งขัน</h2>
-  <p class="sub">ความยากของคู่แข่งที่ทีมในสควอดคุณต้องเจอ · ตัวเลขน้อย = ง่ายกว่า</p>
+
+<details class="insight">
+  <summary><span class="summary-icon">GW</span><span><strong>โปรแกรมการแข่งขัน</strong><small>ดูคู่แข่งของนักเตะในทีมล่วงหน้า</small></span><span class="chevron">⌄</span></summary>
+  <div class="insight-body">
+  <p class="sub">ดูว่านักเตะของคุณแต่ละกลุ่มเจอใครบ้าง · กดชื่อนักเตะเพื่อเปิดอันดับเปรียบเทียบ</p>
   <div class="scroll"><table>
-    <thead><tr><th>สโมสร</th><th class="r">GW5</th><th class="r">GW6</th><th class="r">GW7</th><th class="r">GW8</th><th class="r">GW9</th><th class="r">GW10</th><th class="r">เฉลี่ย</th></tr></thead>
+    <thead><tr><th>นักเตะในทีมคุณ</th><th class="r">GW5</th><th class="r">GW6</th><th class="r">GW7</th><th class="r">GW8</th><th class="r">GW9</th><th class="r">GW10</th><th class="r">เฉลี่ย</th></tr></thead>
     <tbody>
       <tr>
-        <td class="pname">Coventry City</td>
+        <td><div class="playerlist"><button type="button" class="playerlink player-open" data-player="173">Thomas <span class="pmeta">DEF</span></button></div><span class="pmeta">Coventry City</span></td>
         <td class="r"><span class="fdr d3">NFO A 3</span></td>
         <td class="r"><span class="fdr d2">NEW H 2</span></td>
         <td class="r"><span class="fdr d3">TOT A 3</span></td>
@@ -900,7 +289,7 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
         <td class="r">2.50</td>
       </tr>
       <tr>
-        <td class="pname">Arsenal</td>
+        <td><div class="playerlist"><button type="button" class="playerlink player-open" data-player="4">Gabriel <span class="pmeta">DEF</span></button><button type="button" class="playerlink player-open" data-player="15">Ødegaard <span class="pmeta">MID</span></button></div><span class="pmeta">Arsenal</span></td>
         <td class="r"><span class="fdr d3">BHA A 3</span></td>
         <td class="r"><span class="fdr d2">LEE H 2</span></td>
         <td class="r"><span class="fdr d3">NFO A 3</span></td>
@@ -910,7 +299,7 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
         <td class="r">2.83</td>
       </tr>
       <tr>
-        <td class="pname">Man City</td>
+        <td><div class="playerlist"><button type="button" class="playerlink player-open" data-player="399">Cherki <span class="pmeta">MID</span></button><button type="button" class="playerlink player-open" data-player="411">Haaland <span class="pmeta">FWD</span></button></div><span class="pmeta">Man City</span></td>
         <td class="r"><span class="fdr d2">SUN H 2</span></td>
         <td class="r"><span class="fdr d4">LIV A 4</span></td>
         <td class="r"><span class="fdr d2">IPS H 2</span></td>
@@ -920,27 +309,7 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
         <td class="r">2.83</td>
       </tr>
       <tr>
-        <td class="pname">Bournemouth</td>
-        <td class="r"><span class="fdr d4">LIV H 4</span></td>
-        <td class="r"><span class="fdr d4">CHE A 4</span></td>
-        <td class="r"><span class="fdr d2">SUN H 2</span></td>
-        <td class="r"><span class="fdr d4">MUN A 4</span></td>
-        <td class="r"><span class="fdr d2">LEE H 2</span></td>
-        <td class="r"><span class="fdr d2">IPS A 2</span></td>
-        <td class="r">3.00</td>
-      </tr>
-      <tr>
-        <td class="pname">Crystal Palace</td>
-        <td class="r"><span class="fdr d3">LEE A 3</span></td>
-        <td class="r"><span class="fdr d3">NFO H 3</span></td>
-        <td class="r"><span class="fdr d3">BHA A 3</span></td>
-        <td class="r"><span class="fdr d2">NEW H 2</span></td>
-        <td class="r"><span class="fdr d3">TOT A 3</span></td>
-        <td class="r"><span class="fdr d4">LIV H 4</span></td>
-        <td class="r">3.00</td>
-      </tr>
-      <tr>
-        <td class="pname">Ipswich Town</td>
+        <td><div class="playerlist"><button type="button" class="playerlink player-open" data-player="306">Greaves <span class="pmeta">DEF</span></button></div><span class="pmeta">Ipswich Town</span></td>
         <td class="r"><span class="fdr d3">EVE A 3</span></td>
         <td class="r"><span class="fdr d2">FUL H 2</span></td>
         <td class="r"><span class="fdr d5">MCI A 5</span></td>
@@ -950,7 +319,7 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
         <td class="r">3.00</td>
       </tr>
       <tr>
-        <td class="pname">Nott&#39;m Forest</td>
+        <td><div class="playerlist"><button type="button" class="playerlink player-open" data-player="491">Igor Jesus <span class="pmeta">FWD</span></button></div><span class="pmeta">Nott&#39;m Forest</span></td>
         <td class="r"><span class="fdr d2">COV H 2</span></td>
         <td class="r"><span class="fdr d3">CRY A 3</span></td>
         <td class="r"><span class="fdr d4">ARS H 4</span></td>
@@ -960,7 +329,7 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
         <td class="r">3.00</td>
       </tr>
       <tr>
-        <td class="pname">Sunderland</td>
+        <td><div class="playerlist"><button type="button" class="playerlink player-open" data-player="544">Xhaka <span class="pmeta">MID</span></button></div><span class="pmeta">Sunderland</span></td>
         <td class="r"><span class="fdr d5">MCI A 5</span></td>
         <td class="r"><span class="fdr d2">BHA H 2</span></td>
         <td class="r"><span class="fdr d3">BOU A 3</span></td>
@@ -970,7 +339,7 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
         <td class="r">3.00</td>
       </tr>
       <tr>
-        <td class="pname">Chelsea</td>
+        <td><div class="playerlist"><button type="button" class="playerlink player-open" data-player="165">João Pedro <span class="pmeta">FWD</span></button></div><span class="pmeta">Chelsea</span></td>
         <td class="r"><span class="fdr d3">BRE A 3</span></td>
         <td class="r"><span class="fdr d3">BOU H 3</span></td>
         <td class="r"><span class="fdr d3">EVE A 3</span></td>
@@ -980,7 +349,7 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
         <td class="r">3.17</td>
       </tr>
       <tr>
-        <td class="pname">Hull City</td>
+        <td><div class="playerlist"><button type="button" class="playerlink player-open" data-player="586">Mendy <span class="pmeta">DEF</span></button></div><span class="pmeta">Hull City</span></td>
         <td class="r"><span class="fdr d3">NEW A 3</span></td>
         <td class="r"><span class="fdr d3">EVE H 3</span></td>
         <td class="r"><span class="fdr d3">FUL A 3</span></td>
@@ -990,7 +359,7 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
         <td class="r">3.17</td>
       </tr>
       <tr>
-        <td class="pname">Man Utd</td>
+        <td><div class="playerlist"><button type="button" class="playerlink player-open" data-player="418">Maguire <span class="pmeta">DEF</span></button><button type="button" class="playerlink player-open" data-player="426">B.Fernandes <span class="pmeta">MID</span></button></div><span class="pmeta">Man Utd</span></td>
         <td class="r"><span class="fdr d3">FUL A 3</span></td>
         <td class="r"><span class="fdr d3">TOT H 3</span></td>
         <td class="r"><span class="fdr d3">LEE A 3</span></td>
@@ -1000,7 +369,7 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
         <td class="r">3.17</td>
       </tr>
       <tr>
-        <td class="pname">Spurs</td>
+        <td><div class="playerlist"><button type="button" class="playerlink player-open" data-player="496">Kinsky <span class="pmeta">GKP</span></button><button type="button" class="playerlink player-open" data-player="497">Dubravka <span class="pmeta">GKP</span></button></div><span class="pmeta">Spurs</span></td>
         <td class="r"><span class="fdr d3">AVL H 3</span></td>
         <td class="r"><span class="fdr d4">MUN A 4</span></td>
         <td class="r"><span class="fdr d2">COV H 2</span></td>
@@ -1008,6 +377,16 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
         <td class="r"><span class="fdr d3">CRY H 3</span></td>
         <td class="r"><span class="fdr d3">LEE A 3</span></td>
         <td class="r">3.17</td>
+      </tr>
+      <tr>
+        <td><div class="playerlist"><button type="button" class="playerlink player-open" data-player="124">Groß <span class="pmeta">MID</span></button></div><span class="pmeta">Brighton</span></td>
+        <td class="r"><span class="fdr d4">ARS H 4</span></td>
+        <td class="r"><span class="fdr d3">SUN A 3</span></td>
+        <td class="r"><span class="fdr d3">CRY H 3</span></td>
+        <td class="r"><span class="fdr d4">LIV A 4</span></td>
+        <td class="r"><span class="fdr d5">MCI A 5</span></td>
+        <td class="r"><span class="fdr d3">BRE H 3</span></td>
+        <td class="r">3.67</td>
       </tr>
     </tbody>
   </table></div>
@@ -1018,42 +397,285 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
     <span><i style="background:var(--fdr5)"></i>ยากมาก (5)</span>
     <span style="color:var(--ink-3)">H เหย้า &middot; A เยือน</span>
   </div>
-</section>
+  </div>
+</details>
 
-<section>
-  <h2>รายการเฝ้าระวัง</h2>
+<details class="insight">
+  <summary><span class="summary-icon">PLAN</span><span><strong>แผนล่วงหน้า 6 สัปดาห์</strong><small>ดูว่าการเปลี่ยนตัวรอบนี้พาไปทางไหน</small></span><span class="chevron">⌄</span></summary>
+  <div class="insight-body">
+  <p class="sub">ภาพที่ solver มองไว้ล่วงหน้า ใช้ประกอบการตัดสินใจของสัปดาห์นี้เท่านั้น ไม่ใช่ตารางที่ต้องทำตาม สัปดาห์ถัดไปข้อมูลเปลี่ยน แผนก็เปลี่ยน</p>
+  <div class="plan">
+    <div class="pweek">
+      <span class="gw">GW5</span>
+      <span class="what">Ampadu → Groß
+        <span class="muted">&middot; กัปตัน Haaland &middot; FT 3</span>
+      </span>
+      <span class="epbar">
+        <span class="track"><span class="fill" style="width:86%"></span></span>
+        <b class="v">55.4</b>
+      </span>
+    </div>
+    <div class="pweek">
+      <span class="gw">GW6</span>
+      <span class="what">Mendy → Davis
+        <span class="muted">&middot; กัปตัน B.Fernandes &middot; FT 3</span>
+      </span>
+      <span class="epbar">
+        <span class="track"><span class="fill" style="width:92%"></span></span>
+        <b class="v">59.3</b>
+      </span>
+    </div>
+    <div class="pweek">
+      <span class="gw">GW7</span>
+      <span class="what">Gabriel → De Cuyper
+        <span class="muted">&middot; กัปตัน Haaland &middot; FT 3</span>
+      </span>
+      <span class="epbar">
+        <span class="track"><span class="fill" style="width:91%"></span></span>
+        <b class="v">59.0</b>
+      </span>
+    </div>
+    <div class="pweek">
+      <span class="gw">GW8</span>
+      <span class="what">Cherki → Saka
+        <span class="muted">&middot; กัปตัน B.Fernandes &middot; FT 3</span>
+      </span>
+      <span class="epbar">
+        <span class="track"><span class="fill" style="width:96%"></span></span>
+        <b class="v">61.8</b>
+      </span>
+    </div>
+    <div class="pweek">
+      <span class="gw">GW9</span>
+      <span class="what">Xhaka → Tavernier
+        <span class="muted">&middot; กัปตัน Haaland &middot; FT 3</span>
+      </span>
+      <span class="epbar">
+        <span class="track"><span class="fill" style="width:96%"></span></span>
+        <b class="v">61.9</b>
+      </span>
+    </div>
+    <div class="pweek">
+      <span class="gw">GW10</span>
+      <span class="what">Maguire → Khalaili
+        <span class="muted">&middot; กัปตัน B.Fernandes &middot; FT 3</span>
+      </span>
+      <span class="epbar">
+        <span class="track"><span class="fill" style="width:100%"></span></span>
+        <b class="v">64.7</b>
+      </span>
+    </div>
+  </div>
+  </div>
+</details>
+
+<div class="modalback" id="player-modal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="compare-title">
+    <div class="modalhead">
+      <div><h2 id="compare-title">เปรียบเทียบนักเตะ</h2><div class="pmeta" id="compare-sub"></div></div>
+      <button type="button" class="closebtn" id="compare-close" aria-label="ปิด">&times;</button>
+    </div>
+    <div class="comparefilters" aria-label="เรียงตัวเลือก">
+      <button class="filterbtn" data-sort="ep" aria-selected="true">คะแนนสูงสุด</button>
+      <button class="filterbtn" data-sort="price">ราคาใกล้เคียง</button>
+      <button class="filterbtn" data-sort="form">ฟอร์มดีที่สุด</button>
+      <button class="filterbtn" data-sort="fixtures">โปรแกรมดีที่สุด</button>
+    </div>
+    <p class="swipehint">เลื่อนตารางซ้าย–ขวาเพื่อดู EP ผลต่าง และโอกาสลง</p>
+    <div class="scroll comparetable" tabindex="0" aria-label="ตารางเปรียบเทียบนักเตะ เลื่อนซ้ายขวาเพื่อดูทุกคอลัมน์"><table>
+      <thead><tr><th>อันดับ</th><th>ผู้เล่น</th><th class="r">£</th><th>โปรแกรม</th><th class="r">ฟอร์ม</th><th class="r">EP 5 นัด</th><th class="r">เทียบคนที่เลือก</th><th class="r">โอกาสลง</th></tr></thead>
+      <tbody id="compare-body"></tbody>
+    </table></div>
+    <p class="sub" style="margin-top:10px">จัดอันดับเฉพาะตำแหน่งเดียวกันและราคาที่ซื้อได้จริง · ownership ไม่มีผลต่ออันดับ</p>
+  </div>
+</div>
+
+<details class="insight">
+  <summary><span class="summary-icon">ALERT</span><span><strong>รายการเฝ้าระวัง</strong><small>ดูความเสี่ยงอาการเจ็บและการหมุนเวียน</small></span><span class="chevron">⌄</span></summary>
+  <div class="insight-body">
   <p class="sub">ความเสี่ยงเรื่องอาการบาดเจ็บและการหมุนเวียนตัวในทีมคุณ</p>
   <div class="flags">
+    <div class="flag ">
+      <span class="tag">หมุนเวียน</span>
+      <span><b>Igor Jesus</b> — ลงตัวจริงแค่ 53% ของนัดที่ทีมเตะ</span>
+    </div>
     <div class="flag ">
       <span class="tag">ต้องลุ้น</span>
       <span><b>Mendy</b> — Concussion - 50% chance of playing</span>
     </div>
   </div>
-</section>
+  </div>
+</details>
 
-<section>
-  <h2>กันลืม</h2>
-  <p class="sub">สมัครครั้งเดียว มือถือจะเตือนเองก่อนทุก deadline ที่เหลือของฤดูกาล แม้ระบบนี้จะล่ม</p>
+<details class="insight">
+  <summary><span class="summary-icon">CAL</span><span><strong>กันลืม</strong><small>ตั้งปฏิทินเตือนก่อน deadline</small></span><span class="chevron">⌄</span></summary>
+  <div class="insight-body">
+  <p class="sub">เพิ่มลงปฏิทินครั้งเดียว เพื่อเตือนให้กดอัปเดตรายงานก่อน deadline 24 ชั่วโมง</p>
   <div class="subscribe">
     <a class="btn" href="deadlines.ics" download>เพิ่มลงปฏิทิน</a>
     <div class="how">
-      <b>iPhone</b> — แตะปุ่มนี้ แล้วกด &ldquo;เพิ่มทั้งหมด&rdquo; · เตือน 48, 24, 3 ชม. ก่อนปิด<br>
+      <b>iPhone</b> — แตะปุ่มนี้ แล้วกด &ldquo;เพิ่มทั้งหมด&rdquo; · เตือน 24 ชม. ก่อนปิด<br>
       <b>Android</b> — Google Calendar &rsaquo; ปฏิทินอื่น &rsaquo; จาก URL แล้ววางลิงก์นี้
     </div>
   </div>
   <p class="sub" style="margin-top:14px">
-    และกด &ldquo;เพิ่มไปยังหน้าจอโฮม&rdquo; จากเมนูแชร์ของเบราว์เซอร์ เพื่อเปิดหน้านี้ได้เหมือนแอป
+    เมื่อได้รับการเตือน ให้ดับเบิลคลิก <code>เปิดเว็บ FPL.bat</code> แล้วกดปุ่มอัปเดตข้อมูลล่าสุด
   </p>
-</section>
+  </div>
+</details>
 
 <footer>
-  สร้างจาก Fantasy Premier League API เมื่อ อาทิตย์ 13 ก.ย. 2569, 19:16 น. · ตัวเลขคาดการณ์เป็นค่าประมาณเชิงสถิติ ไม่ใช่คำทำนายผลจริง
-  โมเดล v0.1.0 &middot; สถานะ solver: Optimal
+  สร้างจาก Fantasy Premier League API เมื่อ จันทร์ 14 ก.ย. 2569, 23:22 น. · ตัวเลขคาดการณ์เป็นค่าประมาณเชิงสถิติ ไม่ใช่คำทำนายผลจริง
+  โมเดล v0.2.0 &middot; สถานะ solver: Optimal
 </footer>
 </div>
 
 <script>
 (function () {
+  var comparisons = {"124": {"budget": 5.7, "name": "Gro\u00df", "position": "MID", "rows": [{"availability": 1.0, "ep": 26.280267989035337, "fixtures": ["GW5 ARS (H) [4]", "GW6 SUN (A) [3]", "GW7 CRY (H) [3]", "GW8 LIV (A) [4]", "GW9 MCI (A) [5]"], "form": 8.2, "gain": 0.0, "id": 124, "name": "Gro\u00df", "ownership": 17.5, "position": "MID", "price": 5.6, "rank": 1, "selected": true, "starts": 1.0, "team": "BHA"}, {"availability": 1.0, "ep": 22.24141497803352, "fixtures": ["GW5 CHE (H) [4]", "GW6 AVL (A) [4]", "GW7 LIV (H) [4]", "GW8 HUL (A) [2]", "GW9 NFO (H) [3]"], "form": 6.2, "gain": -4.038853011001816, "id": 98, "name": "Janelt", "ownership": 2.4, "position": "MID", "price": 5.0, "rank": 2, "selected": false, "starts": 1.0, "team": "BRE"}, {"availability": 1.0, "ep": 21.26651333544557, "fixtures": ["GW5 FUL (A) [3]", "GW6 TOT (H) [3]", "GW7 LEE (A) [3]", "GW8 BOU (H) [3]", "GW9 CHE (A) [4]"], "form": 4.5, "gain": -5.013754653589768, "id": 432, "name": "Mainoo", "ownership": 1.5, "position": "MID", "price": 5.5, "rank": 3, "selected": false, "starts": 1.0, "team": "MUN"}, {"availability": 1.0, "ep": 21.179932187226257, "fixtures": ["GW5 MUN (H) [4]", "GW6 IPS (A) [2]", "GW7 HUL (H) [2]", "GW8 COV (A) [2]", "GW9 AVL (A) [4]"], "form": 5.5, "gain": -5.100335801809081, "id": 268, "name": "King", "ownership": 1.4, "position": "MID", "price": 5.5, "rank": 4, "selected": false, "starts": 1.0, "team": "FUL"}, {"availability": 1.0, "ep": 20.847238623585234, "fixtures": ["GW5 ARS (H) [4]", "GW6 SUN (A) [3]", "GW7 CRY (H) [3]", "GW8 LIV (A) [4]", "GW9 MCI (A) [5]"], "form": 4.8, "gain": -5.433029365450103, "id": 605, "name": "Yalcouy\u00e9", "ownership": 3.5, "position": "MID", "price": 4.5, "rank": 5, "selected": false, "starts": 1.0, "team": "BHA"}, {"availability": 1.0, "ep": 19.328121189789908, "fixtures": ["GW5 CHE (H) [4]", "GW6 AVL (A) [4]", "GW7 LIV (H) [4]", "GW8 HUL (A) [2]", "GW9 NFO (H) [3]"], "form": 4.8, "gain": -6.95214679924543, "id": 86, "name": "Lewis-Potter", "ownership": 2.0, "position": "MID", "price": 5.5, "rank": 6, "selected": false, "starts": 1.0, "team": "BRE"}, {"availability": 1.0, "ep": 19.039100378704045, "fixtures": ["GW5 NEW (A) [3]", "GW6 EVE (H) [3]", "GW7 FUL (A) [3]", "GW8 BRE (H) [3]", "GW9 IPS (H) [2]"], "form": 6.8, "gain": -7.241167610331292, "id": 286, "name": "Belloumi", "ownership": 2.4, "position": "MID", "price": 5.0, "rank": 7, "selected": false, "starts": 1.0, "team": "HUL"}, {"availability": 1.0, "ep": 17.85913959245192, "fixtures": ["GW5 CHE (H) [4]", "GW6 AVL (A) [4]", "GW7 LIV (H) [4]", "GW8 HUL (A) [2]", "GW9 NFO (H) [3]"], "form": 5.5, "gain": -8.421128396583416, "id": 565, "name": "M.Sangar\u00e9", "ownership": 12.4, "position": "MID", "price": 5.7, "rank": 8, "selected": false, "starts": 1.0, "team": "BRE"}], "selected_rank": 1, "total_ranked": 61}, "15": {"budget": 6.7, "name": "\u00d8degaard", "position": "MID", "rows": [{"availability": 1.0, "ep": 26.93681094936822, "fixtures": ["GW5 LIV (H) [4]", "GW6 CHE (A) [4]", "GW7 SUN (H) [2]", "GW8 MUN (A) [4]", "GW9 LEE (H) [2]"], "form": 7.2, "gain": 3.9234977993335924, "id": 68, "name": "Tavernier", "ownership": 4.8, "position": "MID", "price": 6.1, "rank": 1, "selected": false, "starts": 1.0, "team": "BOU"}, {"availability": 1.0, "ep": 24.504399486984013, "fixtures": ["GW5 CHE (H) [4]", "GW6 AVL (A) [4]", "GW7 LIV (H) [4]", "GW8 HUL (A) [2]", "GW9 NFO (H) [3]"], "form": 7.5, "gain": 1.4910863369493867, "id": 94, "name": "Schade", "ownership": 5.1, "position": "MID", "price": 6.0, "rank": 2, "selected": false, "starts": 1.0, "team": "BRE"}, {"availability": 1.0, "ep": 24.20473542291916, "fixtures": ["GW5 LIV (H) [4]", "GW6 CHE (A) [4]", "GW7 SUN (H) [2]", "GW8 MUN (A) [4]", "GW9 LEE (H) [2]"], "form": 7.0, "gain": 1.1914222728845338, "id": 69, "name": "Scott", "ownership": 5.9, "position": "MID", "price": 6.1, "rank": 3, "selected": false, "starts": 1.0, "team": "BOU"}, {"availability": 1.0, "ep": 23.013313150034627, "fixtures": ["GW5 BHA (A) [3]", "GW6 LEE (H) [2]", "GW7 NFO (A) [3]", "GW8 EVE (H) [3]", "GW9 LIV (A) [4]"], "form": 6.8, "gain": 0.0, "id": 15, "name": "\u00d8degaard", "ownership": 19.0, "position": "MID", "price": 6.7, "rank": 4, "selected": true, "starts": 1.0, "team": "ARS"}, {"availability": 1.0, "ep": 22.24141497803352, "fixtures": ["GW5 CHE (H) [4]", "GW6 AVL (A) [4]", "GW7 LIV (H) [4]", "GW8 HUL (A) [2]", "GW9 NFO (H) [3]"], "form": 6.2, "gain": -0.7718981720011051, "id": 98, "name": "Janelt", "ownership": 2.4, "position": "MID", "price": 5.0, "rank": 5, "selected": false, "starts": 1.0, "team": "BRE"}, {"availability": 1.0, "ep": 21.26651333544557, "fixtures": ["GW5 FUL (A) [3]", "GW6 TOT (H) [3]", "GW7 LEE (A) [3]", "GW8 BOU (H) [3]", "GW9 CHE (A) [4]"], "form": 4.5, "gain": -1.7467998145890569, "id": 432, "name": "Mainoo", "ownership": 1.5, "position": "MID", "price": 5.5, "rank": 6, "selected": false, "starts": 1.0, "team": "MUN"}, {"availability": 1.0, "ep": 21.179932187226257, "fixtures": ["GW5 MUN (H) [4]", "GW6 IPS (A) [2]", "GW7 HUL (H) [2]", "GW8 COV (A) [2]", "GW9 AVL (A) [4]"], "form": 5.5, "gain": -1.83338096280837, "id": 268, "name": "King", "ownership": 1.4, "position": "MID", "price": 5.5, "rank": 7, "selected": false, "starts": 1.0, "team": "FUL"}, {"availability": 1.0, "ep": 20.847238623585234, "fixtures": ["GW5 ARS (H) [4]", "GW6 SUN (A) [3]", "GW7 CRY (H) [3]", "GW8 LIV (A) [4]", "GW9 MCI (A) [5]"], "form": 4.8, "gain": -2.1660745264493926, "id": 605, "name": "Yalcouy\u00e9", "ownership": 3.5, "position": "MID", "price": 4.5, "rank": 8, "selected": false, "starts": 1.0, "team": "BHA"}], "selected_rank": 4, "total_ranked": 88}, "165": {"budget": 7.7, "name": "Jo\u00e3o Pedro", "position": "FWD", "rows": [{"availability": 1.0, "ep": 28.608317840550235, "fixtures": ["GW5 BRE (A) [3]", "GW6 BOU (H) [3]", "GW7 EVE (A) [3]", "GW8 TOT (H) [3]", "GW9 MUN (H) [4]"], "form": 8.2, "gain": 0.0, "id": 165, "name": "Jo\u00e3o Pedro", "ownership": 74.8, "position": "FWD", "price": 7.8, "rank": 16, "selected": true, "starts": 1.0, "team": "CHE"}, {"availability": 1.0, "ep": 19.97566097550648, "fixtures": ["GW5 IPS (H) [2]", "GW6 HUL (A) [2]", "GW7 CHE (H) [4]", "GW8 ARS (A) [5]", "GW9 NEW (A) [3]"], "form": 3.5, "gain": -8.632656865043757, "id": 249, "name": "Barry", "ownership": 6.5, "position": "FWD", "price": 5.6, "rank": 1, "selected": false, "starts": 1.0, "team": "EVE"}, {"availability": 1.0, "ep": 18.897544564337494, "fixtures": ["GW5 ARS (H) [4]", "GW6 SUN (A) [3]", "GW7 CRY (H) [3]", "GW8 LIV (A) [4]", "GW9 MCI (A) [5]"], "form": 4.5, "gain": -9.710773276212741, "id": 138, "name": "Kostoulas", "ownership": 0.7, "position": "FWD", "price": 5.5, "rank": 2, "selected": false, "starts": 0.9155927397430391, "team": "BHA"}, {"availability": 1.0, "ep": 18.212543956979346, "fixtures": ["GW5 EVE (A) [3]", "GW6 FUL (H) [2]", "GW7 MCI (A) [5]", "GW8 NFO (H) [3]", "GW9 HUL (A) [2]"], "form": 6.0, "gain": -10.39577388357089, "id": 316, "name": "Emersonn", "ownership": 2.4, "position": "FWD", "price": 5.5, "rank": 3, "selected": false, "starts": 1.0, "team": "IPS"}, {"availability": 1.0, "ep": 18.165976073395722, "fixtures": ["GW5 BHA (A) [3]", "GW6 LEE (H) [2]", "GW7 NFO (A) [3]", "GW8 EVE (H) [3]", "GW9 LIV (A) [4]"], "form": 4.2, "gain": -10.442341767154513, "id": 26, "name": "Havertz", "ownership": 8.0, "position": "FWD", "price": 7.6, "rank": 4, "selected": false, "starts": 1.0, "team": "ARS"}, {"availability": 1.0, "ep": 17.862088449479625, "fixtures": ["GW5 MUN (H) [4]", "GW6 IPS (A) [2]", "GW7 HUL (H) [2]", "GW8 COV (A) [2]", "GW9 AVL (A) [4]"], "form": 3.0, "gain": -10.74622939107061, "id": 569, "name": "Gonzalo", "ownership": 3.8, "position": "FWD", "price": 6.0, "rank": 5, "selected": false, "starts": 1.0, "team": "FUL"}, {"availability": 1.0, "ep": 17.82769124314093, "fixtures": ["GW5 HUL (H) [2]", "GW6 COV (A) [2]", "GW7 AVL (H) [3]", "GW8 CRY (A) [3]", "GW9 EVE (H) [3]"], "form": 3.2, "gain": -10.780626597409306, "id": 464, "name": "Wissa", "ownership": 18.6, "position": "FWD", "price": 6.2, "rank": 6, "selected": false, "starts": 1.0, "team": "NEW"}, {"availability": 1.0, "ep": 17.3899236950918, "fixtures": ["GW5 LIV (H) [4]", "GW6 CHE (A) [4]", "GW7 SUN (H) [2]", "GW8 MUN (A) [4]", "GW9 LEE (H) [2]"], "form": 4.0, "gain": -11.218394145458436, "id": 79, "name": "Evanilson", "ownership": 3.3, "position": "FWD", "price": 6.0, "rank": 7, "selected": false, "starts": 1.0, "team": "BOU"}, {"availability": 1.0, "ep": 16.878910317496373, "fixtures": ["GW5 CRY (H) [3]", "GW6 ARS (A) [5]", "GW7 MUN (H) [4]", "GW8 SUN (A) [3]", "GW9 BOU (A) [3]"], "form": 2.5, "gain": -11.729407523053862, "id": 346, "name": "Calvert-Lewin", "ownership": 21.6, "position": "FWD", "price": 6.0, "rank": 8, "selected": false, "starts": 1.0, "team": "LEE"}], "selected_rank": 16, "total_ranked": 15}, "173": {"budget": 4.1, "name": "Thomas", "position": "DEF", "rows": [{"availability": 1.0, "ep": 21.42167619671128, "fixtures": ["GW5 EVE (A) [3]", "GW6 FUL (H) [2]", "GW7 MCI (A) [5]", "GW8 NFO (H) [3]", "GW9 HUL (A) [2]"], "form": 5.8, "gain": 3.1781448656330156, "id": 305, "name": "Davis", "ownership": 5.9, "position": "DEF", "price": 4.0, "rank": 1, "selected": false, "starts": 1.0, "team": "IPS"}, {"availability": 1.0, "ep": 20.63005911735477, "fixtures": ["GW5 NEW (A) [3]", "GW6 EVE (H) [3]", "GW7 FUL (A) [3]", "GW8 BRE (H) [3]", "GW9 IPS (H) [2]"], "form": 6.2, "gain": 2.3865277862765026, "id": 277, "name": "Egan", "ownership": 6.7, "position": "DEF", "price": 4.1, "rank": 2, "selected": false, "starts": 1.0, "team": "HUL"}, {"availability": 1.0, "ep": 18.243531331078266, "fixtures": ["GW5 NFO (A) [3]", "GW6 NEW (H) [2]", "GW7 TOT (A) [3]", "GW8 FUL (H) [2]", "GW9 SUN (H) [2]"], "form": 3.8, "gain": 0.0, "id": 173, "name": "Thomas", "ownership": 9.1, "position": "DEF", "price": 4.0, "rank": 3, "selected": true, "starts": 1.0, "team": "COV"}, {"availability": 1.0, "ep": 18.180093042782854, "fixtures": ["GW5 NEW (A) [3]", "GW6 EVE (H) [3]", "GW7 FUL (A) [3]", "GW8 BRE (H) [3]", "GW9 IPS (H) [2]"], "form": 6.0, "gain": -0.06343828829541209, "id": 282, "name": "Giles", "ownership": 2.2, "position": "DEF", "price": 4.0, "rank": 4, "selected": false, "starts": 1.0, "team": "HUL"}, {"availability": 1.0, "ep": 15.480830780984649, "fixtures": ["GW5 EVE (A) [3]", "GW6 FUL (H) [2]", "GW7 MCI (A) [5]", "GW8 NFO (H) [3]", "GW9 HUL (A) [2]"], "form": 2.0, "gain": -2.7627005500936175, "id": 304, "name": "O\u0027Shea", "ownership": 2.9, "position": "DEF", "price": 4.0, "rank": 5, "selected": false, "starts": 1.0, "team": "IPS"}, {"availability": 1.0, "ep": 14.671546057798158, "fixtures": ["GW5 EVE (A) [3]", "GW6 FUL (H) [2]", "GW7 MCI (A) [5]", "GW8 NFO (H) [3]", "GW9 HUL (A) [2]"], "form": 2.0, "gain": -3.5719852732801076, "id": 259, "name": "Diop", "ownership": 14.0, "position": "DEF", "price": 4.0, "rank": 6, "selected": false, "starts": 1.0, "team": "IPS"}, {"availability": 1.0, "ep": 13.93963702390266, "fixtures": ["GW5 NFO (A) [3]", "GW6 NEW (H) [2]", "GW7 TOT (A) [3]", "GW8 FUL (H) [2]", "GW9 SUN (H) [2]"], "form": 1.2, "gain": -4.3038943071756055, "id": 176, "name": "Dasilva", "ownership": 0.7, "position": "DEF", "price": 4.0, "rank": 7, "selected": false, "starts": 1.0, "team": "COV"}, {"availability": 1.0, "ep": 13.736786904398445, "fixtures": ["GW5 NFO (A) [3]", "GW6 NEW (H) [2]", "GW7 TOT (A) [3]", "GW8 FUL (H) [2]", "GW9 SUN (H) [2]"], "form": 1.5, "gain": -4.506744426679822, "id": 175, "name": "van Ewijk", "ownership": 10.3, "position": "DEF", "price": 4.0, "rank": 8, "selected": false, "starts": 1.0, "team": "COV"}], "selected_rank": 3, "total_ranked": 10}, "306": {"budget": 4.1, "name": "Greaves", "position": "DEF", "rows": [{"availability": 1.0, "ep": 21.42167619671128, "fixtures": ["GW5 EVE (A) [3]", "GW6 FUL (H) [2]", "GW7 MCI (A) [5]", "GW8 NFO (H) [3]", "GW9 HUL (A) [2]"], "form": 5.8, "gain": 8.939278776912047, "id": 305, "name": "Davis", "ownership": 5.9, "position": "DEF", "price": 4.0, "rank": 1, "selected": false, "starts": 1.0, "team": "IPS"}, {"availability": 1.0, "ep": 20.63005911735477, "fixtures": ["GW5 NEW (A) [3]", "GW6 EVE (H) [3]", "GW7 FUL (A) [3]", "GW8 BRE (H) [3]", "GW9 IPS (H) [2]"], "form": 6.2, "gain": 8.147661697555534, "id": 277, "name": "Egan", "ownership": 6.7, "position": "DEF", "price": 4.1, "rank": 2, "selected": false, "starts": 1.0, "team": "HUL"}, {"availability": 1.0, "ep": 18.180093042782854, "fixtures": ["GW5 NEW (A) [3]", "GW6 EVE (H) [3]", "GW7 FUL (A) [3]", "GW8 BRE (H) [3]", "GW9 IPS (H) [2]"], "form": 6.0, "gain": 5.69769562298362, "id": 282, "name": "Giles", "ownership": 2.2, "position": "DEF", "price": 4.0, "rank": 3, "selected": false, "starts": 1.0, "team": "HUL"}, {"availability": 1.0, "ep": 15.480830780984649, "fixtures": ["GW5 EVE (A) [3]", "GW6 FUL (H) [2]", "GW7 MCI (A) [5]", "GW8 NFO (H) [3]", "GW9 HUL (A) [2]"], "form": 2.0, "gain": 2.9984333611854144, "id": 304, "name": "O\u0027Shea", "ownership": 2.9, "position": "DEF", "price": 4.0, "rank": 4, "selected": false, "starts": 1.0, "team": "IPS"}, {"availability": 1.0, "ep": 14.671546057798158, "fixtures": ["GW5 EVE (A) [3]", "GW6 FUL (H) [2]", "GW7 MCI (A) [5]", "GW8 NFO (H) [3]", "GW9 HUL (A) [2]"], "form": 2.0, "gain": 2.1891486379989242, "id": 259, "name": "Diop", "ownership": 14.0, "position": "DEF", "price": 4.0, "rank": 5, "selected": false, "starts": 1.0, "team": "IPS"}, {"availability": 1.0, "ep": 13.93963702390266, "fixtures": ["GW5 NFO (A) [3]", "GW6 NEW (H) [2]", "GW7 TOT (A) [3]", "GW8 FUL (H) [2]", "GW9 SUN (H) [2]"], "form": 1.2, "gain": 1.4572396041034263, "id": 176, "name": "Dasilva", "ownership": 0.7, "position": "DEF", "price": 4.0, "rank": 6, "selected": false, "starts": 1.0, "team": "COV"}, {"availability": 1.0, "ep": 13.736786904398445, "fixtures": ["GW5 NFO (A) [3]", "GW6 NEW (H) [2]", "GW7 TOT (A) [3]", "GW8 FUL (H) [2]", "GW9 SUN (H) [2]"], "form": 1.5, "gain": 1.2543894845992103, "id": 175, "name": "van Ewijk", "ownership": 10.3, "position": "DEF", "price": 4.0, "rank": 7, "selected": false, "starts": 1.0, "team": "COV"}, {"availability": 1.0, "ep": 13.16215297077081, "fixtures": ["GW5 NFO (A) [3]", "GW6 NEW (H) [2]", "GW7 TOT (A) [3]", "GW8 FUL (H) [2]", "GW9 SUN (H) [2]"], "form": 1.0, "gain": 0.679755550971576, "id": 182, "name": "Amenda", "ownership": 0.7, "position": "DEF", "price": 4.0, "rank": 8, "selected": false, "starts": 1.0, "team": "COV"}, {"availability": 1.0, "ep": 12.482397419799234, "fixtures": ["GW5 EVE (A) [3]", "GW6 FUL (H) [2]", "GW7 MCI (A) [5]", "GW8 NFO (H) [3]", "GW9 HUL (A) [2]"], "form": 0.8, "gain": 0.0, "id": 306, "name": "Greaves", "ownership": 1.2, "position": "DEF", "price": 4.0, "rank": 9, "selected": true, "starts": 1.0, "team": "IPS"}], "selected_rank": 9, "total_ranked": 10}, "399": {"budget": 7.8, "name": "Cherki", "position": "MID", "rows": [{"availability": 1.0, "ep": 26.93681094936822, "fixtures": ["GW5 LIV (H) [4]", "GW6 CHE (A) [4]", "GW7 SUN (H) [2]", "GW8 MUN (A) [4]", "GW9 LEE (H) [2]"], "form": 7.2, "gain": 6.791075229413334, "id": 68, "name": "Tavernier", "ownership": 4.8, "position": "MID", "price": 6.1, "rank": 1, "selected": false, "starts": 1.0, "team": "BOU"}, {"availability": 1.0, "ep": 25.628441589705965, "fixtures": ["GW5 BRE (A) [3]", "GW6 BOU (H) [3]", "GW7 EVE (A) [3]", "GW8 TOT (H) [3]", "GW9 MUN (H) [4]"], "form": 6.8, "gain": 5.482705869751079, "id": 40, "name": "Rogers", "ownership": 36.7, "position": "MID", "price": 7.7, "rank": 2, "selected": false, "starts": 1.0, "team": "CHE"}, {"availability": 1.0, "ep": 24.504399486984013, "fixtures": ["GW5 CHE (H) [4]", "GW6 AVL (A) [4]", "GW7 LIV (H) [4]", "GW8 HUL (A) [2]", "GW9 NFO (H) [3]"], "form": 7.5, "gain": 4.358663767029128, "id": 94, "name": "Schade", "ownership": 5.1, "position": "MID", "price": 6.0, "rank": 3, "selected": false, "starts": 1.0, "team": "BRE"}, {"availability": 1.0, "ep": 24.20473542291916, "fixtures": ["GW5 LIV (H) [4]", "GW6 CHE (A) [4]", "GW7 SUN (H) [2]", "GW8 MUN (A) [4]", "GW9 LEE (H) [2]"], "form": 7.0, "gain": 4.058999702964275, "id": 69, "name": "Scott", "ownership": 5.9, "position": "MID", "price": 6.1, "rank": 4, "selected": false, "starts": 1.0, "team": "BOU"}, {"availability": 1.0, "ep": 22.24141497803352, "fixtures": ["GW5 CHE (H) [4]", "GW6 AVL (A) [4]", "GW7 LIV (H) [4]", "GW8 HUL (A) [2]", "GW9 NFO (H) [3]"], "form": 6.2, "gain": 2.0956792580786363, "id": 98, "name": "Janelt", "ownership": 2.4, "position": "MID", "price": 5.0, "rank": 5, "selected": false, "starts": 1.0, "team": "BRE"}, {"availability": 1.0, "ep": 22.129598038888897, "fixtures": ["GW5 BOU (A) [3]", "GW6 MCI (H) [4]", "GW7 BRE (A) [3]", "GW8 BHA (H) [2]", "GW9 ARS (H) [4]"], "form": 4.5, "gain": 1.9838623189340119, "id": 368, "name": "Szoboszlai", "ownership": 37.0, "position": "MID", "price": 7.0, "rank": 6, "selected": false, "starts": 1.0, "team": "LIV"}, {"availability": 1.0, "ep": 21.715060795764682, "fixtures": ["GW5 BOU (A) [3]", "GW6 MCI (H) [4]", "GW7 BRE (A) [3]", "GW8 BHA (H) [2]", "GW9 ARS (H) [4]"], "form": 7.2, "gain": 1.5693250758097967, "id": 367, "name": "Gakpo", "ownership": 12.2, "position": "MID", "price": 7.2, "rank": 7, "selected": false, "starts": 0.8311854794860785, "team": "LIV"}, {"availability": 1.0, "ep": 21.26651333544557, "fixtures": ["GW5 FUL (A) [3]", "GW6 TOT (H) [3]", "GW7 LEE (A) [3]", "GW8 BOU (H) [3]", "GW9 CHE (A) [4]"], "form": 4.5, "gain": 1.1207776154906846, "id": 432, "name": "Mainoo", "ownership": 1.5, "position": "MID", "price": 5.5, "rank": 8, "selected": false, "starts": 1.0, "team": "MUN"}, {"availability": 1.0, "ep": 20.145735719954885, "fixtures": ["GW5 SUN (H) [2]", "GW6 LIV (A) [4]", "GW7 IPS (H) [2]", "GW8 AVL (A) [4]", "GW9 BHA (H) [2]"], "form": 6.5, "gain": 0.0, "id": 399, "name": "Cherki", "ownership": 28.8, "position": "MID", "price": 7.8, "rank": 11, "selected": true, "starts": 0.9155927397430391, "team": "MCI"}], "selected_rank": 11, "total_ranked": 95}, "4": {"budget": 8.1, "name": "Gabriel", "position": "DEF", "rows": [{"availability": 1.0, "ep": 22.89458515944242, "fixtures": ["GW5 ARS (H) [4]", "GW6 SUN (A) [3]", "GW7 CRY (H) [3]", "GW8 LIV (A) [4]", "GW9 MCI (A) [5]"], "form": 8.0, "gain": 5.38038666017615, "id": 115, "name": "De Cuyper", "ownership": 23.0, "position": "DEF", "price": 4.8, "rank": 1, "selected": false, "starts": 1.0, "team": "BHA"}, {"availability": 1.0, "ep": 22.02704020603263, "fixtures": ["GW5 SUN (H) [2]", "GW6 LIV (A) [4]", "GW7 IPS (H) [2]", "GW8 AVL (A) [4]", "GW9 BHA (H) [2]"], "form": 6.5, "gain": 4.512841706766359, "id": 388, "name": "Gu\u00e9hi", "ownership": 18.5, "position": "DEF", "price": 6.0, "rank": 2, "selected": false, "starts": 1.0, "team": "MCI"}, {"availability": 1.0, "ep": 21.91579448271987, "fixtures": ["GW5 SUN (H) [2]", "GW6 LIV (A) [4]", "GW7 IPS (H) [2]", "GW8 AVL (A) [4]", "GW9 BHA (H) [2]"], "form": 8.2, "gain": 4.4015959834536, "id": 391, "name": "Gvardiol", "ownership": 21.9, "position": "DEF", "price": 5.7, "rank": 3, "selected": false, "starts": 1.0, "team": "MCI"}, {"availability": 1.0, "ep": 21.42167619671128, "fixtures": ["GW5 EVE (A) [3]", "GW6 FUL (H) [2]", "GW7 MCI (A) [5]", "GW8 NFO (H) [3]", "GW9 HUL (A) [2]"], "form": 5.8, "gain": 3.9074776974450103, "id": 305, "name": "Davis", "ownership": 5.9, "position": "DEF", "price": 4.0, "rank": 4, "selected": false, "starts": 1.0, "team": "IPS"}, {"availability": 1.0, "ep": 21.03197612422902, "fixtures": ["GW5 IPS (H) [2]", "GW6 HUL (A) [2]", "GW7 CHE (H) [4]", "GW8 ARS (A) [5]", "GW9 NEW (A) [3]"], "form": 7.2, "gain": 3.517777624962747, "id": 229, "name": "Tarkowski", "ownership": 12.8, "position": "DEF", "price": 6.1, "rank": 5, "selected": false, "starts": 1.0, "team": "EVE"}, {"availability": 1.0, "ep": 20.63005911735477, "fixtures": ["GW5 NEW (A) [3]", "GW6 EVE (H) [3]", "GW7 FUL (A) [3]", "GW8 BRE (H) [3]", "GW9 IPS (H) [2]"], "form": 6.2, "gain": 3.1158606180884973, "id": 277, "name": "Egan", "ownership": 6.7, "position": "DEF", "price": 4.1, "rank": 6, "selected": false, "starts": 1.0, "team": "HUL"}, {"availability": 1.0, "ep": 20.0829858058903, "fixtures": ["GW5 HUL (H) [2]", "GW6 COV (A) [2]", "GW7 AVL (H) [3]", "GW8 CRY (A) [3]", "GW9 EVE (H) [3]"], "form": 4.5, "gain": 2.568787306624028, "id": 449, "name": "Hall", "ownership": 14.5, "position": "DEF", "price": 5.2, "rank": 7, "selected": false, "starts": 1.0, "team": "NEW"}, {"availability": 1.0, "ep": 20.082496951276877, "fixtures": ["GW5 LEE (A) [3]", "GW6 NFO (H) [3]", "GW7 BHA (A) [3]", "GW8 NEW (H) [2]", "GW9 TOT (A) [3]"], "form": 3.2, "gain": 2.5682984520106054, "id": 588, "name": "Khalaili", "ownership": 0.3, "position": "DEF", "price": 5.0, "rank": 8, "selected": false, "starts": 1.0, "team": "CRY"}, {"availability": 1.0, "ep": 17.51419849926627, "fixtures": ["GW5 BHA (A) [3]", "GW6 LEE (H) [2]", "GW7 NFO (A) [3]", "GW8 EVE (H) [3]", "GW9 LIV (A) [4]"], "form": 6.0, "gain": 0.0, "id": 4, "name": "Gabriel", "ownership": 23.6, "position": "DEF", "price": 8.0, "rank": 20, "selected": true, "starts": 1.0, "team": "ARS"}], "selected_rank": 20, "total_ranked": 83}, "411": {"budget": 15.6, "name": "Haaland", "position": "FWD", "rows": [{"availability": 1.0, "ep": 31.724801016030213, "fixtures": ["GW5 SUN (H) [2]", "GW6 LIV (A) [4]", "GW7 IPS (H) [2]", "GW8 AVL (A) [4]", "GW9 BHA (H) [2]"], "form": 8.2, "gain": 0.0, "id": 411, "name": "Haaland", "ownership": 72.0, "position": "FWD", "price": 15.5, "rank": 1, "selected": true, "starts": 1.0, "team": "MCI"}, {"availability": 1.0, "ep": 24.52883528149752, "fixtures": ["GW5 BOU (A) [3]", "GW6 MCI (H) [4]", "GW7 BRE (A) [3]", "GW8 BHA (H) [2]", "GW9 ARS (H) [4]"], "form": 6.2, "gain": -7.195965734532692, "id": 379, "name": "Isak", "ownership": 22.4, "position": "FWD", "price": 9.1, "rank": 2, "selected": false, "starts": 1.0, "team": "LIV"}, {"availability": 1.0, "ep": 19.97566097550648, "fixtures": ["GW5 IPS (H) [2]", "GW6 HUL (A) [2]", "GW7 CHE (H) [4]", "GW8 ARS (A) [5]", "GW9 NEW (A) [3]"], "form": 3.5, "gain": -11.749140040523734, "id": 249, "name": "Barry", "ownership": 6.5, "position": "FWD", "price": 5.6, "rank": 3, "selected": false, "starts": 1.0, "team": "EVE"}, {"availability": 1.0, "ep": 18.897544564337494, "fixtures": ["GW5 ARS (H) [4]", "GW6 SUN (A) [3]", "GW7 CRY (H) [3]", "GW8 LIV (A) [4]", "GW9 MCI (A) [5]"], "form": 4.5, "gain": -12.827256451692719, "id": 138, "name": "Kostoulas", "ownership": 0.7, "position": "FWD", "price": 5.5, "rank": 4, "selected": false, "starts": 0.9155927397430391, "team": "BHA"}, {"availability": 1.0, "ep": 18.212543956979346, "fixtures": ["GW5 EVE (A) [3]", "GW6 FUL (H) [2]", "GW7 MCI (A) [5]", "GW8 NFO (H) [3]", "GW9 HUL (A) [2]"], "form": 6.0, "gain": -13.512257059050867, "id": 316, "name": "Emersonn", "ownership": 2.4, "position": "FWD", "price": 5.5, "rank": 5, "selected": false, "starts": 1.0, "team": "IPS"}, {"availability": 1.0, "ep": 18.165976073395722, "fixtures": ["GW5 BHA (A) [3]", "GW6 LEE (H) [2]", "GW7 NFO (A) [3]", "GW8 EVE (H) [3]", "GW9 LIV (A) [4]"], "form": 4.2, "gain": -13.558824942634491, "id": 26, "name": "Havertz", "ownership": 8.0, "position": "FWD", "price": 7.6, "rank": 6, "selected": false, "starts": 1.0, "team": "ARS"}, {"availability": 1.0, "ep": 17.862088449479625, "fixtures": ["GW5 MUN (H) [4]", "GW6 IPS (A) [2]", "GW7 HUL (H) [2]", "GW8 COV (A) [2]", "GW9 AVL (A) [4]"], "form": 3.0, "gain": -13.862712566550588, "id": 569, "name": "Gonzalo", "ownership": 3.8, "position": "FWD", "price": 6.0, "rank": 7, "selected": false, "starts": 1.0, "team": "FUL"}, {"availability": 1.0, "ep": 17.82769124314093, "fixtures": ["GW5 HUL (H) [2]", "GW6 COV (A) [2]", "GW7 AVL (H) [3]", "GW8 CRY (A) [3]", "GW9 EVE (H) [3]"], "form": 3.2, "gain": -13.897109772889284, "id": 464, "name": "Wissa", "ownership": 18.6, "position": "FWD", "price": 6.2, "rank": 8, "selected": false, "starts": 1.0, "team": "NEW"}], "selected_rank": 1, "total_ranked": 18}, "418": {"budget": 5.0, "name": "Maguire", "position": "DEF", "rows": [{"availability": 1.0, "ep": 22.89458515944242, "fixtures": ["GW5 ARS (H) [4]", "GW6 SUN (A) [3]", "GW7 CRY (H) [3]", "GW8 LIV (A) [4]", "GW9 MCI (A) [5]"], "form": 8.0, "gain": 9.180519897299071, "id": 115, "name": "De Cuyper", "ownership": 23.0, "position": "DEF", "price": 4.8, "rank": 1, "selected": false, "starts": 1.0, "team": "BHA"}, {"availability": 1.0, "ep": 21.42167619671128, "fixtures": ["GW5 EVE (A) [3]", "GW6 FUL (H) [2]", "GW7 MCI (A) [5]", "GW8 NFO (H) [3]", "GW9 HUL (A) [2]"], "form": 5.8, "gain": 7.707610934567931, "id": 305, "name": "Davis", "ownership": 5.9, "position": "DEF", "price": 4.0, "rank": 2, "selected": false, "starts": 1.0, "team": "IPS"}, {"availability": 1.0, "ep": 20.63005911735477, "fixtures": ["GW5 NEW (A) [3]", "GW6 EVE (H) [3]", "GW7 FUL (A) [3]", "GW8 BRE (H) [3]", "GW9 IPS (H) [2]"], "form": 6.2, "gain": 6.915993855211418, "id": 277, "name": "Egan", "ownership": 6.7, "position": "DEF", "price": 4.1, "rank": 3, "selected": false, "starts": 1.0, "team": "HUL"}, {"availability": 1.0, "ep": 20.082496951276877, "fixtures": ["GW5 LEE (A) [3]", "GW6 NFO (H) [3]", "GW7 BHA (A) [3]", "GW8 NEW (H) [2]", "GW9 TOT (A) [3]"], "form": 3.2, "gain": 6.368431689133526, "id": 588, "name": "Khalaili", "ownership": 0.3, "position": "DEF", "price": 5.0, "rank": 4, "selected": false, "starts": 1.0, "team": "CRY"}, {"availability": 1.0, "ep": 19.067435780046374, "fixtures": ["GW5 NEW (A) [3]", "GW6 EVE (H) [3]", "GW7 FUL (A) [3]", "GW8 BRE (H) [3]", "GW9 IPS (H) [2]"], "form": 6.5, "gain": 5.3533705179030235, "id": 279, "name": "Ajayi", "ownership": 13.5, "position": "DEF", "price": 4.2, "rank": 5, "selected": false, "starts": 1.0, "team": "HUL"}, {"availability": 1.0, "ep": 18.797365140063405, "fixtures": ["GW5 ARS (H) [4]", "GW6 SUN (A) [3]", "GW7 CRY (H) [3]", "GW8 LIV (A) [4]", "GW9 MCI (A) [5]"], "form": 6.0, "gain": 5.083299877920055, "id": 504, "name": "Vuskovic", "ownership": 3.2, "position": "DEF", "price": 5.0, "rank": 6, "selected": false, "starts": 1.0, "team": "BHA"}, {"availability": 1.0, "ep": 18.180093042782854, "fixtures": ["GW5 NEW (A) [3]", "GW6 EVE (H) [3]", "GW7 FUL (A) [3]", "GW8 BRE (H) [3]", "GW9 IPS (H) [2]"], "form": 6.0, "gain": 4.466027780639504, "id": 282, "name": "Giles", "ownership": 2.2, "position": "DEF", "price": 4.0, "rank": 7, "selected": false, "starts": 1.0, "team": "HUL"}, {"availability": 1.0, "ep": 18.17178149005045, "fixtures": ["GW5 LIV (H) [4]", "GW6 CHE (A) [4]", "GW7 SUN (H) [2]", "GW8 MUN (A) [4]", "GW9 LEE (H) [2]"], "form": 2.5, "gain": 4.457716227907099, "id": 566, "name": "Silva", "ownership": 0.4, "position": "DEF", "price": 5.0, "rank": 8, "selected": false, "starts": 1.0, "team": "BOU"}, {"availability": 1.0, "ep": 13.71406526214335, "fixtures": ["GW5 FUL (A) [3]", "GW6 TOT (H) [3]", "GW7 LEE (A) [3]", "GW8 BOU (H) [3]", "GW9 CHE (A) [4]"], "form": 2.0, "gain": 0.0, "id": 418, "name": "Maguire", "ownership": 10.4, "position": "DEF", "price": 4.9, "rank": 36, "selected": true, "starts": 1.0, "team": "MUN"}], "selected_rank": 36, "total_ranked": 60}, "426": {"budget": 12.1, "name": "B.Fernandes", "position": "MID", "rows": [{"availability": 1.0, "ep": 29.197657764968195, "fixtures": ["GW5 FUL (A) [3]", "GW6 TOT (H) [3]", "GW7 LEE (A) [3]", "GW8 BOU (H) [3]", "GW9 CHE (A) [4]"], "form": 7.2, "gain": 0.0, "id": 426, "name": "B.Fernandes", "ownership": 42.2, "position": "MID", "price": 12.0, "rank": 1, "selected": true, "starts": 1.0, "team": "MUN"}, {"availability": 1.0, "ep": 28.537102197083236, "fixtures": ["GW5 BHA (A) [3]", "GW6 LEE (H) [2]", "GW7 NFO (A) [3]", "GW8 EVE (H) [3]", "GW9 LIV (A) [4]"], "form": 7.5, "gain": -0.6605555678849591, "id": 12, "name": "Saka", "ownership": 11.9, "position": "MID", "price": 9.5, "rank": 2, "selected": false, "starts": 1.0, "team": "ARS"}, {"availability": 1.0, "ep": 26.93681094936822, "fixtures": ["GW5 LIV (H) [4]", "GW6 CHE (A) [4]", "GW7 SUN (H) [2]", "GW8 MUN (A) [4]", "GW9 LEE (H) [2]"], "form": 7.2, "gain": -2.260846815599976, "id": 68, "name": "Tavernier", "ownership": 4.8, "position": "MID", "price": 6.1, "rank": 3, "selected": false, "starts": 1.0, "team": "BOU"}, {"availability": 1.0, "ep": 25.628441589705965, "fixtures": ["GW5 BRE (A) [3]", "GW6 BOU (H) [3]", "GW7 EVE (A) [3]", "GW8 TOT (H) [3]", "GW9 MUN (H) [4]"], "form": 6.8, "gain": -3.5692161752622305, "id": 40, "name": "Rogers", "ownership": 36.7, "position": "MID", "price": 7.7, "rank": 4, "selected": false, "starts": 1.0, "team": "CHE"}, {"availability": 1.0, "ep": 24.857649571482145, "fixtures": ["GW5 BRE (A) [3]", "GW6 BOU (H) [3]", "GW7 EVE (A) [3]", "GW8 TOT (H) [3]", "GW9 MUN (H) [4]"], "form": 6.5, "gain": -4.3400081934860495, "id": 154, "name": "Palmer", "ownership": 26.8, "position": "MID", "price": 9.7, "rank": 5, "selected": false, "starts": 1.0, "team": "CHE"}, {"availability": 1.0, "ep": 24.504399486984013, "fixtures": ["GW5 CHE (H) [4]", "GW6 AVL (A) [4]", "GW7 LIV (H) [4]", "GW8 HUL (A) [2]", "GW9 NFO (H) [3]"], "form": 7.5, "gain": -4.693258277984182, "id": 94, "name": "Schade", "ownership": 5.1, "position": "MID", "price": 6.0, "rank": 6, "selected": false, "starts": 1.0, "team": "BRE"}, {"availability": 1.0, "ep": 24.20473542291916, "fixtures": ["GW5 LIV (H) [4]", "GW6 CHE (A) [4]", "GW7 SUN (H) [2]", "GW8 MUN (A) [4]", "GW9 LEE (H) [2]"], "form": 7.0, "gain": -4.9929223420490345, "id": 69, "name": "Scott", "ownership": 5.9, "position": "MID", "price": 6.1, "rank": 7, "selected": false, "starts": 1.0, "team": "BOU"}, {"availability": 1.0, "ep": 24.152556209468568, "fixtures": ["GW5 FUL (A) [3]", "GW6 TOT (H) [3]", "GW7 LEE (A) [3]", "GW8 BOU (H) [3]", "GW9 CHE (A) [4]"], "form": 5.8, "gain": -5.0451015554996275, "id": 427, "name": "Mbeumo", "ownership": 23.2, "position": "MID", "price": 7.9, "rank": 8, "selected": false, "starts": 1.0, "team": "MUN"}], "selected_rank": 1, "total_ranked": 101}, "491": {"budget": 5.9, "name": "Igor Jesus", "position": "FWD", "rows": [{"availability": 1.0, "ep": 19.97566097550648, "fixtures": ["GW5 IPS (H) [2]", "GW6 HUL (A) [2]", "GW7 CHE (H) [4]", "GW8 ARS (A) [5]", "GW9 NEW (A) [3]"], "form": 3.5, "gain": 8.210873379575725, "id": 249, "name": "Barry", "ownership": 6.5, "position": "FWD", "price": 5.6, "rank": 1, "selected": false, "starts": 1.0, "team": "EVE"}, {"availability": 1.0, "ep": 18.897544564337494, "fixtures": ["GW5 ARS (H) [4]", "GW6 SUN (A) [3]", "GW7 CRY (H) [3]", "GW8 LIV (A) [4]", "GW9 MCI (A) [5]"], "form": 4.5, "gain": 7.13275696840674, "id": 138, "name": "Kostoulas", "ownership": 0.7, "position": "FWD", "price": 5.5, "rank": 2, "selected": false, "starts": 0.9155927397430391, "team": "BHA"}, {"availability": 1.0, "ep": 18.212543956979346, "fixtures": ["GW5 EVE (A) [3]", "GW6 FUL (H) [2]", "GW7 MCI (A) [5]", "GW8 NFO (H) [3]", "GW9 HUL (A) [2]"], "form": 6.0, "gain": 6.447756361048592, "id": 316, "name": "Emersonn", "ownership": 2.4, "position": "FWD", "price": 5.5, "rank": 3, "selected": false, "starts": 1.0, "team": "IPS"}, {"availability": 1.0, "ep": 15.889703311227525, "fixtures": ["GW5 NEW (A) [3]", "GW6 EVE (H) [3]", "GW7 FUL (A) [3]", "GW8 BRE (H) [3]", "GW9 IPS (H) [2]"], "form": 3.0, "gain": 4.124915715296771, "id": 295, "name": "McBurnie", "ownership": 1.9, "position": "FWD", "price": 5.5, "rank": 4, "selected": false, "starts": 1.0, "team": "HUL"}, {"availability": 1.0, "ep": 13.091241823692119, "fixtures": ["GW5 MCI (A) [5]", "GW6 BHA (H) [2]", "GW7 BOU (A) [3]", "GW8 LEE (H) [2]", "GW9 COV (A) [2]"], "form": 1.8, "gain": 1.3264542277613653, "id": 552, "name": "Brobbey", "ownership": 6.4, "position": "FWD", "price": 5.8, "rank": 5, "selected": false, "starts": 1.0, "team": "SUN"}, {"availability": 1.0, "ep": 11.764787595930754, "fixtures": ["GW5 COV (H) [2]", "GW6 CRY (A) [3]", "GW7 ARS (H) [4]", "GW8 IPS (A) [2]", "GW9 BRE (A) [3]"], "form": 2.8, "gain": 0.0, "id": 491, "name": "Igor Jesus", "ownership": 2.5, "position": "FWD", "price": 5.8, "rank": 6, "selected": true, "starts": 0.5283827852465037, "team": "NFO"}, {"availability": 1.0, "ep": 11.635389443467222, "fixtures": ["GW5 COV (H) [2]", "GW6 CRY (A) [3]", "GW7 ARS (H) [4]", "GW8 IPS (A) [2]", "GW9 BRE (A) [3]"], "form": 2.0, "gain": -0.1293981524635317, "id": 167, "name": "Delap", "ownership": 1.2, "position": "FWD", "price": 5.5, "rank": 7, "selected": false, "starts": 0.6666666666666666, "team": "NFO"}, {"availability": 0.75, "ep": 10.198198200645944, "fixtures": ["GW5 LEE (A) [3]", "GW6 NFO (H) [3]", "GW7 BHA (A) [3]", "GW8 NEW (H) [2]", "GW9 TOT (A) [3]"], "form": 1.8, "gain": -1.5665893952848098, "id": 224, "name": "Nketiah", "ownership": 0.7, "position": "FWD", "price": 5.5, "rank": 8, "selected": false, "starts": 0.75, "team": "CRY"}], "selected_rank": 6, "total_ranked": 8}, "496": {"budget": 4.6, "name": "Kinsky", "position": "GKP", "rows": [{"availability": 1.0, "ep": 23.11926419450341, "fixtures": ["GW5 NEW (A) [3]", "GW6 EVE (H) [3]", "GW7 FUL (A) [3]", "GW8 BRE (H) [3]", "GW9 IPS (H) [2]"], "form": 7.0, "gain": 5.102835578572147, "id": 572, "name": "Tzolakis", "ownership": 10.6, "position": "GKP", "price": 4.6, "rank": 1, "selected": false, "starts": 1.0, "team": "HUL"}, {"availability": 1.0, "ep": 18.588112094010835, "fixtures": ["GW5 ARS (H) [4]", "GW6 SUN (A) [3]", "GW7 CRY (H) [3]", "GW8 LIV (A) [4]", "GW9 MCI (A) [5]"], "form": 4.2, "gain": 0.5716834780795743, "id": 109, "name": "Verbruggen", "ownership": 22.1, "position": "GKP", "price": 4.5, "rank": 2, "selected": false, "starts": 1.0, "team": "BHA"}, {"availability": 1.0, "ep": 18.01642861593126, "fixtures": ["GW5 AVL (H) [3]", "GW6 MUN (A) [4]", "GW7 COV (H) [2]", "GW8 CHE (A) [4]", "GW9 CRY (H) [3]"], "form": 4.0, "gain": 0.0, "id": 496, "name": "Kinsky", "ownership": 18.5, "position": "GKP", "price": 4.5, "rank": 3, "selected": true, "starts": 1.0, "team": "TOT"}, {"availability": 1.0, "ep": 17.371252985263695, "fixtures": ["GW5 MUN (H) [4]", "GW6 IPS (A) [2]", "GW7 HUL (H) [2]", "GW8 COV (A) [2]", "GW9 AVL (A) [4]"], "form": 3.8, "gain": -0.6451756306675662, "id": 250, "name": "Leno", "ownership": 3.0, "position": "GKP", "price": 4.5, "rank": 4, "selected": false, "starts": 1.0, "team": "FUL"}, {"availability": 1.0, "ep": 16.626659126340453, "fixtures": ["GW5 EVE (A) [3]", "GW6 FUL (H) [2]", "GW7 MCI (A) [5]", "GW8 NFO (H) [3]", "GW9 HUL (A) [2]"], "form": 1.8, "gain": -1.3897694895908081, "id": 564, "name": "Scherpen", "ownership": 0.6, "position": "GKP", "price": 4.5, "rank": 5, "selected": false, "starts": 1.0, "team": "IPS"}, {"availability": 1.0, "ep": 15.883474070476714, "fixtures": ["GW5 LIV (H) [4]", "GW6 CHE (A) [4]", "GW7 SUN (H) [2]", "GW8 MUN (A) [4]", "GW9 LEE (H) [2]"], "form": 1.8, "gain": -2.132954545454547, "id": 57, "name": "Petrovi\u0107", "ownership": 3.2, "position": "GKP", "price": 4.5, "rank": 6, "selected": false, "starts": 1.0, "team": "BOU"}, {"availability": 1.0, "ep": 15.08438529359331, "fixtures": ["GW5 NFO (A) [3]", "GW6 NEW (H) [2]", "GW7 TOT (A) [3]", "GW8 FUL (H) [2]", "GW9 SUN (H) [2]"], "form": 1.2, "gain": -2.9320433223379503, "id": 110, "name": "Rushworth", "ownership": 0.9, "position": "GKP", "price": 4.5, "rank": 7, "selected": false, "starts": 1.0, "team": "COV"}], "selected_rank": 3, "total_ranked": 7}, "497": {"budget": 4.1, "name": "Dubravka", "position": "GKP", "rows": [{"availability": 1.0, "ep": 0.8688400565866472, "fixtures": ["GW5 AVL (H) [3]", "GW6 MUN (A) [4]", "GW7 COV (H) [2]", "GW8 CHE (A) [4]", "GW9 CRY (H) [3]"], "form": 0.0, "gain": 0.0, "id": 497, "name": "Dubravka", "ownership": 17.7, "position": "GKP", "price": 4.0, "rank": 1, "selected": true, "starts": 0.0, "team": "TOT"}], "selected_rank": 1, "total_ranked": 1}, "544": {"budget": 5.6, "name": "Xhaka", "position": "MID", "rows": [{"availability": 1.0, "ep": 22.24141497803352, "fixtures": ["GW5 CHE (H) [4]", "GW6 AVL (A) [4]", "GW7 LIV (H) [4]", "GW8 HUL (A) [2]", "GW9 NFO (H) [3]"], "form": 6.2, "gain": 3.460993574177788, "id": 98, "name": "Janelt", "ownership": 2.4, "position": "MID", "price": 5.0, "rank": 1, "selected": false, "starts": 1.0, "team": "BRE"}, {"availability": 1.0, "ep": 21.26651333544557, "fixtures": ["GW5 FUL (A) [3]", "GW6 TOT (H) [3]", "GW7 LEE (A) [3]", "GW8 BOU (H) [3]", "GW9 CHE (A) [4]"], "form": 4.5, "gain": 2.4860919315898364, "id": 432, "name": "Mainoo", "ownership": 1.5, "position": "MID", "price": 5.5, "rank": 2, "selected": false, "starts": 1.0, "team": "MUN"}, {"availability": 1.0, "ep": 21.179932187226257, "fixtures": ["GW5 MUN (H) [4]", "GW6 IPS (A) [2]", "GW7 HUL (H) [2]", "GW8 COV (A) [2]", "GW9 AVL (A) [4]"], "form": 5.5, "gain": 2.3995107833705234, "id": 268, "name": "King", "ownership": 1.4, "position": "MID", "price": 5.5, "rank": 3, "selected": false, "starts": 1.0, "team": "FUL"}, {"availability": 1.0, "ep": 20.847238623585234, "fixtures": ["GW5 ARS (H) [4]", "GW6 SUN (A) [3]", "GW7 CRY (H) [3]", "GW8 LIV (A) [4]", "GW9 MCI (A) [5]"], "form": 4.8, "gain": 2.0668172197295007, "id": 605, "name": "Yalcouy\u00e9", "ownership": 3.5, "position": "MID", "price": 4.5, "rank": 4, "selected": false, "starts": 1.0, "team": "BHA"}, {"availability": 1.0, "ep": 19.328121189789908, "fixtures": ["GW5 CHE (H) [4]", "GW6 AVL (A) [4]", "GW7 LIV (H) [4]", "GW8 HUL (A) [2]", "GW9 NFO (H) [3]"], "form": 4.8, "gain": 0.5476997859341743, "id": 86, "name": "Lewis-Potter", "ownership": 2.0, "position": "MID", "price": 5.5, "rank": 5, "selected": false, "starts": 1.0, "team": "BRE"}, {"availability": 1.0, "ep": 19.039100378704045, "fixtures": ["GW5 NEW (A) [3]", "GW6 EVE (H) [3]", "GW7 FUL (A) [3]", "GW8 BRE (H) [3]", "GW9 IPS (H) [2]"], "form": 6.8, "gain": 0.25867897484831204, "id": 286, "name": "Belloumi", "ownership": 2.4, "position": "MID", "price": 5.0, "rank": 6, "selected": false, "starts": 1.0, "team": "HUL"}, {"availability": 1.0, "ep": 18.780421403855733, "fixtures": ["GW5 MCI (A) [5]", "GW6 BHA (H) [2]", "GW7 BOU (A) [3]", "GW8 LEE (H) [2]", "GW9 COV (A) [2]"], "form": 4.8, "gain": 0.0, "id": 544, "name": "Xhaka", "ownership": 4.1, "position": "MID", "price": 5.5, "rank": 7, "selected": true, "starts": 1.0, "team": "SUN"}, {"availability": 1.0, "ep": 17.644123028876937, "fixtures": ["GW5 LEE (A) [3]", "GW6 NFO (H) [3]", "GW7 BHA (A) [3]", "GW8 NEW (H) [2]", "GW9 TOT (A) [3]"], "form": 4.5, "gain": -1.1362983749787965, "id": 214, "name": "Kamada", "ownership": 0.5, "position": "MID", "price": 5.0, "rank": 8, "selected": false, "starts": 1.0, "team": "CRY"}], "selected_rank": 7, "total_ranked": 60}, "586": {"budget": 4.1, "name": "Mendy", "position": "DEF", "rows": [{"availability": 1.0, "ep": 21.42167619671128, "fixtures": ["GW5 EVE (A) [3]", "GW6 FUL (H) [2]", "GW7 MCI (A) [5]", "GW8 NFO (H) [3]", "GW9 HUL (A) [2]"], "form": 5.8, "gain": 14.02916494894963, "id": 305, "name": "Davis", "ownership": 5.9, "position": "DEF", "price": 4.0, "rank": 1, "selected": false, "starts": 1.0, "team": "IPS"}, {"availability": 1.0, "ep": 20.63005911735477, "fixtures": ["GW5 NEW (A) [3]", "GW6 EVE (H) [3]", "GW7 FUL (A) [3]", "GW8 BRE (H) [3]", "GW9 IPS (H) [2]"], "form": 6.2, "gain": 13.237547869593117, "id": 277, "name": "Egan", "ownership": 6.7, "position": "DEF", "price": 4.1, "rank": 2, "selected": false, "starts": 1.0, "team": "HUL"}, {"availability": 1.0, "ep": 18.180093042782854, "fixtures": ["GW5 NEW (A) [3]", "GW6 EVE (H) [3]", "GW7 FUL (A) [3]", "GW8 BRE (H) [3]", "GW9 IPS (H) [2]"], "form": 6.0, "gain": 10.787581795021202, "id": 282, "name": "Giles", "ownership": 2.2, "position": "DEF", "price": 4.0, "rank": 3, "selected": false, "starts": 1.0, "team": "HUL"}, {"availability": 1.0, "ep": 15.480830780984649, "fixtures": ["GW5 EVE (A) [3]", "GW6 FUL (H) [2]", "GW7 MCI (A) [5]", "GW8 NFO (H) [3]", "GW9 HUL (A) [2]"], "form": 2.0, "gain": 8.088319533222997, "id": 304, "name": "O\u0027Shea", "ownership": 2.9, "position": "DEF", "price": 4.0, "rank": 4, "selected": false, "starts": 1.0, "team": "IPS"}, {"availability": 1.0, "ep": 14.671546057798158, "fixtures": ["GW5 EVE (A) [3]", "GW6 FUL (H) [2]", "GW7 MCI (A) [5]", "GW8 NFO (H) [3]", "GW9 HUL (A) [2]"], "form": 2.0, "gain": 7.2790348100365065, "id": 259, "name": "Diop", "ownership": 14.0, "position": "DEF", "price": 4.0, "rank": 5, "selected": false, "starts": 1.0, "team": "IPS"}, {"availability": 1.0, "ep": 13.93963702390266, "fixtures": ["GW5 NFO (A) [3]", "GW6 NEW (H) [2]", "GW7 TOT (A) [3]", "GW8 FUL (H) [2]", "GW9 SUN (H) [2]"], "form": 1.2, "gain": 6.547125776141009, "id": 176, "name": "Dasilva", "ownership": 0.7, "position": "DEF", "price": 4.0, "rank": 6, "selected": false, "starts": 1.0, "team": "COV"}, {"availability": 1.0, "ep": 13.736786904398445, "fixtures": ["GW5 NFO (A) [3]", "GW6 NEW (H) [2]", "GW7 TOT (A) [3]", "GW8 FUL (H) [2]", "GW9 SUN (H) [2]"], "form": 1.5, "gain": 6.344275656636793, "id": 175, "name": "van Ewijk", "ownership": 10.3, "position": "DEF", "price": 4.0, "rank": 7, "selected": false, "starts": 1.0, "team": "COV"}, {"availability": 1.0, "ep": 13.16215297077081, "fixtures": ["GW5 NFO (A) [3]", "GW6 NEW (H) [2]", "GW7 TOT (A) [3]", "GW8 FUL (H) [2]", "GW9 SUN (H) [2]"], "form": 1.0, "gain": 5.769641723009158, "id": 182, "name": "Amenda", "ownership": 0.7, "position": "DEF", "price": 4.0, "rank": 8, "selected": false, "starts": 1.0, "team": "COV"}, {"availability": 0.5, "ep": 7.392511247761652, "fixtures": ["GW5 NEW (A) [3]", "GW6 EVE (H) [3]", "GW7 FUL (A) [3]", "GW8 BRE (H) [3]", "GW9 IPS (H) [2]"], "form": 6.2, "gain": 0.0, "id": 586, "name": "Mendy", "ownership": 7.6, "position": "DEF", "price": 4.1, "rank": 10, "selected": true, "starts": 0.5, "team": "HUL"}], "selected_rank": 10, "total_ranked": 10}};
+  var modal = document.getElementById('player-modal');
+  var compareTitle = document.getElementById('compare-title');
+  var compareSub = document.getElementById('compare-sub');
+  var compareBody = document.getElementById('compare-body');
+  var activePlayerId = null, compareSort = "ep";
+  function fixtureScore(p) { var n=p.fixtures.map(function(x){var m=x.match(/\[(\d)\]/);return m?Number(m[1]):3;}); return n.reduce(function(a,b){return a+b;},0)/Math.max(n.length,1); }
+  function openComparison(playerId) {
+    var data = comparisons[String(playerId)];
+    if (!data) return;
+    activePlayerId = playerId;
+    var chosen=data.rows.find(function(p){return p.selected;}) || data.rows[0];
+    var rows=data.rows.slice().sort(function(a,b){if(compareSort==="price")return Math.abs(a.price-chosen.price)-Math.abs(b.price-chosen.price)||b.ep-a.ep;if(compareSort==="form")return b.form-a.form||b.ep-a.ep;if(compareSort==="fixtures")return fixtureScore(a)-fixtureScore(b)||b.ep-a.ep;return b.ep-a.ep;});
+    document.querySelectorAll(".filterbtn").forEach(function(b){b.setAttribute("aria-selected",String(b.dataset.sort===compareSort));});
+    compareTitle.textContent = data.name + ' เทียบกับตัวเลือกตำแหน่ง ' + data.position;
+    compareSub.textContent = 'อันดับ ' + data.selected_rank + ' จาก ' + data.total_ranked +
+      ' คนที่ซื้อได้ · งบสูงสุด £' + data.budget.toFixed(1) + 'm';
+    compareBody.textContent = '';
+    rows.forEach(function (p) {
+      var tr = document.createElement('tr');
+      if (p.selected) tr.className = 'selectedrow';
+      var values = [
+        p.rank,
+        p.name + ' · ' + p.team + (p.selected ? ' (คนที่เลือก)' : ''),
+        '£' + p.price.toFixed(1),
+        p.fixtures.join(' · '),
+        p.form.toFixed(1),
+        p.ep.toFixed(1),
+        (p.gain >= 0 ? '+' : '') + p.gain.toFixed(1),
+        Math.round(p.availability * 100) + '%'
+      ];
+      values.forEach(function (value, index) {
+        var td = document.createElement('td');
+        td.textContent = value;
+        if ([0, 2, 4, 5, 6, 7].indexOf(index) >= 0) td.className = 'r';
+        if (index === 3) td.style.whiteSpace = 'normal';
+        tr.appendChild(td);
+      });
+      compareBody.appendChild(tr);
+    });
+    modal.hidden = false;
+    document.body.style.overflow = 'hidden';
+  }
+  document.querySelectorAll('.player-open').forEach(function (button) {
+    button.addEventListener('click', function () { openComparison(button.dataset.player); });
+  });
+  document.querySelectorAll(".filterbtn").forEach(function(button){button.addEventListener("click",function(){compareSort=button.dataset.sort;if(activePlayerId)openComparison(activePlayerId);});});
+  function closeComparison() {
+    modal.hidden = true;
+    document.body.style.overflow = '';
+  }
+  document.getElementById('compare-close').addEventListener('click', closeComparison);
+  modal.addEventListener('click', function (event) { if (event.target === modal) closeComparison(); });
+  document.addEventListener('keydown', function (event) { if (event.key === 'Escape') closeComparison(); });
+
+  var refreshForm = document.getElementById('refresh-form');
+  var refreshBtn = document.getElementById('refresh-btn');
+  var refreshLabel = refreshBtn.querySelector('.refresh-label');
+  var refreshStatus = document.getElementById('refresh-status');
+  var canBuildLocally = location.hostname === '127.0.0.1' || location.hostname === 'localhost';
+  if (location.protocol === 'file:') {
+    refreshForm.hidden = true;
+  } else if (canBuildLocally) {
+    refreshForm.addEventListener('submit', async function (event) {
+      event.preventDefault();
+      refreshBtn.disabled = true;
+      refreshBtn.classList.add('loading');
+      refreshLabel.textContent = 'กำลังวิเคราะห์ข้อมูล…';
+      refreshStatus.hidden = false;
+      refreshStatus.className = 'refresh-status working';
+      refreshStatus.textContent = 'กำลังดึงข้อมูลล่าสุดและจัดทีมใหม่ ใช้เวลาประมาณ 5–30 วินาที';
+      try {
+        var response = await fetch('/refresh', {
+          method: 'POST', headers: { 'Accept': 'application/json' }
+        });
+        var result = await response.json().catch(function () { return {}; });
+        if (!response.ok || !result.ok) throw new Error(result.error || 'อัปเดตไม่สำเร็จ');
+        refreshStatus.className = 'refresh-status success';
+        refreshStatus.textContent = 'อัปเดตสำเร็จ กำลังเปิดรายงานใหม่…';
+        location.replace('/index.html?updated=' + Date.now());
+      } catch (error) {
+        refreshStatus.className = 'refresh-status error';
+        refreshStatus.textContent = error.message || 'อัปเดตไม่สำเร็จ กรุณาลองอีกครั้ง';
+        refreshBtn.disabled = false;
+        refreshBtn.classList.remove('loading');
+        refreshLabel.textContent = 'ลองอัปเดตอีกครั้ง';
+      }
+    });
+  } else {
+    refreshLabel.textContent = 'ตรวจข้อมูลล่าสุด';
+    refreshForm.addEventListener('submit', async function (event) {
+      event.preventDefault();
+      refreshBtn.disabled = true;
+      refreshBtn.classList.add('loading');
+      refreshStatus.hidden = false;
+      refreshStatus.className = 'refresh-status working';
+      refreshStatus.textContent = 'กำลังตรวจรายงานล่าสุดจากระบบ Cloud…';
+      if (!navigator.onLine) {
+        refreshStatus.className = 'refresh-status error';
+        refreshStatus.textContent = 'ขณะนี้ออฟไลน์ จึงแสดงรายงานล่าสุดที่บันทึกไว้ในเครื่อง';
+        refreshBtn.disabled = false;
+        refreshBtn.classList.remove('loading');
+        return;
+      }
+      try {
+        var latestUrl = './index.html?fresh=' + Date.now();
+        var latest = await fetch(latestUrl, { cache: 'no-store' });
+        if (!latest.ok) throw new Error('ยังตรวจรายงานล่าสุดไม่ได้');
+        location.replace(latestUrl);
+      } catch (error) {
+        refreshStatus.className = 'refresh-status error';
+        refreshStatus.textContent = error.message || 'ตรวจข้อมูลไม่สำเร็จ กรุณาลองอีกครั้ง';
+        refreshBtn.disabled = false;
+        refreshBtn.classList.remove('loading');
+      }
+    });
+  }
+
+  var themeToggle = document.getElementById('theme-toggle');
+  var savedTheme = localStorage.getItem('fpl-theme');
+  if (savedTheme) document.documentElement.dataset.theme = savedTheme;
+  themeToggle.addEventListener('click', function () {
+    var current = document.documentElement.dataset.theme;
+    var systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var next = current === 'dark' || (!current && systemDark) ? 'light' : 'dark';
+    document.documentElement.dataset.theme = next;
+    localStorage.setItem('fpl-theme', next);
+  });
+
+  var installPrompt = null;
+  var installBtn = document.getElementById('install-btn');
+  window.addEventListener('beforeinstallprompt', function (event) {
+    event.preventDefault();
+    installPrompt = event;
+    installBtn.hidden = false;
+  });
+  installBtn.addEventListener('click', async function () {
+    if (!installPrompt) return;
+    installPrompt.prompt();
+    await installPrompt.userChoice;
+    installPrompt = null;
+    installBtn.hidden = true;
+  });
+  window.addEventListener('appinstalled', function () { installBtn.hidden = true; });
   var el = document.getElementById('cd');
   if (!el) return;
   var target = new Date(el.dataset.deadline).getTime();
@@ -1066,16 +688,6 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
     if (h < 24) el.parentElement.classList.add('urgent');
   }
   tick(); setInterval(tick, 30000);
-
-  var tabs = document.querySelectorAll('.tabs [data-pos]');
-  tabs.forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      tabs.forEach(function (b) { b.setAttribute('aria-selected', String(b === btn)); });
-      document.querySelectorAll('.target-panel').forEach(function (panel) {
-        panel.hidden = panel.dataset.pos !== btn.dataset.pos;
-      });
-    });
-  });
 
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(function () {});

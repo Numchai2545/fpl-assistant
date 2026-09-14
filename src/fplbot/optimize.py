@@ -11,10 +11,9 @@ Decision variables, for every candidate player p and gameweek g:
     cap[p,g]    they wear the armband
     buy[p,g] / sell[p,g]
 
-Money is handled with the standard simplification that a squad is affordable if
-its total current market value fits the budget. Real FPL selling prices give
-back only half of any rise, so the true budget is slightly tighter; the plan
-reports the gap so you can sanity-check it before pulling the trigger.
+Money follows the actual transfer cash flow. Players already owned can stay in
+the squad without being repurchased at today's price; cash changes only when a
+player is sold or bought.
 """
 from __future__ import annotations
 
@@ -47,6 +46,7 @@ class GameweekPlan:
     bench_outfield: list[int] = field(default_factory=list)
     hits: int = 0
     free_transfers_before: int = 1
+    free_transfers_used: int = 0
     expected_points: float = 0.0
 
 
@@ -85,6 +85,180 @@ class Plan:
     notes: list[str] = field(default_factory=list)
 
 
+@dataclass
+class TransferCandidate:
+    """One affordable replacement for the selected weak link."""
+
+    out_id: int
+    in_id: int
+    out_ep: float
+    in_ep: float
+    gain: float
+    net_gain: float
+    fixtures: list[dict] = field(default_factory=list)
+
+
+@dataclass
+class TransferAdvice:
+    """A single decision, plus alternatives for the manager to compare."""
+
+    out_id: int | None
+    candidates: list[TransferCandidate]
+    recommend: bool
+    hit: bool
+    threshold: float
+    reason: str
+
+
+def outlook_by_player(ep_rows: pd.DataFrame, matches: int) -> tuple[dict[int, float], dict[int, list[dict]]]:
+    """Sum each player's next N actual fixtures, preserving blanks and doubles."""
+    if ep_rows.empty:
+        return {}, {}
+    ordered = ep_rows.copy()
+    ordered["_kickoff"] = (ordered["kickoff"].fillna("")
+                           if "kickoff" in ordered else "")
+    ordered = ordered.sort_values(["player_id", "gw", "_kickoff"])
+    window = ordered.groupby("player_id", sort=False).head(matches)
+    totals = window.groupby("player_id").ep.sum().astype(float).to_dict()
+    fixtures: dict[int, list[dict]] = {}
+    for pid, rows in window.groupby("player_id", sort=False):
+        fixtures[int(pid)] = [
+            {"gw": int(r.gw), "opponent": int(r.opponent),
+             "is_home": bool(r.is_home), "fdr": int(r.fdr), "ep": float(r.ep)}
+            for r in rows.itertuples()
+        ]
+    return totals, fixtures
+
+
+def _project_xi(ep_next: dict[int, float], players: pd.DataFrame,
+                squad: list[int]) -> set[int]:
+    """Pick the highest-EP legal XI from the current squad."""
+    valid = [p for p in squad if p in players.index]
+    keepers = sorted((p for p in valid if int(players.element_type[p]) == 1),
+                     key=lambda p: ep_next.get(p, 0.0), reverse=True)
+    if not keepers:
+        return set()
+    best: tuple[float, set[int]] | None = None
+    for defenders in range(3, 6):
+        for midfielders in range(2, 6):
+            forwards = 10 - defenders - midfielders
+            if not 1 <= forwards <= 3:
+                continue
+            chosen = {keepers[0]}
+            legal = True
+            for pos, count in ((2, defenders), (3, midfielders), (4, forwards)):
+                band = sorted((p for p in valid if int(players.element_type[p]) == pos),
+                              key=lambda p: ep_next.get(p, 0.0), reverse=True)[:count]
+                if len(band) != count:
+                    legal = False
+                    break
+                chosen.update(band)
+            if legal:
+                score = sum(ep_next.get(p, 0.0) for p in chosen)
+                if best is None or score > best[0]:
+                    best = score, chosen
+    return best[1] if best else set()
+
+
+def _has_bench_cover(out_id: int, xi: set[int], squad: list[int],
+                     players: pd.DataFrame) -> bool:
+    """Return whether an available bench player can replace `out_id` legally."""
+    if out_id not in xi:
+        return True
+    remaining = xi - {out_id}
+    for pid in squad:
+        if pid in xi or pid not in players.index or float(players.p_available[pid]) < 0.5:
+            continue
+        trial = remaining | {pid}
+        counts = {pos: sum(int(players.element_type[p]) == pos for p in trial)
+                  for pos in (1, 2, 3, 4)}
+        if len(trial) == XI_SIZE and all(XI_MIN[pos] <= counts[pos] <= XI_MAX[pos]
+                                        for pos in counts):
+            return True
+    return False
+
+
+def analyse_transfers(ep_rows: pd.DataFrame, players: pd.DataFrame,
+                      current_squad: list[int], bank: float,
+                      free_transfers: int, cfg: Config,
+                      selling_price: dict[int, float] | None = None) -> TransferAdvice:
+    """Rank legal replacements and return one evidence-based transfer decision.
+
+    Ownership is intentionally absent. The manager wants fixture-adjusted EP,
+    availability and price to drive the ranking, with ownership shown only as
+    context in the report.
+    """
+    threshold = float(cfg.get("planning", "min_transfer_gain", default=3.0))
+    count = int(cfg.get("planning", "candidate_count", default=4))
+    matches = int(cfg.get("planning", "outlook_matches", default=5))
+    min_start = float(cfg.get("planning", "min_candidate_start", default=0.5))
+    hit_policy = cfg.get("planning", "hit_policy", default="emergency_only")
+    totals, fixtures = outlook_by_player(ep_rows, matches)
+    owned = [p for p in current_squad if p in players.index]
+    owned_set = set(owned)
+    locked = {int(p) for p in (cfg.get("strategy", "never_sell", default=[]) or [])}
+    sell_at = dict(selling_price or {})
+    club_counts = players.loc[owned].team.value_counts().to_dict() if owned else {}
+
+    pairs: list[TransferCandidate] = []
+    for out_id in owned:
+        if out_id in locked:
+            continue
+        out_pos = int(players.element_type[out_id])
+        out_club = int(players.team[out_id])
+        funds = float(sell_at.get(out_id, players.price[out_id])) + float(bank)
+        band = players[(players.element_type == out_pos)
+                       & (~players.index.isin(owned_set))
+                       & (players.p_available > 0.25)
+                       & (players.p_start >= min_start)
+                       & (players.price <= funds + 1e-9)]
+        for in_id, incoming in band.iterrows():
+            in_id = int(in_id)
+            in_club = int(incoming.team)
+            after = int(club_counts.get(in_club, 0)) + 1 - int(in_club == out_club)
+            if after > MAX_PER_CLUB:
+                continue
+            out_ep = float(totals.get(out_id, 0.0))
+            in_ep = float(totals.get(in_id, 0.0))
+            pairs.append(TransferCandidate(
+                out_id=out_id, in_id=in_id, out_ep=out_ep, in_ep=in_ep,
+                gain=in_ep - out_ep, net_gain=in_ep - out_ep,
+                fixtures=fixtures.get(in_id, []),
+            ))
+
+    if not pairs:
+        return TransferAdvice(None, [], False, False, threshold,
+                              "ไม่พบตัวแทนที่ถูกกติกาและอยู่ในงบ")
+
+    pairs.sort(key=lambda p: (p.gain, p.in_ep), reverse=True)
+    out_id = pairs[0].out_id
+    candidates = [p for p in pairs if p.out_id == out_id][:count]
+    best = candidates[0]
+    if best.gain < threshold:
+        return TransferAdvice(out_id, candidates, False, False, threshold,
+                              f"ตัวเลือกที่ดีที่สุดเพิ่มเพียง {best.gain:.1f} แต้มใน {matches} นัด")
+
+    if free_transfers > 0:
+        return TransferAdvice(out_id, candidates, True, False, threshold,
+                              f"เพิ่ม {best.gain:.1f} แต้มใน {matches} นัดและไม่เสียแต้ม")
+
+    first_gw = int(ep_rows.gw.min()) if not ep_rows.empty else 0
+    next_ep = (ep_rows[ep_rows.gw == first_gw].groupby("player_id").ep.sum()
+               .astype(float).to_dict())
+    xi = _project_xi(next_ep, players, owned)
+    unavailable = float(players.p_available[out_id]) < 0.5
+    emergency = (hit_policy == "emergency_only" and unavailable and out_id in xi
+                 and not _has_bench_cover(out_id, xi, owned, players))
+    net = best.gain - HIT_COST
+    for candidate in candidates:
+        candidate.net_gain = candidate.gain - HIT_COST
+    if emergency and net >= threshold:
+        return TransferAdvice(out_id, candidates, True, True, threshold,
+                              f"เหตุฉุกเฉิน: เพิ่มสุทธิ {net:.1f} แต้มหลังหัก 4 แต้ม")
+    return TransferAdvice(out_id, candidates, False, False, threshold,
+                          "ไม่มี free transfer และยังไม่เข้าเงื่อนไขย้ายฉุกเฉิน")
+
+
 def choose_candidates(ep_grid: pd.DataFrame, players: pd.DataFrame,
                       current_squad: list[int], pool_size: int) -> list[int]:
     """Shrink ~700 players to a pool the solver can chew through.
@@ -113,12 +287,17 @@ def solve(ep_grid: pd.DataFrame, players: pd.DataFrame, current_squad: list[int]
           bank: float, free_transfers: int, cfg: Config,
           selling_price: dict[int, float] | None = None,
           locked: list[int] | None = None,
-          locked_out: list[int] | None = None) -> Plan:
+          locked_out: list[int] | None = None,
+          forced_first_move: tuple[int, int] | None = None,
+          hold_first_week: bool = False) -> Plan:
     gws = list(ep_grid.columns)
     pool_size = int(cfg.get("planning", "candidate_pool", default=200))
     cand = choose_candidates(ep_grid, players, current_squad, pool_size)
     cand = [p for p in cand if p not in set(locked_out or [])]
     for pid in current_squad:
+        if pid in players.index and pid not in cand:
+            cand.append(pid)
+    for pid in (forced_first_move or ()):
         if pid in players.index and pid not in cand:
             cand.append(pid)
 
@@ -145,8 +324,11 @@ def solve(ep_grid: pd.DataFrame, players: pd.DataFrame, current_squad: list[int]
         log.warning("no current squad known — planning from scratch on a %.1fm budget", budget)
 
     decay = float(cfg.get("planning", "decay", default=0.86))
-    bench_w = [float(x) for x in
-               cfg.get("strategy", "bench_weight", default=[0.0, 0.16, 0.10, 0.05])]
+    bench_w = [float(x) for x in cfg.get(
+        "model", "auto_sub_slot_probability",
+        default=cfg.get("strategy", "bench_weight", default=[0.0, 0.16, 0.10, 0.05]))]
+    if len(bench_w) != 4:
+        raise ValueError("model.auto_sub_slot_probability must contain GK, 1, 2, 3")
     cap_mult = float(cfg.get("strategy", "captain_multiplier", default=2.0))
     max_hit_gw = int(cfg.get("planning", "max_hit_per_gw", default=8))
     max_hits_total = int(cfg.get("planning", "max_total_hits", default=12))
@@ -155,37 +337,31 @@ def solve(ep_grid: pd.DataFrame, players: pd.DataFrame, current_squad: list[int]
     # Without this the solver churns the bench every single week for hundredths
     # of a point, which is the opposite of what a time-poor manager wants.
     friction = float(cfg.get("planning", "transfer_friction", default=0.8))
+    raw_cap = cfg.get("planning", "max_transfers_per_gw", default=1)
+    max_moves_gw = None if raw_cap in (None, 0, "none") else int(raw_cap)
 
     prob = pulp.LpProblem("fpl_multi_gw", pulp.LpMaximize)
-    V = pulp.LpVariable.dicts
+    V = prob.add_variable_dicts
     squad = V("squad", (cand, gws), cat="Binary")
     start = V("start", (cand, gws), cat="Binary")
     cap = V("cap", (cand, gws), cat="Binary")
     buy = V("buy", (cand, gws), cat="Binary")
     sell = V("sell", (cand, gws), cat="Binary")
+    bench_slot = V("bench_slot", (cand, gws, range(4)), cat="Binary")
     free_used = V("free_used", gws, lowBound=0, upBound=MAX_SAVED_TRANSFERS, cat="Integer")
     hits = V("hits", gws, lowBound=0, upBound=max_hit_gw // HIT_COST, cat="Integer")
+    hit_active = V("hit_active", gws, cat="Binary")
     ft = V("ft", gws, lowBound=0, upBound=MAX_SAVED_TRANSFERS, cat="Integer")
+    ft_overflow = V("ft_overflow", gws, cat="Binary")
+    cash = V("cash", gws, lowBound=0, cat="Continuous")
 
     # ---- objective --------------------------------------------------------
-    # Bench value splits two ways rather than collapsing to one average: the
-    # backup keeper only plays if the starter does not, so his points are worth
-    # almost nothing, while an outfield sub can be auto-subbed in. Ordering the
-    # three outfield slots properly would need assignment variables and roughly
-    # quadruple the model, for a weight difference of a few hundredths.
-    bench_gk_w = bench_w[0] if bench_w else 0.0
-    outfield_w = bench_w[1:] or [0.10]
-    bench_out_w = sum(outfield_w) / len(outfield_w)
-
-    def bench_weight_for(p: int) -> float:
-        return bench_gk_w if pos[p] == 1 else bench_out_w
-
     prob += pulp.lpSum(
         (decay ** i) * (
             pulp.lpSum(ep[(p, g)] * start[p][g] for p in cand)
             + pulp.lpSum(ep[(p, g)] * (cap_mult - 1.0) * cap[p][g] for p in cand)
-            + pulp.lpSum(bench_weight_for(p) * ep[(p, g)] * (squad[p][g] - start[p][g])
-                         for p in cand)
+            + pulp.lpSum(bench_w[slot] * ep[(p, g)] * bench_slot[p][g][slot]
+                         for p in cand for slot in range(4))
             - HIT_COST * hits[g]
             - friction * pulp.lpSum(buy[p][g] for p in cand)
         )
@@ -199,17 +375,24 @@ def solve(ep_grid: pd.DataFrame, players: pd.DataFrame, current_squad: list[int]
             prob += pulp.lpSum(squad[p][g] for p in cand if pos[p] == position) == count
         for team_id in set(club[p] for p in cand):
             prob += pulp.lpSum(squad[p][g] for p in cand if club[p] == team_id) <= MAX_PER_CLUB
-        prob += pulp.lpSum(price[p] * squad[p][g] for p in cand) <= budget
-
         prob += pulp.lpSum(start[p][g] for p in cand) == XI_SIZE
         for position in (1, 2, 3, 4):
             members = [start[p][g] for p in cand if pos[p] == position]
             prob += pulp.lpSum(members) >= XI_MIN[position]
             prob += pulp.lpSum(members) <= XI_MAX[position]
         prob += pulp.lpSum(cap[p][g] for p in cand) == 1
+        for slot in range(4):
+            prob += pulp.lpSum(bench_slot[p][g][slot] for p in cand) == 1
         for p in cand:
             prob += start[p][g] <= squad[p][g]
             prob += cap[p][g] <= start[p][g]
+            prob += pulp.lpSum(bench_slot[p][g][slot] for slot in range(4)) \
+                == squad[p][g] - start[p][g]
+            if pos[p] == 1:
+                for slot in (1, 2, 3):
+                    prob += bench_slot[p][g][slot] == 0
+            else:
+                prob += bench_slot[p][g][0] == 0
 
     # Players you never want sold, whatever the model thinks of them.
     for pid in (locked or []):
@@ -232,21 +415,63 @@ def solve(ep_grid: pd.DataFrame, players: pd.DataFrame, current_squad: list[int]
             prob += ft[g] == min(free_transfers, MAX_SAVED_TRANSFERS)
             prob += free_used[g] == 0
             prob += hits[g] == 0
+            prob += hit_active[g] == 0
+            prob += ft_overflow[g] == 0
+            prob += cash[g] == budget - pulp.lpSum(price[p] * buy[p][g] for p in cand)
             continue
+        previous_cash = float(bank) if i == 0 else cash[gws[i - 1]]
+        sale_revenue = pulp.lpSum(
+            sell_at.get(p, price[p]) * sell[p][g] for p in cand)
+        purchase_cost = pulp.lpSum(price[p] * buy[p][g] for p in cand)
+        prob += cash[g] == previous_cash + sale_revenue - purchase_cost
         moves = pulp.lpSum(buy[p][g] for p in cand)
         prob += moves == pulp.lpSum(sell[p][g] for p in cand)
-        prob += moves <= free_used[g] + hits[g]
+        # FPL always consumes available free transfers before charging a hit.
+        # Equality accounts for every move; hit_active makes free_used equal
+        # the entire FT bank whenever at least one paid transfer is required.
+        prob += moves == free_used[g] + hits[g]
         prob += free_used[g] <= ft[g]
+        prob += free_used[g] <= moves
+        hit_limit = max_hit_gw // HIT_COST
+        prob += hits[g] <= hit_limit * hit_active[g]
+        prob += hits[g] >= hit_active[g]
+        prob += free_used[g] >= ft[g] - MAX_SAVED_TRANSFERS * (1 - hit_active[g])
+        # One change a week is the working rhythm, even with transfers banked.
+        # Spending three at once is a different kind of decision — it rebuilds
+        # the squad rather than improving it, and it is not what a manager who
+        # wants a single considered move each week is asking for.
+        if max_moves_gw is not None:
+            prob += moves <= max_moves_gw
+        if i == 0 and forced_first_move:
+            out_id, in_id = forced_first_move
+            if out_id not in cand or in_id not in cand:
+                raise ValueError("forced transfer is outside the optimiser candidate pool")
+            prob += sell[out_id][g] == 1
+            prob += buy[in_id][g] == 1
+        elif i == 0 and hold_first_week:
+            prob += moves == 0
         if i == 0:
             prob += ft[g] == min(free_transfers, MAX_SAVED_TRANSFERS)
+            prob += ft_overflow[g] == 0
         else:
-            prob += ft[g] <= ft[gws[i - 1]] - free_used[gws[i - 1]] + 1
+            previous_gw = gws[i - 1]
+            prob += ft[g] == ft[previous_gw] - free_used[previous_gw] + 1 - ft_overflow[g]
+            # Overflow is exactly the one transfer discarded when a full bank
+            # of five rolls into another unused week.
+            prob += MAX_SAVED_TRANSFERS * ft_overflow[g] <= ft[previous_gw]
+            prob += MAX_SAVED_TRANSFERS * ft_overflow[g] \
+                <= MAX_SAVED_TRANSFERS - free_used[previous_gw]
     prob += pulp.lpSum(hits[g] for g in gws) <= max_hits_total // HIT_COST
 
     time_limit = int(cfg.get("planning", "solver_time_limit", default=180))
-    prob.solve(pulp.PULP_CBC_CMD(msg=False, timeLimit=time_limit))
+    # PuLP 4 removes PULP_CBC_CMD. Use the supported COIN_CMD interface while
+    # pointing it at the CBC binary bundled by the `pulp[cbc]` extra.
+    cbc_path = getattr(pulp.apis.PULP_CBC_CMD, "pulp_cbc_path", None)
+    prob.solve(pulp.COIN_CMD(path=cbc_path, msg=False, timeLimit=time_limit))
     status = pulp.LpStatus[prob.status]
     log.info("solver finished: %s (%d candidates, %d gameweeks)", status, len(cand), len(gws))
+    if status in {"Infeasible", "Unbounded", "Undefined"}:
+        raise RuntimeError(f"transfer plan has no usable solution: {status}")
 
     plans: list[GameweekPlan] = []
     for g in gws:
@@ -257,9 +482,12 @@ def solve(ep_grid: pd.DataFrame, players: pd.DataFrame, current_squad: list[int]
 
         # FPL benches the reserve keeper in his own slot; the other three are
         # ordered, and that order decides who gets auto-subbed in first.
-        bench_all = [p for p in chosen if p not in xi]
-        bench_gk = [p for p in bench_all if pos[p] == 1]
-        bench_out = sorted((p for p in bench_all if pos[p] != 1), key=lambda p: -ep[(p, g)])
+        bench_by_slot = [next(
+            (p for p in cand if bench_slot[p][g][slot].value()
+             and bench_slot[p][g][slot].value() > 0.5), None)
+            for slot in range(4)]
+        bench_gk = [bench_by_slot[0]] if bench_by_slot[0] is not None else []
+        bench_out = [p for p in bench_by_slot[1:] if p is not None]
 
         buys = [p for p in cand if buy[p][g].value() and buy[p][g].value() > 0.5]
         sells = [p for p in cand if sell[p][g].value() and sell[p][g].value() > 0.5]
@@ -267,6 +495,7 @@ def solve(ep_grid: pd.DataFrame, players: pd.DataFrame, current_squad: list[int]
         # so a fresh build (fifteen in, nobody out) is not silently emptied.
         moves = _pair_by_position(sells, buys, pos, ep, g)
         gw_hits = int(round(hits[g].value() or 0))
+        gw_free_used = int(round(free_used[g].value() or 0))
         plans.append(GameweekPlan(
             gw=int(g), squad=chosen, xi=sorted(xi, key=lambda p: (pos[p], -ep[(p, g)])),
             bench=bench_gk + bench_out, bench_gk=bench_gk, bench_outfield=bench_out,
@@ -274,9 +503,12 @@ def solve(ep_grid: pd.DataFrame, players: pd.DataFrame, current_squad: list[int]
             buys=buys, sells=sells, moves=moves,
             hits=gw_hits,
             free_transfers_before=int(round(ft[g].value() or 0)),
+            free_transfers_used=gw_free_used,
             expected_points=round(
                 sum(ep[(p, g)] for p in xi)
                 + (ep[(captain, g)] * (cap_mult - 1.0) if captain else 0.0)
+                + sum(bench_w[slot] * ep[(pid, g)]
+                      for slot, pid in enumerate(bench_by_slot) if pid is not None)
                 - HIT_COST * gw_hits, 2),
         ))
 
