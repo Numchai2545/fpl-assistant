@@ -2,21 +2,21 @@
   "gw": 6,
   "deadline": "2026-10-10T10:00:00+00:00",
   "deadline_local": "เสาร์ 10 ต.ค. 2569, 17:00 น.",
-  "headline": "พิจารณาย้าย 2 ตัว · กัปตัน Groß",
-  "detail": "ดีกว่าแผนไม่ย้าย 12.9 คะแนนแผนสุทธิ. คาดการณ์ 56 แต้มใน GW6. ราคา: Schade มีแรงซื้อสูงและเสี่ยงขึ้นราคา",
-  "captain": "Groß",
+  "headline": "พิจารณาย้าย 2 ตัว · กัปตัน Saka",
+  "detail": "ดีกว่าแผนไม่ย้าย 12.7 คะแนนแผนสุทธิ. คาดการณ์ 56 แต้มใน GW6",
+  "captain": "Saka",
   "moves": [
     {
-      "out": "Maguire",
-      "in": "Tarkowski"
+      "out": "Gabriel",
+      "in": "Hall"
     },
     {
       "out": "Cherki",
-      "in": "Schade"
+      "in": "Saka"
     }
   ],
   "alerts": [],
-  "expected_points": 55.81,
+  "expected_points": 56.02,
   "site_url": "https://Numchai2545.github.io/fpl-assistant",
   "candidates": [
     {
@@ -76,14 +76,14 @@
       ]
     }
   ],
-  "built_at": "เสาร์ 19 ก.ย. 2569, 23:33 น.",
-  "built_at_iso": "2026-09-19T16:33:13.555157+00:00",
-  "fetched_at": "2026-09-19T16:33:12.890776+00:00",
+  "built_at": "อาทิตย์ 20 ก.ย. 2569, 00:16 น.",
+  "built_at_iso": "2026-09-19T17:16:21.746585+00:00",
+  "fetched_at": "2026-09-19T17:16:20.260834+00:00",
   "data_sources": [
     "network"
   ],
   "model_version": "0.3.0",
-  "plan_change": "แผนหลักยังเหมือนรายงานครั้งก่อน · EP GW นี้เปลี่ยน +0.0",
+  "plan_change": "แผนหลักเปลี่ยนจาก “พิจารณาย้าย 2 ตัว · กัปตัน Groß” หลังดึงข้อมูลและคำนวณทุก scenario ใหม่",
   "scenarios": [
     {
       "transfers": 0,
@@ -98,7 +98,7 @@
       "transfers": 1,
       "variant": 1,
       "recommended": false,
-      "objective_gain": 7.649,
+      "objective_gain": 7.457,
       "next_gw_gain": 2.53,
       "moves": [
         {
@@ -117,7 +117,7 @@
       "transfers": 1,
       "variant": 2,
       "recommended": false,
-      "objective_gain": 6.926,
+      "objective_gain": 6.791,
       "next_gw_gain": 2.88,
       "moves": [
         {
@@ -136,34 +136,7 @@
       "transfers": 2,
       "variant": 1,
       "recommended": true,
-      "objective_gain": 12.894,
-      "next_gw_gain": 4.08,
-      "moves": [
-        {
-          "out": "Maguire",
-          "in": "Tarkowski"
-        },
-        {
-          "out": "Cherki",
-          "in": "Schade"
-        }
-      ],
-      "move_ids": [
-        {
-          "out": 418,
-          "in": 229
-        },
-        {
-          "out": 399,
-          "in": 94
-        }
-      ]
-    },
-    {
-      "transfers": 2,
-      "variant": 2,
-      "recommended": false,
-      "objective_gain": 12.704,
+      "objective_gain": 12.697,
       "next_gw_gain": 4.03,
       "moves": [
         {
@@ -183,6 +156,33 @@
         {
           "out": 399,
           "in": 12
+        }
+      ]
+    },
+    {
+      "transfers": 2,
+      "variant": 2,
+      "recommended": false,
+      "objective_gain": 12.41,
+      "next_gw_gain": 4.08,
+      "moves": [
+        {
+          "out": "Maguire",
+          "in": "Tarkowski"
+        },
+        {
+          "out": "Cherki",
+          "in": "Schade"
+        }
+      ],
+      "move_ids": [
+        {
+          "out": 418,
+          "in": 229
+        },
+        {
+          "out": 399,
+          "in": 94
         }
       ]
     }

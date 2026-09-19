@@ -70,5 +70,23 @@
     ],
     "expected_points": 55.81,
     "headline": "พิจารณาย้าย 2 ตัว · กัปตัน Groß"
+  },
+  {
+    "built_at": "2026-09-19T17:16:21.746585+00:00",
+    "fetched_at": "2026-09-19T17:16:20.260834+00:00",
+    "gw": 6,
+    "model_version": "0.3.0",
+    "moves": [
+      {
+        "out": "Gabriel",
+        "in": "Hall"
+      },
+      {
+        "out": "Cherki",
+        "in": "Saka"
+      }
+    ],
+    "expected_points": 56.02,
+    "headline": "พิจารณาย้าย 2 ตัว · กัปตัน Saka"
   }
 ]
