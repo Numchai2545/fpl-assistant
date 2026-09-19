@@ -179,6 +179,7 @@ td.r,th.r{text-align:right;font-family:"IBM Plex Mono",monospace;font-variant-nu
 .card.player-open{transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}
 .card.cap{border:2px solid #FFE066}
 .card .nm{font-weight:600;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .nm{display:flex;align-items:center;justify-content:center;gap:3px}.card .player-name{min-width:0;overflow:hidden;text-overflow:ellipsis}
 .card .ep{font-family:"IBM Plex Mono",monospace;font-size:13px;font-weight:600;color:#087F70;line-height:1.3}
 .card .op{font-size:9.5px;color:#526277;font-family:"IBM Plex Mono",monospace}
 .card .slot{font-family:"IBM Plex Mono",monospace;font-size:9.5px;font-weight:600;color:#526277;
@@ -275,8 +276,17 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
   .comparetable{box-shadow:inset -14px 0 14px -16px var(--ink)}
   .swipehint{display:block}
 }
+
+.data-state{margin:10px 0 16px;padding:11px 14px;border:1px solid var(--rule);border-radius:12px;background:var(--surface);font-size:13px}
+.data-state.working{border-color:#8B5CF6}.data-state.success{border-color:var(--good)}.data-state.caution{border-color:#D97706;background:#FFFBEB}
+.scenario-tabs{display:flex;gap:8px;overflow-x:auto;padding:2px 0 12px;scrollbar-width:thin}
+.scenario-tab{white-space:nowrap;border:1px solid var(--rule);border-radius:999px;background:var(--surface);color:var(--ink);padding:9px 13px;font-weight:700;cursor:pointer}
+.scenario-tab[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.scenario-tab span{margin-left:5px;font-size:10px;background:#fff;color:var(--accent);border-radius:999px;padding:2px 5px}
+.scenario-panel[hidden]{display:none}.scenario-summary{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:8px;font-size:12px}.scenario-summary span{color:var(--ink-2);text-align:right}
+.scenario-save{white-space:nowrap;color:var(--accent);font-weight:700;text-decoration:none;border:1px solid var(--rule);border-radius:9px;padding:6px 9px;background:var(--surface)}
 @media(max-width:520px){
-  .countdown{display:none}.header-actions{gap:0}
+  .countdown{display:block;padding:5px 7px}.countdown .lab{display:none}.countdown .val{font-size:12px}.countdown .sub{display:none}.header-actions{gap:5px}
   .brand h1{font-size:18px}
   .webtools{display:flex;flex-direction:column;align-items:stretch}
   .webtools .stamp{max-width:none}
@@ -285,6 +295,8 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);color:v
   .card{width:clamp(54px,17vw,72px)}
   .pitch{padding-inline:8px}
   .pitch>.row{gap:4px}
+  .scenario-summary{display:block}.scenario-summary span{display:block;text-align:left;margin-top:4px}
+  .card .badge{flex:0 0 auto}
 }
 @media(min-width:720px){
   .wrap{padding-inline:24px}

@@ -1,0 +1,16 @@
+name: Update FPL report
+description: Ask the free GitHub worker to fetch FPL and rebuild the mobile report.
+title: "[refresh] Update FPL report"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        กด **Submit new issue** ด้านล่างเพื่อเริ่มอัปเดต รายงานจะเข้าคิว GitHub Actions แล้วเผยแพร่กลับไปที่หน้าแอป
+        ระบบรับคำขอจากเจ้าของ repository เท่านั้น และไม่ล็อกอินหรือแก้ทีม FPL
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Confirm
+      options:
+        - label: ดึงข้อมูลสาธารณะจาก FPL ใหม่และสร้างรายงาน
+          required: true

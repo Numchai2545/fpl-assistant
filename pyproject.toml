@@ -1,6 +1,6 @@
 [project]
 name = "fpl-assistant"
-version = "0.2.0"
+version = "0.3.0"
 description = "Expected points and multi-gameweek transfer planning for Fantasy Premier League"
 requires-python = ">=3.11"
 dependencies = [

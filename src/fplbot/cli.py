@@ -15,10 +15,11 @@ from datetime import datetime, timezone
 
 import pandas as pd
 
-from . import backtest, calendar_feed, features, model, optimize, report
+from . import backtest, calendar_feed, features, model, optimize, report, state
 from .config import load_config, selling_fee, verify_scoring
 from .fetch import (FPLClient, apply_event_transfer_state, bank_and_value,
-                    deadline_utc, free_transfers, next_gameweek, selling_prices)
+                    current_gameweek, deadline_utc, free_transfers, next_gameweek,
+                    selling_prices)
 
 log = logging.getLogger("fplbot")
 
@@ -80,8 +81,9 @@ def build(args) -> int:
         picks = client.entry_picks(last_finished)
         current_squad = [int(p["element"]) for p in picks["picks"]]
     except Exception as exc:  # first gameweek, or a private entry
-        log.warning("could not read GW%s picks (%s) — planning from scratch",
-                    last_finished, exc)
+        log.error("could not read GW%s picks (%s) — keeping the previous report",
+                  last_finished, exc)
+        return 2
 
     try:
         transfers = client.entry_transfers()
@@ -144,23 +146,51 @@ def build(args) -> int:
     locked = [int(p) for p in (cfg.get("strategy", "never_sell", default=[]) or [])]
     advice = optimize.analyse_transfers(
         ep_rows, players, current_squad, bank, ft, cfg, selling_price=sell_at)
-    forced_move = None
-    if advice.recommend and advice.out_id is not None and advice.candidates:
-        forced_move = (advice.out_id, advice.candidates[0].in_id)
-    log.info("solving the transfer plan")
-    plan = optimize.solve(ep_grid, players, current_squad, bank, ft, cfg,
-                          selling_price=sell_at, locked=locked,
-                          forced_first_move=forced_move,
-                          hold_first_week=not advice.recommend)
+    log.info("solving hold and multi-transfer scenarios")
+    scenarios = optimize.solve_scenarios(
+        ep_grid, players, current_squad, bank, ft, cfg,
+        selling_price=sell_at, locked=locked,
+    )
+    selected = state.load_selected(cfg.site_dir / "selected-plan.json", gw)
+    if selected:
+        wanted = sorted((int(m["out"]), int(m["in"])) for m in selected.get("move_ids", []))
+        matched = next((s for s in scenarios
+                        if sorted(s.plan.gameweeks[0].moves) == wanted), None)
+        if matched:
+            for scenario in scenarios:
+                scenario.recommended = scenario is matched
+            log.info("kept the explicitly selected GW%s scenario", gw)
+        else:
+            log.warning("saved GW%s scenario no longer matches a legal optimal plan", gw)
+    plan = next(s.plan for s in scenarios if s.recommended)
     log.info("solver: %s  objective %.1f  budget %.1fm",
              plan.status, plan.objective, plan.budget)
+
+    live = None
+    live_gw = current_gameweek(bootstrap)
+    if live_gw:
+        try:
+            payload = client.event_live(live_gw)
+            current_event = next(
+                (e for e in bootstrap["events"] if int(e["id"]) == live_gw), {})
+            points = {int(row["id"]): float(row.get("stats", {}).get("total_points", 0))
+                      for row in payload.get("elements", [])}
+            live_points = sum(
+                points.get(int(p["element"]), 0.0) * int(p.get("multiplier", 1))
+                for p in (picks or {}).get("picks", []))
+            live = {"gw": live_gw, "provisional": not bool(current_event.get("finished")),
+                    "players_updated": len(payload.get("elements", [])),
+                    "team_points": int(live_points)}
+        except Exception as exc:
+            log.warning("live GW%s points unavailable (%s)", live_gw, exc)
 
     ctx = report.build_context(
         cfg=cfg, bootstrap=bootstrap, teams=teams, players=players,
         ep_rows=ep_rows, ep_grid=ep_grid, plan=plan, entry=entry,
         current_squad=current_squad, free_transfers=ft,
         bank=bank, squad_value=squad_value, event=event,
-        transfer_advice=advice, selling_price=sell_at,
+        transfer_advice=advice, selling_price=sell_at, scenarios=scenarios,
+        provenance=client.provenance, live=live,
     )
     path = report.render(ctx, cfg)
     log.info("dashboard written to %s", path)
@@ -211,14 +241,25 @@ def serve(args) -> int:
 
 def run_backtest(args) -> int:
     cfg = load_config(args.config)
-    client = FPLClient(cfg, offline=args.offline)
-    result = backtest.evaluate_projections(cfg, client.element_summary)
+    client = FPLClient(cfg, offline=args.offline,
+                       force_refresh=getattr(args, "fresh", False))
+    result = backtest.evaluate_projections(
+        cfg, client.element_summary, fixtures=client.fixtures())
     if result["gameweeks"] == 0:
         print("ยังไม่มี projection ที่ deadline ผ่านแล้วสำหรับ backtest")
         return 0
     path = backtest.write_report(cfg, result)
     print(backtest.format_summary(result))
     print(f"\n  report: {path}")
+    return 0
+
+
+def select_plan(args) -> int:
+    cfg = load_config(args.config)
+    payload = state.select_scenario(
+        cfg.site_dir / "summary.json", cfg.site_dir / "selected-plan.json",
+        args.scenario)
+    print(f"selected GW{payload['gw']} scenario {args.scenario}")
     return 0
 
 
@@ -231,6 +272,8 @@ def main(argv: list[str] | None = None) -> int:
     p_build = sub.add_parser("build", help="fetch, model and write the dashboard")
     p_build.add_argument("--offline", action="store_true",
                          help="reuse today's cached snapshot instead of calling the API")
+    p_build.add_argument("--fresh", action="store_true",
+                         help="bypass cache and fetch a new public FPL snapshot")
     p_build.set_defaults(func=build)
 
     p_notify = sub.add_parser("notify", help="send the deadline alert if it is due")
@@ -251,6 +294,10 @@ def main(argv: list[str] | None = None) -> int:
     p_backtest.add_argument("--offline", action="store_true",
                             help="use cached element histories only")
     p_backtest.set_defaults(func=run_backtest)
+
+    p_select = sub.add_parser("select-plan", help="persist a reviewed dashboard scenario")
+    p_select.add_argument("--scenario", type=int, required=True)
+    p_select.set_defaults(func=select_plan)
 
     args = parser.parse_args(argv)
     _setup_console()

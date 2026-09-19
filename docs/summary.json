@@ -1,76 +1,190 @@
 {
-  "gw": 5,
-  "deadline": "2026-09-18T17:30:00+00:00",
-  "deadline_local": "เสาร์ 19 ก.ย. 2569, 00:30 น.",
-  "headline": "พิจารณา Ampadu → Groß · กัปตัน Haaland",
-  "detail": "เพิ่ม 15.0 แต้มใน 5 นัดและไม่เสียแต้ม. คาดการณ์ 55 แต้มใน GW5. ราคา: Groß มีแรงซื้อสูงและเสี่ยงขึ้นราคา",
-  "captain": "Haaland",
+  "gw": 6,
+  "deadline": "2026-10-10T10:00:00+00:00",
+  "deadline_local": "เสาร์ 10 ต.ค. 2569, 17:00 น.",
+  "headline": "พิจารณาย้าย 2 ตัว · กัปตัน Groß",
+  "detail": "ดีกว่าแผนไม่ย้าย 12.9 คะแนนแผนสุทธิ. คาดการณ์ 56 แต้มใน GW6. ราคา: Schade มีแรงซื้อสูงและเสี่ยงขึ้นราคา",
+  "captain": "Groß",
   "moves": [
     {
-      "out": "Ampadu",
-      "in": "Groß"
+      "out": "Maguire",
+      "in": "Tarkowski"
+    },
+    {
+      "out": "Cherki",
+      "in": "Schade"
     }
   ],
   "alerts": [],
-  "expected_points": 55.44,
+  "expected_points": 55.81,
   "site_url": "",
   "candidates": [
     {
       "rank": 1,
-      "name": "Groß",
-      "price": 5.6,
-      "ep": 26.28,
-      "gain": 15.04,
+      "name": "Schade",
+      "price": 6.1,
+      "ep": 27.22,
+      "gain": 13.55,
       "fixtures": [
-        "GW5 ARS (H) [4]",
-        "GW6 SUN (A) [3]",
-        "GW7 CRY (H) [3]",
-        "GW8 LIV (A) [4]",
-        "GW9 MCI (A) [5]"
+        "GW6 AVL (A) [4]",
+        "GW7 LIV (H) [4]",
+        "GW8 HUL (A) [2]",
+        "GW9 NFO (H) [3]",
+        "GW10 BHA (A) [3]"
       ]
     },
     {
       "rank": 2,
-      "name": "Janelt",
-      "price": 5.0,
-      "ep": 22.24,
-      "gain": 11.0,
+      "name": "Rogers",
+      "price": 7.7,
+      "ep": 26.4,
+      "gain": 12.73,
       "fixtures": [
-        "GW5 CHE (H) [4]",
-        "GW6 AVL (A) [4]",
-        "GW7 LIV (H) [4]",
-        "GW8 HUL (A) [2]",
-        "GW9 NFO (H) [3]"
+        "GW6 BOU (H) [3]",
+        "GW7 EVE (A) [3]",
+        "GW8 TOT (H) [3]",
+        "GW9 MUN (H) [4]",
+        "GW10 SUN (A) [3]"
       ]
     },
     {
       "rank": 3,
-      "name": "Mainoo",
-      "price": 5.5,
-      "ep": 21.27,
-      "gain": 10.03,
+      "name": "Mbeumo",
+      "price": 7.9,
+      "ep": 26.07,
+      "gain": 12.4,
       "fixtures": [
-        "GW5 FUL (A) [3]",
         "GW6 TOT (H) [3]",
         "GW7 LEE (A) [3]",
         "GW8 BOU (H) [3]",
-        "GW9 CHE (A) [4]"
+        "GW9 CHE (A) [4]",
+        "GW10 AVL (H) [3]"
       ]
     },
     {
       "rank": 4,
-      "name": "King",
-      "price": 5.5,
-      "ep": 21.18,
-      "gain": 9.94,
+      "name": "Szoboszlai",
+      "price": 7.0,
+      "ep": 23.79,
+      "gain": 10.12,
       "fixtures": [
-        "GW5 MUN (H) [4]",
-        "GW6 IPS (A) [2]",
-        "GW7 HUL (H) [2]",
-        "GW8 COV (A) [2]",
-        "GW9 AVL (A) [4]"
+        "GW6 MCI (H) [4]",
+        "GW7 BRE (A) [3]",
+        "GW8 BHA (H) [2]",
+        "GW9 ARS (H) [4]",
+        "GW10 CRY (A) [3]"
       ]
     }
   ],
-  "built_at": "จันทร์ 14 ก.ย. 2569, 23:22 น."
+  "built_at": "เสาร์ 19 ก.ย. 2569, 23:23 น.",
+  "built_at_iso": "2026-09-19T16:23:15.562451+00:00",
+  "fetched_at": "2026-09-19T16:20:57.862401+00:00",
+  "data_sources": [
+    "cache"
+  ],
+  "model_version": "0.3.0",
+  "plan_change": "แผนหลักยังเหมือนรายงานครั้งก่อน · EP GW นี้เปลี่ยน +0.0",
+  "scenarios": [
+    {
+      "transfers": 0,
+      "variant": 1,
+      "recommended": false,
+      "objective_gain": 0.0,
+      "next_gw_gain": 0.0,
+      "moves": [],
+      "move_ids": []
+    },
+    {
+      "transfers": 1,
+      "variant": 1,
+      "recommended": false,
+      "objective_gain": 7.649,
+      "next_gw_gain": 2.53,
+      "moves": [
+        {
+          "out": "Cherki",
+          "in": "Schade"
+        }
+      ],
+      "move_ids": [
+        {
+          "out": 399,
+          "in": 94
+        }
+      ]
+    },
+    {
+      "transfers": 1,
+      "variant": 2,
+      "recommended": false,
+      "objective_gain": 6.926,
+      "next_gw_gain": 2.88,
+      "moves": [
+        {
+          "out": "Cherki",
+          "in": "Rogers"
+        }
+      ],
+      "move_ids": [
+        {
+          "out": 399,
+          "in": 40
+        }
+      ]
+    },
+    {
+      "transfers": 2,
+      "variant": 1,
+      "recommended": true,
+      "objective_gain": 12.894,
+      "next_gw_gain": 4.08,
+      "moves": [
+        {
+          "out": "Maguire",
+          "in": "Tarkowski"
+        },
+        {
+          "out": "Cherki",
+          "in": "Schade"
+        }
+      ],
+      "move_ids": [
+        {
+          "out": 418,
+          "in": 229
+        },
+        {
+          "out": 399,
+          "in": 94
+        }
+      ]
+    },
+    {
+      "transfers": 2,
+      "variant": 2,
+      "recommended": false,
+      "objective_gain": 12.704,
+      "next_gw_gain": 4.03,
+      "moves": [
+        {
+          "out": "Gabriel",
+          "in": "Hall"
+        },
+        {
+          "out": "Cherki",
+          "in": "Saka"
+        }
+      ],
+      "move_ids": [
+        {
+          "out": 4,
+          "in": 449
+        },
+        {
+          "out": 399,
+          "in": 12
+        }
+      ]
+    }
+  ]
 }

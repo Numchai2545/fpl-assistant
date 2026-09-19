@@ -71,7 +71,8 @@ def _eligible_projection_files(cfg: Config, now: datetime) -> list[Path]:
 
 
 def evaluate_projections(cfg: Config, history_loader: Callable[[int], dict],
-                         *, now: datetime | None = None) -> dict:
+                         *, now: datetime | None = None,
+                         fixtures: list[dict] | None = None) -> dict:
     now = now or datetime.now(timezone.utc)
     records = []
     history_cache: dict[int, dict] = {}
@@ -79,6 +80,12 @@ def evaluate_projections(cfg: Config, history_loader: Callable[[int], dict],
     for path in files:
         projection = json.loads(path.read_text(encoding="utf-8"))
         gw = int(projection["gw"])
+        if fixtures is not None:
+            scheduled = [f for f in fixtures if int(f.get("event") or 0) == gw]
+            # A deadline passing is not an outcome. Wait until every scheduled
+            # fixture is final so partial live points never enter calibration.
+            if not scheduled or any(not f.get("finished") for f in scheduled):
+                continue
         for row in projection.get("players", []):
             pid = int(row["player_id"])
             if pid not in history_cache:

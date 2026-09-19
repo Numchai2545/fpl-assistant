@@ -3,15 +3,18 @@ name: Deploy FPL Assistant to Pages
 on:
   push:
     branches: [master]
+  issues:
+    types: [opened]
   schedule:
-    # 09:15 and 21:15 in Bangkok. The mobile app is never over 12 hours stale.
+    # 09:15 and 21:15 in Bangkok. Scheduled jobs are a fallback and can queue.
     - cron: "15 2,14 * * *"
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
+  issues: write
 
 concurrency:
   group: pages
@@ -19,6 +22,9 @@ concurrency:
 
 jobs:
   build-and-deploy:
+    if: >-
+      github.event_name != 'issues' ||
+      (github.event.issue.user.login == github.repository_owner && startsWith(github.event.issue.title, '[refresh]'))
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -44,7 +50,15 @@ jobs:
           PYTHONPATH: src
           PYTHONIOENCODING: utf-8
           FPL_SITE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
-        run: python -m fplbot -v build
+        run: python -m fplbot -v build --fresh
+
+      - name: Persist the latest report and plan history
+        run: |
+          git config user.name "fpl-assistant[bot]"
+          git config user.email "fpl-assistant[bot]@users.noreply.github.com"
+          git add docs
+          git diff --cached --quiet || git commit -m "dashboard: refresh published report [skip ci]"
+          git push
 
       - uses: actions/configure-pages@v5
 
@@ -55,3 +69,55 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Close a completed mobile refresh request
+        if: github.event_name == 'issues' && success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue comment "${{ github.event.issue.number }}" --body "อัปเดตและเผยแพร่รายงานแล้ว กลับไปที่แอปและรอให้หน้ารีเฟรช"
+          gh issue close "${{ github.event.issue.number }}"
+
+  save-selected-plan:
+    if: >-
+      github.event_name == 'issues' &&
+      github.event.issue.user.login == github.repository_owner &&
+      startsWith(github.event.issue.title, '[select-plan]')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+      - name: Install dependencies
+        run: pip install -r requirements-lock.txt
+      - name: Validate and save selected scenario
+        env:
+          PYTHONPATH: src
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+        run: |
+          python - <<'PY'
+          import json, os, re, subprocess
+          match = re.fullmatch(r"\[select-plan\] GW(\d+) scenario (\d+)", os.environ["ISSUE_TITLE"])
+          if not match:
+              raise SystemExit("invalid selection title")
+          with open("docs/summary.json", encoding="utf-8") as handle:
+              report = json.load(handle)
+          if int(match.group(1)) != int(report["gw"]):
+              raise SystemExit("selection is for a stale gameweek")
+          subprocess.run(["python", "-m", "fplbot", "select-plan", "--scenario", match.group(2)], check=True)
+          PY
+      - name: Persist selection
+        run: |
+          git config user.name "fpl-assistant[bot]"
+          git config user.email "fpl-assistant[bot]@users.noreply.github.com"
+          git add docs/selected-plan.json
+          git commit -m "plan: save reviewed scenario"
+          git push
+      - name: Close selection request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue comment "${{ github.event.issue.number }}" --body "บันทึกแผนแล้ว รายงานรอบถัดไปจะยึดแผนนี้หากยังถูกกติกาและตรงกับ scenario ที่คำนวณได้"
+          gh issue close "${{ github.event.issue.number }}"

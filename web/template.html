@@ -45,9 +45,16 @@
     <button class="btn refreshbtn" type="submit" id="refresh-btn"><span class="refreshicon" aria-hidden="true">↻</span><span class="refresh-label">อัปเดตข้อมูลล่าสุด</span></button>
     <button class="btn installbtn" type="button" id="install-btn" hidden><span aria-hidden="true">↓</span> ติดตั้งแอป</button>
   </form>
-  <span class="stamp">ข้อมูลชุดนี้สร้างเมื่อ {{ built_at }}</span>
+  <span class="stamp">{{ data_status }} · ดึงล่าสุด {{ fetched_at_human }} · วิเคราะห์ {{ built_at }}</span>
   <div class="refresh-status" id="refresh-status" role="status" aria-live="polite" hidden></div>
 </div>
+
+{% if live %}
+<div class="data-state {{ 'working' if live.provisional else 'success' }}">
+  GW{{ live.gw }}: <b>{{ live.team_points }} แต้ม</b> · {{ 'คะแนนระหว่างแข่งขัน ยังเปลี่ยนได้' if live.provisional else 'ผลการแข่งขันยืนยันแล้ว' }}
+  · รับข้อมูลนักเตะ {{ live.players_updated }} คน
+</div>
+{% endif %}
 
 <div class="overview-label">ภาพรวมก่อนตัดสินใจ</div>
 <div class="top-summary">
@@ -79,12 +86,52 @@
   </div>
   {% endif %}
   <p class="detail">{{ action.detail }}</p>
+  <p class="sub">{{ plan_change }}</p>
 </div>
 </div>
 
 <section>
-  <h2>ทีมของคุณสำหรับ GW{{ gw }}</h2>
-  <p class="sub">แผน {{ formation }} เลือกใหม่ตาม EP ฟอร์ม และโปรแกรม · กดชื่อนักเตะเพื่อเทียบตัวเลือกตำแหน่งเดียวกัน</p>
+  <h2>เปรียบเทียบทีมจำลองสำหรับ GW{{ gw }}</h2>
+  <p class="sub">เลือกดูทีมเมื่อไม่ย้ายหรือใช้ free transfers จำนวนต่างกัน สนามเป็นภาพจำลองและไม่เปลี่ยนทีมใน FPL</p>
+  {% if scenario_cards %}
+  <div class="scenario-tabs" role="tablist" aria-label="เลือกแผนเปลี่ยนตัว">
+    {% for s in scenario_cards %}
+    <button type="button" class="scenario-tab" data-scenario="{{ s.index }}" role="tab" aria-selected="{{ 'true' if s.recommended else 'false' }}">
+      {{ 'ไม่ย้าย' if s.transfers == 0 else 'ย้าย ' ~ s.transfers ~ ' ตัว · ทางเลือก ' ~ s.variant }}
+      {% if s.recommended %}<span>แนะนำ</span>{% endif %}
+    </button>
+    {% endfor %}
+  </div>
+  <p class="sub">“คะแนนแผนสุทธิ” รวม EP ตลอดช่วง {{ horizon }} GW แบบให้น้ำหนักนัดใกล้มากกว่า และหักต้นทุนความไม่แน่นอนของการใช้ transfer จึงไม่ใช่คะแนน FPL ที่จะได้รับตรงๆ</p>
+  {% for s in scenario_cards %}
+  <div class="scenario-panel" data-scenario-panel="{{ s.index }}" role="tabpanel" {% if not s.recommended %}hidden{% endif %}>
+    <div class="scenario-summary">
+      <b>{{ 'เก็บ transfer' if not s.moves else s.moves|map(attribute='out')|join(', ') ~ ' → ' ~ s.moves|map(attribute='in')|join(', ') }}</b>
+      <span>GW ถัดไป {{ "%+.1f"|format(s.next_gw_gain) }} EP · คะแนนแผนสุทธิ {{ "%+.1f"|format(s.objective_gain) }} · กัปตัน {{ s.captain }}</span>
+      {% if s.select_url %}<a class="scenario-save" href="{{ s.select_url }}" target="_blank" rel="noopener">บันทึกแผนนี้</a>{% endif %}
+    </div>
+    <div class="pitch">
+    {% for line in s.pitch_rows %}
+    <div class="row">
+      {% for p in line %}
+      <button type="button" class="card player-open {% if p.is_captain %}cap{% endif %}" data-player="{{ p.id }}">
+        <div class="nm"><span class="player-name">{{ p.name }}</span>{% if p.is_captain %}<span class="badge">C</span>{% elif p.is_vice %}<span class="badge">V</span>{% endif %}</div>
+        <div class="ep">{{ "%.1f"|format(p.ep) }}</div><div class="op">{{ p.opponent }}</div>
+      </button>
+      {% endfor %}
+    </div>
+    {% endfor %}
+    <div class="benchrow"><div class="lab">ตัวสำรอง · เรียงตามลำดับที่จะถูกเปลี่ยนเข้า</div><div class="row benchgrid">
+      {% for p in s.bench_gk %}<button type="button" class="card player-open gkslot" data-player="{{ p.id }}"><div class="slot">GK</div><div class="nm"><span class="player-name">{{ p.name }}</span></div><div class="ep">{{ "%.1f"|format(p.ep) }}</div><div class="op">{{ p.opponent }}</div></button>{% endfor %}
+      {% for p in s.bench_outfield %}<button type="button" class="card player-open" data-player="{{ p.id }}"><div class="slot">{{ loop.index }}</div><div class="nm"><span class="player-name">{{ p.name }}</span></div><div class="ep">{{ "%.1f"|format(p.ep) }}</div><div class="op">{{ p.opponent }}</div></button>{% endfor %}
+    </div></div>
+    </div>
+  </div>
+  {% endfor %}
+  {% else %}
+  <p class="sub">ยังไม่มี scenario ที่คำนวณได้</p>
+  {% endif %}
+  <div hidden aria-hidden="true">
   <div class="pitch">
     {% for line in pitch_rows %}
     <div class="row">
@@ -109,7 +156,12 @@
       </div>
     </div>
   </div>
+  </div>
 </section>
+
+{% if clashes %}
+<div class="data-state caution"><b>ตัวรุกพบแนวรับที่คุณถือ:</b> {{ clashes|join(' · ') }}<br><span class="sub">EP คิดคู่แข่งไว้แล้ว รายการนี้เตือนเรื่องโอกาสทำคะแนนพร้อมกัน ไม่ได้หักแต้มซ้ำ</span></div>
+{% endif %}
 
 <details class="insight">
   <summary><span class="summary-icon">C</span><span><strong>ตัวเลือกกัปตัน</strong><small>ดูคะแนนคาดการณ์ก่อนคูณสอง</small></span><span class="chevron">⌄</span></summary>
@@ -152,7 +204,7 @@
     {% for p in transfer_candidates %}
       <tr{% if p.recommended %} style="background:var(--good-soft)"{% endif %}>
         <td class="r">{{ p.rank }}</td>
-        <td><span class="pname">{{ p.name }}</span> <span class="pmeta">{{ p.team }}</span>{% if p.recommended %} <span class="pos">แนะนำ</span>{% endif %}{% if p.price_signal == 'rising' %} <span class="pos">ราคาเสี่ยงขึ้น</span>{% elif p.price_signal == 'falling' %} <span class="pos">ราคาเสี่ยงลง</span>{% endif %}</td>
+        <td><span class="pname">{{ p.name }}</span> <span class="pmeta">{{ p.team }}</span>{% if p.recommended %} <span class="pos">อยู่ในแผน</span>{% endif %}{% if p.price_signal == 'rising' %} <span class="pos">ราคาเสี่ยงขึ้น</span>{% elif p.price_signal == 'falling' %} <span class="pos">ราคาเสี่ยงลง</span>{% endif %}<br><span class="pmeta">นาที {{ "%+.1f"|format(p.components.get('minutes',0)) }} · ประตู {{ "%+.1f"|format(p.components.get('goals',0)) }} · แอสซิสต์ {{ "%+.1f"|format(p.components.get('assists',0)) }} · คลีนชีต {{ "%+.1f"|format(p.components.get('clean_sheet',0)) }}</span></td>
         <td class="r">{{ "%.1f"|format(p.price) }}</td>
         <td class="r">{{ "%.1f"|format(p.ownership) }}</td>
         <td style="white-space:normal"><span class="pmeta">{{ p.fixtures|join(' · ') }}</span></td>
@@ -274,6 +326,18 @@
 {% endif %}
 
 <details class="insight">
+  <summary><span class="summary-icon">DATA</span><span><strong>ข้อมูลมาจากไหนและเก็บที่ไหน</strong><small>ตรวจความสดและที่มาของรายงานนี้</small></span><span class="chevron">⌄</span></summary>
+  <div class="insight-body">
+    <p class="sub"><b>{{ data_status }}</b> · ดึงเมื่อ {{ fetched_at_human }} · วิเคราะห์เมื่อ {{ built_at }}</p>
+    <div class="flags">
+      <div class="flag"><span class="tag">FPL</span><span>ข้อมูลทีม โปรแกรม ราคา ข่าว และคะแนนมาจาก public Fantasy Premier League API ไม่มีการล็อกอินหรือแก้ทีม</span></div>
+      <div class="flag"><span class="tag">คอม</span><span>ข้อมูลดิบมีสำเนาตามเวลาที่ <code>data/snapshots/</code> และ projection ก่อน deadline อยู่ที่ <code>data/projections/</code></span></div>
+      <div class="flag"><span class="tag">มือถือ</span><span>หน้า Add to Home Screen เก็บรายงานล่าสุดใน cache; รายงานและประวัติแผนกลางอยู่ใน <code>docs/</code> ที่ GitHub Pages เผยแพร่</span></div>
+    </div>
+  </div>
+</details>
+
+<details class="insight">
   <summary><span class="summary-icon">CAL</span><span><strong>กันลืม</strong><small>ตั้งปฏิทินเตือนก่อน deadline</small></span><span class="chevron">⌄</span></summary>
   <div class="insight-body">
   <p class="sub">เพิ่มลงปฏิทินครั้งเดียว เพื่อเตือนให้กดอัปเดตรายงานก่อน deadline 24 ชั่วโมง</p>
@@ -304,12 +368,13 @@
   var compareTitle = document.getElementById('compare-title');
   var compareSub = document.getElementById('compare-sub');
   var compareBody = document.getElementById('compare-body');
-  var activePlayerId = null, compareSort = "ep";
+  var activePlayerId = null, compareSort = "ep", lastFocused = null;
   function fixtureScore(p) { var n=p.fixtures.map(function(x){var m=x.match(/\[(\d)\]/);return m?Number(m[1]):3;}); return n.reduce(function(a,b){return a+b;},0)/Math.max(n.length,1); }
   function openComparison(playerId) {
     var data = comparisons[String(playerId)];
     if (!data) return;
     activePlayerId = playerId;
+    lastFocused = document.activeElement;
     var chosen=data.rows.find(function(p){return p.selected;}) || data.rows[0];
     var rows=data.rows.slice().sort(function(a,b){if(compareSort==="price")return Math.abs(a.price-chosen.price)-Math.abs(b.price-chosen.price)||b.ep-a.ep;if(compareSort==="form")return b.form-a.form||b.ep-a.ep;if(compareSort==="fixtures")return fixtureScore(a)-fixtureScore(b)||b.ep-a.ep;return b.ep-a.ep;});
     document.querySelectorAll(".filterbtn").forEach(function(b){b.setAttribute("aria-selected",String(b.dataset.sort===compareSort));});
@@ -341,6 +406,7 @@
     });
     modal.hidden = false;
     document.body.style.overflow = 'hidden';
+    document.getElementById('compare-close').focus();
   }
   document.querySelectorAll('.player-open').forEach(function (button) {
     button.addEventListener('click', function () { openComparison(button.dataset.player); });
@@ -349,15 +415,35 @@
   function closeComparison() {
     modal.hidden = true;
     document.body.style.overflow = '';
+    if (lastFocused && lastFocused.focus) lastFocused.focus();
   }
   document.getElementById('compare-close').addEventListener('click', closeComparison);
   modal.addEventListener('click', function (event) { if (event.target === modal) closeComparison(); });
-  document.addEventListener('keydown', function (event) { if (event.key === 'Escape') closeComparison(); });
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape' && !modal.hidden) closeComparison();
+    if (event.key === 'Tab' && !modal.hidden) {
+      var focusable = Array.from(modal.querySelectorAll('button,[href],[tabindex]:not([tabindex="-1"])')).filter(function(e){return !e.disabled;});
+      if (!focusable.length) return;
+      var first = focusable[0], last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    }
+  });
+
+  document.querySelectorAll('.scenario-tab').forEach(function (button) {
+    button.addEventListener('click', function () {
+      var id = button.dataset.scenario;
+      document.querySelectorAll('.scenario-tab').forEach(function (b) { b.setAttribute('aria-selected', String(b === button)); });
+      document.querySelectorAll('.scenario-panel').forEach(function (panel) { panel.hidden = panel.dataset.scenarioPanel !== id; });
+    });
+  });
 
   var refreshForm = document.getElementById('refresh-form');
   var refreshBtn = document.getElementById('refresh-btn');
   var refreshLabel = refreshBtn.querySelector('.refresh-label');
   var refreshStatus = document.getElementById('refresh-status');
+  var refreshRequestUrl = {{ refresh_request_url|tojson }};
+  var currentBuild = {{ built_at_iso|tojson }};
   var canBuildLocally = location.hostname === '127.0.0.1' || location.hostname === 'localhost';
   if (location.protocol === 'file:') {
     refreshForm.hidden = true;
@@ -369,7 +455,7 @@
       refreshLabel.textContent = 'กำลังวิเคราะห์ข้อมูล…';
       refreshStatus.hidden = false;
       refreshStatus.className = 'refresh-status working';
-      refreshStatus.textContent = 'กำลังดึงข้อมูลล่าสุดและจัดทีมใหม่ ใช้เวลาประมาณ 5–30 วินาที';
+      refreshStatus.textContent = 'กำลังดึงข้อมูลล่าสุดและคำนวณหลายแผน ใช้เวลาประมาณ 20–90 วินาที';
       try {
         var response = await fetch('/refresh', {
           method: 'POST', headers: { 'Accept': 'application/json' }
@@ -388,14 +474,14 @@
       }
     });
   } else {
-    refreshLabel.textContent = 'ตรวจข้อมูลล่าสุด';
+    refreshLabel.textContent = refreshRequestUrl ? 'ขออัปเดตจาก FPL' : 'ตรวจข้อมูลล่าสุด';
     refreshForm.addEventListener('submit', async function (event) {
       event.preventDefault();
       refreshBtn.disabled = true;
       refreshBtn.classList.add('loading');
       refreshStatus.hidden = false;
       refreshStatus.className = 'refresh-status working';
-      refreshStatus.textContent = 'กำลังตรวจรายงานล่าสุดจากระบบ Cloud…';
+      refreshStatus.textContent = refreshRequestUrl ? 'เปิด GitHub เพื่อยืนยันคำขอ แล้วกลับมาหน้านี้ ระบบจะตรวจผลใหม่ให้อัตโนมัติ' : 'กำลังตรวจรายงานล่าสุดจากระบบ Cloud…';
       if (!navigator.onLine) {
         refreshStatus.className = 'refresh-status error';
         refreshStatus.textContent = 'ขณะนี้ออฟไลน์ จึงแสดงรายงานล่าสุดที่บันทึกไว้ในเครื่อง';
@@ -404,6 +490,31 @@
         return;
       }
       try {
+        if (refreshRequestUrl) {
+          window.open(refreshRequestUrl, '_blank', 'noopener');
+          refreshBtn.disabled = false;
+          refreshBtn.classList.remove('loading');
+          var attempts = 0;
+          var poll = setInterval(async function () {
+            attempts += 1;
+            try {
+              var check = await fetch('./summary.json?poll=' + Date.now(), { cache: 'no-store' });
+              var summary = await check.json();
+              if (summary.built_at_iso && summary.built_at_iso !== currentBuild) {
+                clearInterval(poll);
+                refreshStatus.className = 'refresh-status success';
+                refreshStatus.textContent = 'รายงานใหม่พร้อมแล้ว กำลังเปิด…';
+                location.replace('./index.html?updated=' + Date.now());
+              }
+            } catch (_) {}
+            if (attempts >= 40) {
+              clearInterval(poll);
+              refreshStatus.className = 'refresh-status working';
+              refreshStatus.textContent = 'งานอาจยังอยู่ในคิว กดตรวจอีกครั้งภายหลังได้';
+            }
+          }, 15000);
+          return;
+        }
         var latestUrl = './index.html?fresh=' + Date.now();
         var latest = await fetch(latestUrl, { cache: 'no-store' });
         if (!latest.ok) throw new Error('ยังตรวจรายงานล่าสุดไม่ได้');

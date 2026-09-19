@@ -86,6 +86,18 @@ class Plan:
 
 
 @dataclass
+class TransferScenario:
+    """A complete first-GW choice, comparable with holding the current squad."""
+
+    transfers: int
+    plan: Plan
+    variant: int = 1
+    objective_gain: float = 0.0
+    next_gw_gain: float = 0.0
+    recommended: bool = False
+
+
+@dataclass
 class TransferCandidate:
     """One affordable replacement for the selected weak link."""
 
@@ -289,7 +301,9 @@ def solve(ep_grid: pd.DataFrame, players: pd.DataFrame, current_squad: list[int]
           locked: list[int] | None = None,
           locked_out: list[int] | None = None,
           forced_first_move: tuple[int, int] | None = None,
-          hold_first_week: bool = False) -> Plan:
+          hold_first_week: bool = False,
+          exact_first_moves: int | None = None,
+          forbidden_first_buys: list[set[int]] | None = None) -> Plan:
     gws = list(ep_grid.columns)
     pool_size = int(cfg.get("planning", "candidate_pool", default=200))
     cand = choose_candidates(ep_grid, players, current_squad, pool_size)
@@ -306,6 +320,7 @@ def solve(ep_grid: pd.DataFrame, players: pd.DataFrame, current_squad: list[int]
     club = players.team.to_dict()
     ep = {(p, g): float(ep_grid.at[p, g]) if p in ep_grid.index else 0.0
           for p in cand for g in gws}
+    stable_rank = {p: rank for rank, p in enumerate(sorted(cand), start=1)}
 
     # What you would actually receive for the players you own. FPL gives back
     # only half of any price rise, so market value overstates your budget; the
@@ -364,6 +379,7 @@ def solve(ep_grid: pd.DataFrame, players: pd.DataFrame, current_squad: list[int]
                          for p in cand for slot in range(4))
             - HIT_COST * hits[g]
             - friction * pulp.lpSum(buy[p][g] for p in cand)
+            - 1e-6 * pulp.lpSum(stable_rank[p] * squad[p][g] for p in cand)
         )
         for i, g in enumerate(gws)
     )
@@ -441,7 +457,10 @@ def solve(ep_grid: pd.DataFrame, players: pd.DataFrame, current_squad: list[int]
         # the squad rather than improving it, and it is not what a manager who
         # wants a single considered move each week is asking for.
         if max_moves_gw is not None:
-            prob += moves <= max_moves_gw
+            cap_for_week = max_moves_gw
+            if i == 0 and exact_first_moves is not None:
+                cap_for_week = max(cap_for_week, int(exact_first_moves))
+            prob += moves <= cap_for_week
         if i == 0 and forced_first_move:
             out_id, in_id = forced_first_move
             if out_id not in cand or in_id not in cand:
@@ -450,6 +469,13 @@ def solve(ep_grid: pd.DataFrame, players: pd.DataFrame, current_squad: list[int]
             prob += buy[in_id][g] == 1
         elif i == 0 and hold_first_week:
             prob += moves == 0
+        if i == 0 and exact_first_moves is not None:
+            prob += moves == int(exact_first_moves)
+        if i == 0:
+            for forbidden in (forbidden_first_buys or []):
+                members = [buy[p][g] for p in forbidden if p in cand]
+                if members:
+                    prob += pulp.lpSum(members) <= len(forbidden) - 1
         if i == 0:
             prob += ft[g] == min(free_transfers, MAX_SAVED_TRANSFERS)
             prob += ft_overflow[g] == 0
@@ -470,7 +496,7 @@ def solve(ep_grid: pd.DataFrame, players: pd.DataFrame, current_squad: list[int]
     prob.solve(pulp.COIN_CMD(path=cbc_path, msg=False, timeLimit=time_limit))
     status = pulp.LpStatus[prob.status]
     log.info("solver finished: %s (%d candidates, %d gameweeks)", status, len(cand), len(gws))
-    if status in {"Infeasible", "Unbounded", "Undefined"}:
+    if status != "Optimal":
         raise RuntimeError(f"transfer plan has no usable solution: {status}")
 
     plans: list[GameweekPlan] = []
@@ -520,3 +546,47 @@ def solve(ep_grid: pd.DataFrame, players: pd.DataFrame, current_squad: list[int]
     return Plan(gameweeks=plans, status=status,
                 objective=float(pulp.value(prob.objective) or 0.0),
                 budget=budget, notes=notes)
+
+
+def solve_scenarios(ep_grid: pd.DataFrame, players: pd.DataFrame,
+                    current_squad: list[int], bank: float, free_transfers: int,
+                    cfg: Config, *, selling_price: dict[int, float] | None = None,
+                    locked: list[int] | None = None) -> list[TransferScenario]:
+    """Solve holding and each usable free-transfer count on the same horizon."""
+    maximum = min(MAX_SAVED_TRANSFERS, max(0, int(free_transfers)))
+    configured = int(cfg.get("planning", "scenario_max_transfers", default=maximum))
+    maximum = min(maximum, max(0, configured))
+    scenarios: list[TransferScenario] = []
+    alternatives = max(1, int(cfg.get("planning", "scenario_alternatives", default=2)))
+    for count in range(maximum + 1):
+        excluded: list[set[int]] = []
+        variants = 1 if count == 0 else alternatives
+        for variant in range(1, variants + 1):
+            try:
+                plan = solve(
+                    ep_grid, players, current_squad, bank, free_transfers, cfg,
+                    selling_price=selling_price, locked=locked,
+                    hold_first_week=count == 0, exact_first_moves=count,
+                    forbidden_first_buys=excluded,
+                )
+            except RuntimeError as exc:
+                log.warning("%d-transfer scenario variant %d unavailable: %s",
+                            count, variant, exc)
+                break
+            scenarios.append(TransferScenario(
+                transfers=count, plan=plan, variant=variant))
+            excluded.append(set(plan.gameweeks[0].buys))
+    if not scenarios:
+        raise RuntimeError("no transfer scenario has a usable optimal solution")
+    baseline = next((s for s in scenarios if s.transfers == 0), scenarios[0])
+    for scenario in scenarios:
+        scenario.objective_gain = scenario.plan.objective - baseline.plan.objective
+        scenario.next_gw_gain = (
+            scenario.plan.gameweeks[0].expected_points
+            - baseline.plan.gameweeks[0].expected_points
+        )
+    threshold = float(cfg.get("planning", "min_transfer_gain", default=3.0))
+    eligible = [s for s in scenarios if s.objective_gain >= threshold]
+    chosen = max(eligible or [baseline], key=lambda s: (s.plan.objective, -s.transfers))
+    chosen.recommended = True
+    return scenarios

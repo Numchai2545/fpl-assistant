@@ -16,9 +16,11 @@ planning:
   solver_time_limit: 180    # seconds; CBC stops and returns best found after this
   fallback_budget: 100.0    # used only when your squad cannot be read (GW1, private entry)
 
-  # The report recommends at most one out -> in decision per gameweek. The
-  # ranked Candidate list contains alternatives for that same squad slot.
+  # Future weeks stay conservative, while this week's scenario comparison can
+  # use every free transfer currently available.
   max_transfers_per_gw: 1
+  scenario_max_transfers: 5
+  scenario_alternatives: 2 # distinct complete plans for each transfer count
 
   # Judge a purchase over the player's next five actual fixtures, rather than
   # only the next gameweek. Blank and double gameweeks remain visible.
@@ -107,6 +109,10 @@ notify:
   # The calendar reminds you to double-click run_weekly.bat and review the data.
   remind_hours_before: [24]
   timezone: "Asia/Bangkok"
+  # Free mobile refresh: GitHub verifies the signed-in issue author, then the
+  # workflow fetches FPL with --fresh and republishes Pages. No token is in PWA.
+  refresh_request_url: "https://github.com/Numchai2545/fpl-assistant/issues/new?template=refresh.yml&title=%5Brefresh%5D+Update+FPL+report"
+  plan_request_url: "https://github.com/Numchai2545/fpl-assistant/issues/new?template=plan.yml"
 
 output:
   site_dir: "docs"              # generated local dashboard and calendar

@@ -18,7 +18,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from fplbot import backtest, features, model, notify, optimize, report
+from fplbot import backtest, features, model, notify, optimize, report, state
 from fplbot.config import (CLEAN_SHEET_POINTS, GOAL_POINTS, MAX_PER_CLUB,
                            MAX_SAVED_TRANSFERS, SQUAD_BY_POSITION, SQUAD_SIZE,
                            XI_SIZE, Config, load_config, verify_scoring)
@@ -1024,3 +1024,67 @@ class TestBacktestPipeline:
         assert "p.form.toFixed(1)" in html, "comparison rows must match all eight headers"
         summary = json.loads((cfg.site_dir / "summary.json").read_text(encoding="utf-8"))
         assert summary["gw"] == 5
+
+
+class TestVersion030:
+    def test_force_refresh_never_treats_cache_as_fresh(self, local_tmp_path):
+        cfg = Config(raw={"entry": {"team_id": 1},
+                          "planning": {"horizon": 1},
+                          "output": {"data_dir": str(local_tmp_path)}})
+        client = FPLClient(cfg, force_refresh=True)
+        path = local_tmp_path / "cached.json"
+        path.write_text("{}", encoding="utf-8")
+        assert client._cache_is_fresh(path) is False
+
+    def test_latest_same_gameweek_purchase_wins_by_time(self):
+        players = pd.DataFrame([{"id": 7, "price": 6.4,
+                                 "cost_change_start": 4}]).set_index("id")
+        transfers = [
+            {"event": 5, "time": "2026-09-19T12:00:00Z",
+             "element_in": 7, "element_in_cost": 62},
+            {"event": 5, "time": "2026-09-19T08:00:00Z",
+             "element_in": 7, "element_in_cost": 60},
+        ]
+        assert purchase_prices([7], transfers, players)[7] == 6.2
+        assert selling_prices([7], transfers, players)[7] == 6.3
+
+    def test_backtest_waits_until_every_fixture_is_finished(self, local_tmp_path):
+        cfg = Config(raw={"entry": {"team_id": 1}, "planning": {"horizon": 1},
+                          "output": {"data_dir": str(local_tmp_path)}})
+        folder = cfg.data_dir / "projections"
+        folder.mkdir(parents=True)
+        now = datetime.now(timezone.utc)
+        payload = {"schema_version": 1, "model_version": "test", "gw": 3,
+                   "built_at": (now - timedelta(days=2)).isoformat(),
+                   "deadline": (now - timedelta(days=1)).isoformat(),
+                   "players": [{"player_id": 9, "name": "Nine", "position": "MID",
+                                "model_ep": 5.0, "fpl_ep_next": 4.0}]}
+        (folder / "gw3.json").write_text(json.dumps(payload), encoding="utf-8")
+        result = backtest.evaluate_projections(
+            cfg, lambda _pid: {"history": [{"round": 3, "total_points": 2}]},
+            now=now, fixtures=[{"event": 3, "finished": False}])
+        assert result["gameweeks"] == 0
+
+    def test_scenarios_include_each_available_transfer_count(self):
+        players, ep = _synthetic_league()
+        squad = _legal_squad(players)
+        scenarios = optimize.solve_scenarios(
+            ep, players, squad, bank=2.0, free_transfers=2,
+            cfg=_cfg(scenario_max_transfers=5, scenario_alternatives=1))
+        assert [s.transfers for s in scenarios] == [0, 1, 2]
+        assert [len(s.plan.gameweeks[0].moves) for s in scenarios] == [0, 1, 2]
+        assert sum(s.recommended for s in scenarios) == 1
+
+    def test_selected_scenario_round_trip(self, local_tmp_path):
+        summary = local_tmp_path / "summary.json"
+        selected = local_tmp_path / "selected-plan.json"
+        summary.write_text(json.dumps({
+            "gw": 6, "built_at_iso": "2026-09-19T00:00:00+00:00",
+            "scenarios": [{"transfers": 0, "moves": [], "move_ids": []},
+                          {"transfers": 1, "moves": [{"out": "A", "in": "B"}],
+                           "move_ids": [{"out": 1, "in": 2}]}],
+        }), encoding="utf-8")
+        saved = state.select_scenario(summary, selected, 1)
+        assert saved["move_ids"] == [{"out": 1, "in": 2}]
+        assert state.load_selected(selected, 6)["transfers"] == 1
+        assert state.load_selected(selected, 7) is None

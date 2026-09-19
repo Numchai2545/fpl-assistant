@@ -1,0 +1,16 @@
+name: Save reviewed plan
+description: Save one dashboard scenario as the plan to keep across refreshes and devices.
+title: "[select-plan] GW0 scenario 0"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ตรวจชื่อ GW และหมายเลข scenario ในหัวข้อ แล้วกด **Submit new issue**
+        การเลือกนี้บันทึกเฉพาะแผนในรายงาน ไม่ทำรายการในบัญชี FPL
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Confirm
+      options:
+        - label: บันทึก scenario นี้เป็นแผนที่เลือก
+          required: true

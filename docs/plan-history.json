@@ -1,0 +1,56 @@
+[
+  {
+    "built_at": "2026-09-19T16:09:08.285048+00:00",
+    "fetched_at": "2026-09-19T13:42:03.758705+00:00",
+    "gw": 6,
+    "model_version": "0.3.0",
+    "moves": [
+      {
+        "out": "Cherki",
+        "in": "Rogers"
+      },
+      {
+        "out": "Ødegaard",
+        "in": "Schade"
+      }
+    ],
+    "expected_points": 48.57,
+    "headline": "พิจารณาย้าย 2 ตัว · กัปตัน Rogers"
+  },
+  {
+    "built_at": "2026-09-19T16:20:59.119051+00:00",
+    "fetched_at": "2026-09-19T16:20:57.865193+00:00",
+    "gw": 6,
+    "model_version": "0.3.0",
+    "moves": [
+      {
+        "out": "Maguire",
+        "in": "Tarkowski"
+      },
+      {
+        "out": "Cherki",
+        "in": "Schade"
+      }
+    ],
+    "expected_points": 55.81,
+    "headline": "พิจารณาย้าย 2 ตัว · กัปตัน Groß"
+  },
+  {
+    "built_at": "2026-09-19T16:23:15.562451+00:00",
+    "fetched_at": "2026-09-19T16:20:57.862401+00:00",
+    "gw": 6,
+    "model_version": "0.3.0",
+    "moves": [
+      {
+        "out": "Maguire",
+        "in": "Tarkowski"
+      },
+      {
+        "out": "Cherki",
+        "in": "Schade"
+      }
+    ],
+    "expected_points": 55.81,
+    "headline": "พิจารณาย้าย 2 ตัว · กัปตัน Groß"
+  }
+]

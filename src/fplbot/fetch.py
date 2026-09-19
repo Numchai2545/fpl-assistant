@@ -11,6 +11,7 @@ from __future__ import annotations
 import json
 import logging
 import math
+import shutil
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
@@ -54,10 +55,13 @@ class FPLClient:
     is only reused inside `cache_ttl_minutes`, or when offline.
     """
 
-    def __init__(self, cfg: Config, offline: bool = False):
+    def __init__(self, cfg: Config, offline: bool = False, force_refresh: bool = False):
         self.cfg = cfg
         self.offline = offline
+        self.force_refresh = force_refresh and not offline
         self.session = _session()
+        self.provenance: dict[str, dict[str, str]] = {}
+        self.run_stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
         stamp = datetime.now(timezone.utc).strftime("%Y-%m-%d")
         snapshots = cfg.data_dir / "snapshots"
         today = snapshots / stamp
@@ -80,6 +84,8 @@ class FPLClient:
     def _cache_is_fresh(self, path: Path) -> bool:
         if self.offline:
             return True
+        if self.force_refresh:
+            return False
         age = datetime.now(timezone.utc) - datetime.fromtimestamp(
             path.stat().st_mtime, tz=timezone.utc)
         if age <= self.ttl:
@@ -92,6 +98,11 @@ class FPLClient:
         cache_path = self.snapshot_dir / f"{cache_name}.json" if cache_name else None
         if cache_path and cache_path.exists() and self._cache_is_fresh(cache_path):
             log.debug("cache hit %s", cache_path.name)
+            fetched = datetime.fromtimestamp(cache_path.stat().st_mtime, tz=timezone.utc)
+            self.provenance[cache_name or path] = {
+                "source": "offline" if self.offline else "cache",
+                "fetched_at": fetched.isoformat(),
+            }
             return json.loads(cache_path.read_text(encoding="utf-8"))
         if self.offline:
             raise RuntimeError(
@@ -104,6 +115,12 @@ class FPLClient:
         payload = resp.json()
         if cache_path:
             cache_path.write_text(json.dumps(payload), encoding="utf-8")
+            archive = self.snapshot_dir / "runs" / self.run_stamp / cache_path.name
+            archive.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(cache_path, archive)
+            self.provenance[cache_name or path] = {
+                "source": "network", "fetched_at": datetime.now(timezone.utc).isoformat(),
+            }
         return payload
 
     # ------------------------------------------------------------- league data
@@ -140,6 +157,10 @@ class FPLClient:
         """
         tid = team_id or self.cfg.team_id
         return self._get(f"entry/{tid}/transfers/", "entry_transfers")
+
+    def event_live(self, event: int) -> dict:
+        """Live points for a started gameweek; provisional until every match finishes."""
+        return self._get(f"event/{event}/live/", f"live_gw{event}")
 
 
 # ------------------------------------------------------------------ gameweeks
@@ -254,7 +275,11 @@ def purchase_prices(squad: list[int], transfers: list[dict] | None, players) -> 
       season-start price, which is `now_cost` minus `cost_change_start`.
     """
     bought_at: dict[int, float] = {}
-    for row in sorted(transfers or [], key=lambda r: r.get("event") or 0):
+    for row in sorted(
+        transfers or [],
+        key=lambda r: (int(r.get("event") or 0), str(r.get("time") or ""),
+                       int(r.get("element_in") or 0)),
+    ):
         pid = int(row["element_in"])
         bought_at[pid] = int(row["element_in_cost"]) / 10.0
 

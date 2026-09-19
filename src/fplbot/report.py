@@ -10,6 +10,7 @@ import json
 import shutil
 from datetime import datetime, timezone
 from pathlib import Path
+from urllib.parse import quote
 from zoneinfo import ZoneInfo
 
 import pandas as pd
@@ -18,7 +19,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 from .config import POSITIONS, Config
 from .optimize import outlook_by_player
 
-MODEL_VERSION = "0.2.0"
+MODEL_VERSION = "0.3.0"
 WEB_DIR = Path(__file__).resolve().parents[2] / "web"
 
 
@@ -218,10 +219,9 @@ def player_comparisons(cfg: Config, ep_rows: pd.DataFrame, players: pd.DataFrame
                 legal_ids.append(other_id)
         ranked = sorted(legal_ids, key=lambda p: totals.get(p, 0.0), reverse=True)
         selected_rank = ranked.index(pid) + 1 if pid in ranked else len(ranked) + 1
-        shown = ranked[:limit]
-        if pid not in shown:
-            shown.append(pid)
-        rows = [row(other_id, other_id == pid) for other_id in shown]
+        # Send the complete legal set. Sorting in the browser must not be limited
+        # to the players that happened to rank highest by EP first.
+        rows = [row(other_id, other_id == pid) for other_id in ranked]
         rows.sort(key=lambda item: item["ep"], reverse=True)
         for item in rows:
             item["gain"] = item["ep"] - float(totals.get(pid, 0.0))
@@ -238,7 +238,9 @@ def build_context(*, cfg: Config, bootstrap: dict, teams: pd.DataFrame,
                   players: pd.DataFrame, ep_rows: pd.DataFrame, ep_grid: pd.DataFrame,
                   plan, entry: dict, current_squad: list[int], free_transfers: int,
                   bank: float, squad_value: float, event: dict,
-                  transfer_advice, selling_price: dict[int, float]) -> dict:
+                  transfer_advice, selling_price: dict[int, float],
+                  scenarios=None, provenance: dict | None = None,
+                  live: dict | None = None) -> dict:
     gw = int(event["id"])
     horizon_gws = list(ep_grid.columns)
     tz = ZoneInfo(cfg.get("notify", "timezone", default="Asia/Bangkok"))
@@ -253,15 +255,17 @@ def build_context(*, cfg: Config, bootstrap: dict, teams: pd.DataFrame,
     id_to_name = players.name.to_dict()
 
     # ---- pitch -----------------------------------------------------------
-    def card(pid: int) -> dict:
+    def card(pid: int, captain: int | None = None, vice: int | None = None) -> dict:
         rows = this_gw[this_gw.player_id == pid]
+        captain = first.captain if captain is None else captain
+        vice = first.vice if vice is None else vice
         return {
             "id": pid,
             "name": id_to_name.get(pid, str(pid)),
             "ep": float(ep_this.get(pid, 0.0)),
             "opponent": _opponent_label(rows, teams),
-            "is_captain": pid == first.captain,
-            "is_vice": pid == first.vice,
+            "is_captain": pid == captain,
+            "is_vice": pid == vice,
             "position": POSITIONS[int(players.element_type.get(pid, 3))],
         }
 
@@ -276,6 +280,32 @@ def build_context(*, cfg: Config, bootstrap: dict, teams: pd.DataFrame,
     }
     formation = (f"{formation_counts['DEF']}-{formation_counts['MID']}-"
                  f"{formation_counts['FWD']}")
+
+    scenario_cards = []
+    plan_request_base = cfg.get("notify", "plan_request_url", default="") or ""
+    for index, scenario in enumerate(scenarios or []):
+        week = scenario.plan.gameweeks[0]
+        cards = [card(p, week.captain, week.vice) for p in week.xi]
+        counts = {pos: sum(int(players.element_type[p]) == pos for p in week.xi)
+                  for pos in (2, 3, 4)}
+        scenario_cards.append({
+            "index": index, "transfers": scenario.transfers,
+            "variant": scenario.variant,
+            "recommended": scenario.recommended,
+            "objective_gain": scenario.objective_gain,
+            "next_gw_gain": scenario.next_gw_gain,
+            "formation": f"{counts[2]}-{counts[3]}-{counts[4]}",
+            "pitch_rows": [[c for c in cards if c["position"] == pos]
+                           for pos in ("GKP", "DEF", "MID", "FWD")],
+            "bench_gk": [card(p, week.captain, week.vice) for p in week.bench_gk],
+            "bench_outfield": [card(p, week.captain, week.vice) for p in week.bench_outfield],
+            "captain": id_to_name.get(week.captain, "—"),
+            "moves": [{"out": id_to_name.get(o, str(o)),
+                       "in": id_to_name.get(i, str(i))} for o, i in week.moves],
+            "move_ids": [{"out": int(o), "in": int(i)} for o, i in week.moves],
+            "select_url": (f"{plan_request_base}&title={quote(f'[select-plan] GW{gw} scenario {index}')}"
+                           if plan_request_base else ""),
+        })
 
     # ---- captain shortlist ----------------------------------------------
     cap_pool = (this_gw[this_gw.player_id.isin(first.xi)]
@@ -312,6 +342,7 @@ def build_context(*, cfg: Config, bootstrap: dict, teams: pd.DataFrame,
         }
 
     transfer_candidates = []
+    chosen_incoming = {incoming for _, incoming in first.moves}
     for rank, candidate in enumerate(transfer_advice.candidates, start=1):
         incoming = players.loc[candidate.in_id]
         fixture_labels = [
@@ -320,6 +351,11 @@ def build_context(*, cfg: Config, bootstrap: dict, teams: pd.DataFrame,
             for fx in candidate.fixtures
         ]
         ownership = pd.to_numeric(incoming.selected_by_percent, errors="coerce")
+        candidate_rows = ep_rows[ep_rows.player_id == candidate.in_id]
+        component_cols = ["ep_minutes", "ep_goals", "ep_assists", "ep_clean_sheet",
+                          "ep_defcon", "ep_bonus", "ep_saves", "ep_cards", "ep_conceded"]
+        components = {name.removeprefix("ep_"): float(candidate_rows[name].head(outlook_matches).sum())
+                      for name in component_cols if name in candidate_rows}
         transfer_candidates.append({
             "rank": rank, "name": incoming["name"], "team": incoming.team_name,
             "price": float(incoming.price),
@@ -329,25 +365,28 @@ def build_context(*, cfg: Config, bootstrap: dict, teams: pd.DataFrame,
             "ep_next": float(ep_this.get(candidate.in_id, 0.0)),
             "ep": candidate.in_ep, "gain": candidate.gain,
             "net_gain": candidate.net_gain, "fixtures": fixture_labels,
-            "recommended": rank == 1 and transfer_advice.recommend,
+            "recommended": candidate.in_id in chosen_incoming,
             "price_signal": str(incoming.get("price_change_signal", "stable")),
             "price_risk": float(incoming.get("price_risk_score", 0.0)),
+            "components": components,
         })
 
     # ---- this week's action ----------------------------------------------
-    moves = []
-    if transfer_advice.recommend and out_id is not None and transfer_advice.candidates:
-        in_id = transfer_advice.candidates[0].in_id
-        moves = [{"out": id_to_name.get(out_id, str(out_id)),
-                  "in_": id_to_name.get(in_id, str(in_id)),
-                  "in": id_to_name.get(in_id, str(in_id))}]
+    moves = [{"out": id_to_name.get(o, str(o)), "in_": id_to_name.get(i, str(i)),
+              "in": id_to_name.get(i, str(i))} for o, i in first.moves]
     captain_name = id_to_name.get(first.captain, "—")
     if moves:
-        headline = f"พิจารณา {moves[0]['out']} → {moves[0]['in_']} · กัปตัน {captain_name}"
-        detail = f"{transfer_advice.reason}. คาดการณ์ {first.expected_points:.0f} แต้มใน GW{gw}"
-        recommended = transfer_candidates[0]
+        if len(moves) == 1:
+            headline = f"พิจารณา {moves[0]['out']} → {moves[0]['in_']} · กัปตัน {captain_name}"
+        else:
+            headline = f"พิจารณาย้าย {len(moves)} ตัว · กัปตัน {captain_name}"
+        selected_scenario = next((s for s in scenario_cards if s["recommended"]), None)
+        gain_text = (f"ดีกว่าแผนไม่ย้าย {selected_scenario['objective_gain']:.1f} คะแนนแผนสุทธิ"
+                     if selected_scenario else transfer_advice.reason)
+        detail = f"{gain_text}. คาดการณ์ {first.expected_points:.0f} แต้มใน GW{gw}"
+        recommended = next((p for p in transfer_candidates if p["recommended"]), None)
         urgency = []
-        if recommended["price_signal"] == "rising" and recommended["price_risk"] >= 0.5:
+        if recommended and recommended["price_signal"] == "rising" and recommended["price_risk"] >= 0.5:
             urgency.append(f"{recommended['name']} มีแรงซื้อสูงและเสี่ยงขึ้นราคา")
         if transfer_out and transfer_out["price_signal"] == "falling":
             urgency.append(f"{transfer_out['name']} มีแรงขายสูงและเสี่ยงลงราคา")
@@ -357,6 +396,18 @@ def build_context(*, cfg: Config, bootstrap: dict, teams: pd.DataFrame,
         headline = f"แนะนำให้เก็บ transfer · กัปตัน {captain_name}"
         detail = f"{transfer_advice.reason}. คาดการณ์ {first.expected_points:.0f} แต้มใน GW{gw}"
     action = {"headline": headline, "detail": detail, "moves": moves}
+
+    clashes = []
+    proposed = set(first.squad)
+    for attacker in proposed:
+        if attacker not in players.index or int(players.element_type[attacker]) not in (3, 4):
+            continue
+        opponents = set(this_gw[this_gw.player_id == attacker].opponent.astype(int).tolist())
+        for defender in proposed:
+            if defender not in players.index or int(players.element_type[defender]) not in (1, 2):
+                continue
+            if int(players.team[defender]) in opponents:
+                clashes.append(f"{id_to_name[attacker]} เกมรุก พบแนวรับของ {id_to_name[defender]}")
 
     # ---- the horizon plan -------------------------------------------------
     max_ep = max((w.expected_points for w in plan.gameweeks), default=1.0) or 1.0
@@ -412,11 +463,51 @@ def build_context(*, cfg: Config, bootstrap: dict, teams: pd.DataFrame,
     if history.get("current"):
         last_gw_points = history["current"][-1].get("points", 0)
 
+    fetched_values = [v.get("fetched_at") for v in (provenance or {}).values()
+                      if v.get("fetched_at")]
+    built_iso = datetime.now(timezone.utc).isoformat()
+    fetched_iso = max(fetched_values) if fetched_values else built_iso
+    try:
+        fetched_human = _thai_datetime(
+            datetime.fromisoformat(fetched_iso).astimezone(tz))
+    except ValueError:
+        fetched_human = fetched_iso
+    previous = None
+    history_path = cfg.site_dir / "plan-history.json"
+    if history_path.exists():
+        try:
+            rows = json.loads(history_path.read_text(encoding="utf-8"))
+            previous = rows[-1] if rows else None
+        except (OSError, ValueError, TypeError):
+            previous = None
+    signature = [{"out": m["out"], "in": m["in"]} for m in moves]
+    if previous and previous.get("moves") == signature:
+        delta = first.expected_points - float(previous.get("expected_points", first.expected_points))
+        plan_change = f"แผนหลักยังเหมือนรายงานครั้งก่อน · EP GW นี้เปลี่ยน {delta:+.1f}"
+    elif previous:
+        old = previous.get("headline", "แผนเดิม")
+        plan_change = f"แผนหลักเปลี่ยนจาก “{old}” หลังดึงข้อมูลและคำนวณทุก scenario ใหม่"
+    else:
+        plan_change = "นี่คือแผนฐานฉบับแรกที่บันทึกไว้"
+
+    sources = sorted({v.get("source", "unknown") for v in (provenance or {}).values()})
+    source_label = ({"network"} if set(sources) == {"network"} else set(sources))
+    if source_label == {"network"}:
+        data_status = "ข้อมูลสดจาก FPL"
+    elif "offline" in sources:
+        data_status = "ข้อมูลออฟไลน์ที่บันทึกไว้"
+    elif "cache" in sources:
+        data_status = "ข้อมูลแคช"
+    else:
+        data_status = "ไม่ทราบที่มาข้อมูล"
+
     return {
         "title": cfg.get("output", "title", default="FPL Assistant"),
         "gw": gw, "horizon": len(horizon_gws), "horizon_gws": horizon_gws,
         "captain_name": captain_name,
-        "built_at": _thai_datetime(datetime.now(tz)),
+        "built_at": _thai_datetime(datetime.now(tz)), "built_at_iso": built_iso,
+        "fetched_at_iso": fetched_iso, "fetched_at_human": fetched_human,
+        "data_sources": sources, "data_status": data_status,
         "deadline_iso": deadline.isoformat(),
         "deadline_human": f"{int(hours_left // 24)}d {int(hours_left % 24)}h" if hours_left >= 24
                           else f"{int(hours_left)}h",
@@ -439,6 +530,9 @@ def build_context(*, cfg: Config, bootstrap: dict, teams: pd.DataFrame,
         "fixture_grid": fixture_grid, "flags": flags[:10], "alerts": alerts,
         "chip_signals": chips,
         "player_comparisons": comparisons,
+        "scenario_cards": scenario_cards, "plan_change": plan_change,
+        "clashes": sorted(set(clashes)), "live": live,
+        "refresh_request_url": cfg.get("notify", "refresh_request_url", default="") or "",
         "site_url": (cfg.get("notify", "site_url", default="") or "").rstrip("/"),
         "remind_hours": [int(h) for h in cfg.get(
             "notify", "remind_hours_before", default=[24])],
@@ -449,9 +543,22 @@ def build_context(*, cfg: Config, bootstrap: dict, teams: pd.DataFrame,
 def render(context: dict, cfg: Config) -> Path:
     out_dir = cfg.site_dir
     out_dir.mkdir(parents=True, exist_ok=True)
+    # Keep render() useful for lightweight callers and older saved contexts.
+    context.setdefault("built_at_iso", datetime.now(timezone.utc).isoformat())
+    context.setdefault("fetched_at_iso", context["built_at_iso"])
+    context.setdefault("fetched_at_human", context.get("built_at", context["built_at_iso"]))
+    context.setdefault("data_sources", ["unknown"])
+    context.setdefault("data_status", "ไม่ทราบที่มาข้อมูล")
+    context.setdefault("scenario_cards", [])
+    context.setdefault("plan_change", "")
+    context.setdefault("clashes", [])
+    context.setdefault("live", None)
+    context.setdefault("refresh_request_url", "")
     html = _env().get_template("template.html").render(**context)
     index = out_dir / "index.html"
-    index.write_text(html, encoding="utf-8")
+    index_tmp = out_dir / "index.html.tmp"
+    index_tmp.write_text(html, encoding="utf-8")
+    index_tmp.replace(index)
 
     for asset in ("manifest.webmanifest", "sw.js", "icon.svg",
                   "icon-180.png", "icon-512.png", "sports-ui.css"):
@@ -463,7 +570,7 @@ def render(context: dict, cfg: Config) -> Path:
     # The captain comes from the plan, not from the captain shortlist: the
     # shortlist is sorted by expected points and can disagree with the armband
     # the solver actually chose, and the alert must match the dashboard.
-    (out_dir / "summary.json").write_text(json.dumps({
+    summary = {
         "gw": context["gw"], "deadline": context["deadline_iso"],
         "deadline_local": context["deadline_local"],
         "headline": context["action"]["headline"], "detail": context["action"]["detail"],
@@ -477,6 +584,35 @@ def render(context: dict, cfg: Config) -> Path:
             "ep": round(p["ep"], 2), "gain": round(p["gain"], 2),
             "fixtures": p["fixtures"],
         } for p in context["transfer_candidates"]],
-        "built_at": context["built_at"],
-    }, indent=2, ensure_ascii=False), encoding="utf-8")
+        "built_at": context["built_at"], "built_at_iso": context["built_at_iso"],
+        "fetched_at": context["fetched_at_iso"],
+        "data_sources": context["data_sources"], "model_version": MODEL_VERSION,
+        "plan_change": context["plan_change"], "scenarios": [{
+            "transfers": s["transfers"], "variant": s["variant"],
+            "recommended": s["recommended"],
+            "objective_gain": round(s["objective_gain"], 3),
+            "next_gw_gain": round(s["next_gw_gain"], 3), "moves": s["moves"],
+            "move_ids": s["move_ids"],
+        } for s in context["scenario_cards"]],
+    }
+    summary_path = out_dir / "summary.json"
+    summary_tmp = out_dir / "summary.json.tmp"
+    summary_tmp.write_text(json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8")
+    summary_tmp.replace(summary_path)
+
+    history_path = out_dir / "plan-history.json"
+    try:
+        history = json.loads(history_path.read_text(encoding="utf-8")) if history_path.exists() else []
+    except (OSError, ValueError, TypeError):
+        history = []
+    history.append({
+        "built_at": context["built_at_iso"], "fetched_at": context["fetched_at_iso"],
+        "gw": context["gw"], "model_version": MODEL_VERSION,
+        "moves": [{"out": m["out"], "in": m["in_"]} for m in context["action"]["moves"]],
+        "expected_points": round(float(context["this_gw_ep"]), 3),
+        "headline": context["action"]["headline"],
+    })
+    history_tmp = out_dir / "plan-history.json.tmp"
+    history_tmp.write_text(json.dumps(history[-100:], indent=2, ensure_ascii=False), encoding="utf-8")
+    history_tmp.replace(history_path)
     return index

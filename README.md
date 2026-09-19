@@ -28,7 +28,7 @@ That writes `docs/index.html` (the dashboard, in Thai) and `docs/deadlines.ics`
 (a calendar reminder 24 hours before each deadline). On Windows, double-click
 `เปิดเว็บ FPL.bat` to open the web dashboard, then use its update button.
 
-Run the tests with `python -m pytest tests/ -q` — 96 of them, about five
+Run the tests with `python -m pytest tests/ -q` — the suite takes about five
 seconds, no network needed.
 
 **No network to the FPL API?** Seed a frozen dataset first and work offline:
@@ -65,7 +65,7 @@ Add `-v` before the subcommand for debug logging: `python -m fplbot -v build`.
 fetch.py         official FPL API  ->  data/snapshots/<date>/*.json
 features.py      raw JSON          ->  player rates, team strength, fixture schedule
 model.py         rates + fixtures  ->  expected points per player per gameweek
-optimize.py      EP + prices       ->  one decision and ranked replacements
+optimize.py      EP + prices       ->  hold / multi-transfer scenarios
 report.py        the analysis      ->  docs/index.html + docs/summary.json
 calendar_feed.py the fixture list  ->  docs/deadlines.ics
 ```
@@ -109,14 +109,14 @@ fixtures. The report selects the squad slot with the largest upgrade and shows
 the best three or four same-position replacements that fit the bank and
 three-per-club rule. Ownership is displayed but never changes the ranking.
 
-A routine transfer is recommended only when the best replacement adds at least
-3.0 expected points across those five fixtures. Otherwise the report says to
-bank the transfer. It recommends at most one pair per gameweek. A -4 hit is
-reserved for an unavailable projected starter with no legal bench cover, and
-must still add 3.0 points after the hit.
+A scenario is recommended only when it adds at least 3.0 expected points over
+the common planning horizon. The dashboard always compares holding with using
+each available free-transfer count, while the Candidate table explains the
+same-position five-fixture alternatives. Paid moves remain outside the normal
+scenario list and are reserved for explicit emergency analysis.
 
 The integer programme (`PuLP` + CBC) then builds a legal squad, XI, bench order,
-captain and vice-captain consistent with that one decision.
+captain and vice-captain consistently for every scenario.
 
 Constraints, all enforced simultaneously:
 
@@ -124,7 +124,7 @@ Constraints, all enforced simultaneously:
 - an XI of 11 with at least 1 GKP, 3 DEF, 2 MID, 1 FWD
 - budget: actual transfer cash flow using reconstructed selling prices
 - one free transfer per gameweek, banked up to five
-- at most one recommended transfer in the report
+- hold plus 1..N free-transfer scenarios, up to the current bank
 - squad continuity: each gameweek's fifteen is the previous fifteen, plus buys, minus sells
 
 ---
@@ -160,13 +160,15 @@ button to fetch current data and rebuild the analysis.
 * **iPhone** — open the dashboard, tap *เพิ่มลงปฏิทิน*, then *Add All*.
 * **Android** — import `docs/deadlines.ics` into Google Calendar.
 
-There is no scheduled refresh, Telegram delivery or FPL account automation.
+GitHub Pages also supports a free, queued mobile refresh request. It opens a
+GitHub issue that only the repository owner can use to trigger a fresh build;
+no token is stored in the PWA and no FPL account action is automated.
 
 ---
 
 ## Calibration and remaining roadmap
 
-Version 0.2 now blends recent match histories into expected minutes, assigns the
+Version 0.3 blends recent match histories into expected minutes, assigns the
 four bench slots explicitly, freezes pre-deadline projections for leakage-safe
 backtesting, quantifies Double Gameweek chip upside, and flags price pressure
 without letting it affect candidate ranking.

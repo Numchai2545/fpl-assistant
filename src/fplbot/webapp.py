@@ -75,7 +75,7 @@ class DashboardHandler(SimpleHTTPRequestHandler):
         config_path = getattr(self.server, "config_path", None)
         if config_path:
             command.extend(["--config", config_path])
-        command.append("build")
+        command.extend(["build", "--fresh"])
         project_dir = getattr(self.server, "project_dir")
         try:
             result = subprocess.run(
