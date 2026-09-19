@@ -17,7 +17,7 @@
   ],
   "alerts": [],
   "expected_points": 55.81,
-  "site_url": "",
+  "site_url": "https://Numchai2545.github.io/fpl-assistant",
   "candidates": [
     {
       "rank": 1,
@@ -76,11 +76,11 @@
       ]
     }
   ],
-  "built_at": "เสาร์ 19 ก.ย. 2569, 23:23 น.",
-  "built_at_iso": "2026-09-19T16:23:15.562451+00:00",
-  "fetched_at": "2026-09-19T16:20:57.862401+00:00",
+  "built_at": "เสาร์ 19 ก.ย. 2569, 23:33 น.",
+  "built_at_iso": "2026-09-19T16:33:13.555157+00:00",
+  "fetched_at": "2026-09-19T16:33:12.890776+00:00",
   "data_sources": [
-    "cache"
+    "network"
   ],
   "model_version": "0.3.0",
   "plan_change": "แผนหลักยังเหมือนรายงานครั้งก่อน · EP GW นี้เปลี่ยน +0.0",
