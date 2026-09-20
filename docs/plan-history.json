@@ -106,5 +106,23 @@
     ],
     "expected_points": 57.42,
     "headline": "พิจารณาย้าย 2 ตัว · กัปตัน Saka"
+  },
+  {
+    "built_at": "2026-09-20T17:27:29.724422+00:00",
+    "fetched_at": "2026-09-20T17:27:28.670964+00:00",
+    "gw": 6,
+    "model_version": "0.3.0",
+    "moves": [
+      {
+        "out": "Gabriel",
+        "in": "Tarkowski"
+      },
+      {
+        "out": "João Pedro",
+        "in": "Isak"
+      }
+    ],
+    "expected_points": 67.15,
+    "headline": "พิจารณาย้าย 2 ตัว · กัปตัน Haaland"
   }
 ]
