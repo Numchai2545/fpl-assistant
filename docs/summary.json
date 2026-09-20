@@ -3,7 +3,7 @@
   "deadline": "2026-10-10T10:00:00+00:00",
   "deadline_local": "เสาร์ 10 ต.ค. 2569, 17:00 น.",
   "headline": "พิจารณาย้าย 2 ตัว · กัปตัน Saka",
-  "detail": "ดีกว่าแผนไม่ย้าย 12.7 คะแนนแผนสุทธิ. คาดการณ์ 56 แต้มใน GW6",
+  "detail": "ดีกว่าแผนไม่ย้าย 13.3 คะแนนแผนสุทธิ. คาดการณ์ 57 แต้มใน GW6",
   "captain": "Saka",
   "moves": [
     {
@@ -16,15 +16,15 @@
     }
   ],
   "alerts": [],
-  "expected_points": 56.02,
+  "expected_points": 57.42,
   "site_url": "https://Numchai2545.github.io/fpl-assistant",
   "candidates": [
     {
       "rank": 1,
       "name": "Schade",
       "price": 6.1,
-      "ep": 27.22,
-      "gain": 13.55,
+      "ep": 27.55,
+      "gain": 13.53,
       "fixtures": [
         "GW6 AVL (A) [4]",
         "GW7 LIV (H) [4]",
@@ -37,8 +37,8 @@
       "rank": 2,
       "name": "Rogers",
       "price": 7.7,
-      "ep": 26.4,
-      "gain": 12.73,
+      "ep": 26.78,
+      "gain": 12.75,
       "fixtures": [
         "GW6 BOU (H) [3]",
         "GW7 EVE (A) [3]",
@@ -51,8 +51,8 @@
       "rank": 3,
       "name": "Mbeumo",
       "price": 7.9,
-      "ep": 26.07,
-      "gain": 12.4,
+      "ep": 26.52,
+      "gain": 12.49,
       "fixtures": [
         "GW6 TOT (H) [3]",
         "GW7 LEE (A) [3]",
@@ -65,8 +65,8 @@
       "rank": 4,
       "name": "Szoboszlai",
       "price": 7.0,
-      "ep": 23.79,
-      "gain": 10.12,
+      "ep": 24.1,
+      "gain": 10.07,
       "fixtures": [
         "GW6 MCI (H) [4]",
         "GW7 BRE (A) [3]",
@@ -76,14 +76,14 @@
       ]
     }
   ],
-  "built_at": "อาทิตย์ 20 ก.ย. 2569, 00:16 น.",
-  "built_at_iso": "2026-09-19T17:16:21.746585+00:00",
-  "fetched_at": "2026-09-19T17:16:20.260834+00:00",
+  "built_at": "อาทิตย์ 20 ก.ย. 2569, 14:43 น.",
+  "built_at_iso": "2026-09-20T07:43:45.690426+00:00",
+  "fetched_at": "2026-09-20T07:43:44.181338+00:00",
   "data_sources": [
     "network"
   ],
   "model_version": "0.3.0",
-  "plan_change": "แผนหลักเปลี่ยนจาก “พิจารณาย้าย 2 ตัว · กัปตัน Groß” หลังดึงข้อมูลและคำนวณทุก scenario ใหม่",
+  "plan_change": "แผนหลักยังเหมือนรายงานครั้งก่อน · EP GW นี้เปลี่ยน +1.4",
   "scenarios": [
     {
       "transfers": 0,
@@ -98,8 +98,8 @@
       "transfers": 1,
       "variant": 1,
       "recommended": false,
-      "objective_gain": 7.457,
-      "next_gw_gain": 2.53,
+      "objective_gain": 7.628,
+      "next_gw_gain": 2.59,
       "moves": [
         {
           "out": "Cherki",
@@ -117,8 +117,8 @@
       "transfers": 1,
       "variant": 2,
       "recommended": false,
-      "objective_gain": 6.791,
-      "next_gw_gain": 2.88,
+      "objective_gain": 6.827,
+      "next_gw_gain": 2.96,
       "moves": [
         {
           "out": "Cherki",
@@ -136,8 +136,8 @@
       "transfers": 2,
       "variant": 1,
       "recommended": true,
-      "objective_gain": 12.697,
-      "next_gw_gain": 4.03,
+      "objective_gain": 13.32,
+      "next_gw_gain": 4.35,
       "moves": [
         {
           "out": "Gabriel",
@@ -163,26 +163,26 @@
       "transfers": 2,
       "variant": 2,
       "recommended": false,
-      "objective_gain": 12.41,
-      "next_gw_gain": 4.08,
+      "objective_gain": 13.021,
+      "next_gw_gain": 4.28,
       "moves": [
         {
-          "out": "Maguire",
-          "in": "Tarkowski"
+          "out": "Gabriel",
+          "in": "De Cuyper"
         },
         {
           "out": "Cherki",
-          "in": "Schade"
+          "in": "Saka"
         }
       ],
       "move_ids": [
         {
-          "out": 418,
-          "in": 229
+          "out": 4,
+          "in": 115
         },
         {
           "out": 399,
-          "in": 94
+          "in": 12
         }
       ]
     }

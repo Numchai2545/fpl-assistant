@@ -88,5 +88,23 @@
     ],
     "expected_points": 56.02,
     "headline": "พิจารณาย้าย 2 ตัว · กัปตัน Saka"
+  },
+  {
+    "built_at": "2026-09-20T07:43:45.690426+00:00",
+    "fetched_at": "2026-09-20T07:43:44.181338+00:00",
+    "gw": 6,
+    "model_version": "0.3.0",
+    "moves": [
+      {
+        "out": "Gabriel",
+        "in": "Hall"
+      },
+      {
+        "out": "Cherki",
+        "in": "Saka"
+      }
+    ],
+    "expected_points": 57.42,
+    "headline": "พิจารณาย้าย 2 ตัว · กัปตัน Saka"
   }
 ]
