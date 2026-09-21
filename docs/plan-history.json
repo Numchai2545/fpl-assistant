@@ -142,5 +142,23 @@
     ],
     "expected_points": 66.96,
     "headline": "พิจารณาย้าย 2 ตัว · กัปตัน Haaland"
+  },
+  {
+    "built_at": "2026-09-21T19:23:04.513166+00:00",
+    "fetched_at": "2026-09-21T19:23:03.000775+00:00",
+    "gw": 6,
+    "model_version": "0.3.0",
+    "moves": [
+      {
+        "out": "Cherki",
+        "in": "Schade"
+      },
+      {
+        "out": "João Pedro",
+        "in": "Isak"
+      }
+    ],
+    "expected_points": 67.23,
+    "headline": "พิจารณาย้าย 2 ตัว · กัปตัน Haaland"
   }
 ]
