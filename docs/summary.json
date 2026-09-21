@@ -3,7 +3,7 @@
   "deadline": "2026-10-10T10:00:00+00:00",
   "deadline_local": "เสาร์ 10 ต.ค. 2569, 17:00 น.",
   "headline": "พิจารณาย้าย 2 ตัว · กัปตัน Haaland",
-  "detail": "ดีกว่าแผนไม่ย้าย 8.7 คะแนนแผนสุทธิ. คาดการณ์ 67 แต้มใน GW6. ราคา: João Pedro มีแรงขายสูงและเสี่ยงลงราคา",
+  "detail": "ดีกว่าแผนไม่ย้าย 9.1 คะแนนแผนสุทธิ. คาดการณ์ 67 แต้มใน GW6. ราคา: João Pedro มีแรงขายสูงและเสี่ยงลงราคา",
   "captain": "Haaland",
   "moves": [
     {
@@ -16,15 +16,15 @@
     }
   ],
   "alerts": [],
-  "expected_points": 67.15,
+  "expected_points": 66.96,
   "site_url": "https://Numchai2545.github.io/fpl-assistant",
   "candidates": [
     {
       "rank": 1,
       "name": "Brobbey",
       "price": 5.7,
-      "ep": 29.45,
-      "gain": 10.07,
+      "ep": 28.85,
+      "gain": 9.48,
       "fixtures": [
         "GW6 BHA (H) [2]",
         "GW7 BOU (A) [3]",
@@ -36,7 +36,7 @@
     {
       "rank": 2,
       "name": "Kostoulas",
-      "price": 5.5,
+      "price": 5.6,
       "ep": 27.57,
       "gain": 8.2,
       "fixtures": [
@@ -65,8 +65,8 @@
       "rank": 4,
       "name": "Havertz",
       "price": 7.6,
-      "ep": 25.34,
-      "gain": 5.97,
+      "ep": 24.89,
+      "gain": 5.52,
       "fixtures": [
         "GW6 LEE (H) [2]",
         "GW7 NFO (A) [3]",
@@ -76,14 +76,14 @@
       ]
     }
   ],
-  "built_at": "จันทร์ 21 ก.ย. 2569, 00:27 น.",
-  "built_at_iso": "2026-09-20T17:27:29.724422+00:00",
-  "fetched_at": "2026-09-20T17:27:28.670964+00:00",
+  "built_at": "จันทร์ 21 ก.ย. 2569, 14:56 น.",
+  "built_at_iso": "2026-09-21T07:56:01.253229+00:00",
+  "fetched_at": "2026-09-21T07:55:59.759152+00:00",
   "data_sources": [
     "network"
   ],
   "model_version": "0.3.0",
-  "plan_change": "แผนหลักเปลี่ยนจาก “พิจารณาย้าย 2 ตัว · กัปตัน Saka” หลังดึงข้อมูลและคำนวณทุก scenario ใหม่",
+  "plan_change": "แผนหลักยังเหมือนรายงานครั้งก่อน · EP GW นี้เปลี่ยน -0.2",
   "scenarios": [
     {
       "transfers": 0,
@@ -98,7 +98,7 @@
       "transfers": 1,
       "variant": 1,
       "recommended": false,
-      "objective_gain": 4.361,
+      "objective_gain": 4.433,
       "next_gw_gain": 0.68,
       "moves": [
         {
@@ -117,18 +117,18 @@
       "transfers": 1,
       "variant": 2,
       "recommended": false,
-      "objective_gain": 3.924,
-      "next_gw_gain": 1.95,
+      "objective_gain": 3.546,
+      "next_gw_gain": 0.27,
       "moves": [
         {
-          "out": "João Pedro",
-          "in": "Brobbey"
+          "out": "Gabriel",
+          "in": "Hall"
         }
       ],
       "move_ids": [
         {
-          "out": 165,
-          "in": 552
+          "out": 4,
+          "in": 449
         }
       ]
     },
@@ -136,8 +136,8 @@
       "transfers": 2,
       "variant": 1,
       "recommended": true,
-      "objective_gain": 8.728,
-      "next_gw_gain": 3.2,
+      "objective_gain": 9.103,
+      "next_gw_gain": 3.19,
       "moves": [
         {
           "out": "Gabriel",
@@ -163,12 +163,12 @@
       "transfers": 2,
       "variant": 2,
       "recommended": false,
-      "objective_gain": 8.0,
-      "next_gw_gain": 3.15,
+      "objective_gain": 8.081,
+      "next_gw_gain": 2.78,
       "moves": [
         {
-          "out": "Cherki",
-          "in": "Schade"
+          "out": "Gabriel",
+          "in": "Hall"
         },
         {
           "out": "João Pedro",
@@ -177,8 +177,8 @@
       ],
       "move_ids": [
         {
-          "out": 399,
-          "in": 94
+          "out": 4,
+          "in": 449
         },
         {
           "out": 165,
