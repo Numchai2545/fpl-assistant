@@ -76,14 +76,14 @@
       ]
     }
   ],
-  "built_at": "พุธ 23 ก.ย. 2569, 01:04 น.",
-  "built_at_iso": "2026-09-22T18:04:37.975850+00:00",
-  "fetched_at": "2026-09-22T18:04:36.481792+00:00",
+  "built_at": "พุธ 23 ก.ย. 2569, 14:43 น.",
+  "built_at_iso": "2026-09-23T07:43:06.357863+00:00",
+  "fetched_at": "2026-09-23T07:43:04.875783+00:00",
   "data_sources": [
     "network"
   ],
   "model_version": "0.3.0",
-  "plan_change": "แผนหลักยังเหมือนรายงานครั้งก่อน · EP GW นี้เปลี่ยน +0.9",
+  "plan_change": "แผนหลักยังเหมือนรายงานครั้งก่อน · EP GW นี้เปลี่ยน +0.0",
   "scenarios": [
     {
       "transfers": 0,
@@ -136,7 +136,7 @@
       "transfers": 2,
       "variant": 1,
       "recommended": true,
-      "objective_gain": 11.212,
+      "objective_gain": 11.187,
       "next_gw_gain": 4.35,
       "moves": [
         {
@@ -163,7 +163,7 @@
       "transfers": 2,
       "variant": 2,
       "recommended": false,
-      "objective_gain": 10.808,
+      "objective_gain": 10.62,
       "next_gw_gain": 3.78,
       "moves": [
         {
