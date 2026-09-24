@@ -24,7 +24,7 @@
       "name": "Brobbey",
       "price": 5.7,
       "ep": 29.38,
-      "gain": 12.4,
+      "gain": 12.88,
       "fixtures": [
         "GW6 BHA (H) [2]",
         "GW7 BOU (A) [3]",
@@ -38,7 +38,7 @@
       "name": "Calvert-Lewin",
       "price": 6.0,
       "ep": 26.68,
-      "gain": 9.71,
+      "gain": 10.19,
       "fixtures": [
         "GW6 ARS (A) [5]",
         "GW7 MUN (H) [4]",
@@ -52,7 +52,7 @@
       "name": "Kostoulas",
       "price": 5.6,
       "ep": 25.12,
-      "gain": 8.15,
+      "gain": 8.63,
       "fixtures": [
         "GW6 SUN (A) [3]",
         "GW7 CRY (H) [3]",
@@ -66,7 +66,7 @@
       "name": "Havertz",
       "price": 7.6,
       "ep": 24.88,
-      "gain": 7.9,
+      "gain": 8.39,
       "fixtures": [
         "GW6 LEE (H) [2]",
         "GW7 NFO (A) [3]",
@@ -76,9 +76,9 @@
       ]
     }
   ],
-  "built_at": "พุธ 23 ก.ย. 2569, 14:43 น.",
-  "built_at_iso": "2026-09-23T07:43:06.357863+00:00",
-  "fetched_at": "2026-09-23T07:43:04.875783+00:00",
+  "built_at": "พฤหัสบดี 24 ก.ย. 2569, 14:34 น.",
+  "built_at_iso": "2026-09-24T07:34:36.343377+00:00",
+  "fetched_at": "2026-09-24T07:34:35.132121+00:00",
   "data_sources": [
     "network"
   ],
@@ -98,7 +98,7 @@
       "transfers": 1,
       "variant": 1,
       "recommended": false,
-      "objective_gain": 5.061,
+      "objective_gain": 5.077,
       "next_gw_gain": 0.77,
       "moves": [
         {
@@ -117,7 +117,7 @@
       "transfers": 1,
       "variant": 2,
       "recommended": false,
-      "objective_gain": 4.969,
+      "objective_gain": 4.985,
       "next_gw_gain": 1.41,
       "moves": [
         {
@@ -136,8 +136,8 @@
       "transfers": 2,
       "variant": 1,
       "recommended": true,
-      "objective_gain": 11.187,
-      "next_gw_gain": 4.35,
+      "objective_gain": 11.222,
+      "next_gw_gain": 4.37,
       "moves": [
         {
           "out": "Cherki",
@@ -163,8 +163,8 @@
       "transfers": 2,
       "variant": 2,
       "recommended": false,
-      "objective_gain": 10.62,
-      "next_gw_gain": 3.78,
+      "objective_gain": 10.655,
+      "next_gw_gain": 3.8,
       "moves": [
         {
           "out": "Gabriel",
