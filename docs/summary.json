@@ -21,20 +21,6 @@
   "candidates": [
     {
       "rank": 1,
-      "name": "Brobbey",
-      "price": 5.7,
-      "ep": 29.38,
-      "gain": 12.88,
-      "fixtures": [
-        "GW6 BHA (H) [2]",
-        "GW7 BOU (A) [3]",
-        "GW8 LEE (H) [2]",
-        "GW9 COV (A) [2]",
-        "GW10 CHE (H) [4]"
-      ]
-    },
-    {
-      "rank": 2,
       "name": "Calvert-Lewin",
       "price": 6.0,
       "ep": 26.68,
@@ -48,7 +34,7 @@
       ]
     },
     {
-      "rank": 3,
+      "rank": 2,
       "name": "Kostoulas",
       "price": 5.6,
       "ep": 25.12,
@@ -62,23 +48,37 @@
       ]
     },
     {
-      "rank": 4,
-      "name": "Havertz",
-      "price": 7.6,
-      "ep": 24.88,
-      "gain": 8.39,
+      "rank": 3,
+      "name": "Emersonn",
+      "price": 5.5,
+      "ep": 23.68,
+      "gain": 7.19,
       "fixtures": [
-        "GW6 LEE (H) [2]",
-        "GW7 NFO (A) [3]",
-        "GW8 EVE (H) [3]",
-        "GW9 LIV (A) [4]",
-        "GW10 HUL (H) [2]"
+        "GW6 FUL (H) [2]",
+        "GW7 MCI (A) [5]",
+        "GW8 NFO (H) [3]",
+        "GW9 HUL (A) [2]",
+        "GW10 BOU (H) [3]"
+      ]
+    },
+    {
+      "rank": 4,
+      "name": "Gonzalo",
+      "price": 6.0,
+      "ep": 23.64,
+      "gain": 7.14,
+      "fixtures": [
+        "GW6 IPS (A) [2]",
+        "GW7 HUL (H) [2]",
+        "GW8 COV (A) [2]",
+        "GW9 AVL (A) [4]",
+        "GW10 NEW (H) [2]"
       ]
     }
   ],
-  "built_at": "ศุกร์ 25 ก.ย. 2569, 01:24 น.",
-  "built_at_iso": "2026-09-24T18:24:53.703648+00:00",
-  "fetched_at": "2026-09-24T18:24:52.467999+00:00",
+  "built_at": "ศุกร์ 25 ก.ย. 2569, 14:43 น.",
+  "built_at_iso": "2026-09-25T07:43:44.251758+00:00",
+  "fetched_at": "2026-09-25T07:43:43.343979+00:00",
   "data_sources": [
     "network"
   ],
