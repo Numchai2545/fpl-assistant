@@ -3,56 +3,56 @@
   "deadline": "2026-10-10T10:00:00+00:00",
   "deadline_local": "เสาร์ 10 ต.ค. 2569, 17:00 น.",
   "headline": "พิจารณาย้าย 2 ตัว · กัปตัน Haaland",
-  "detail": "ดีกว่าแผนไม่ย้าย 11.2 คะแนนแผนสุทธิ. คาดการณ์ 68 แต้มใน GW6. ราคา: João Pedro มีแรงขายสูงและเสี่ยงลงราคา",
+  "detail": "ดีกว่าแผนไม่ย้าย 11.8 คะแนนแผนสุทธิ. คาดการณ์ 66 แต้มใน GW6",
   "captain": "Haaland",
   "moves": [
     {
-      "out": "Cherki",
+      "out": "Xhaka",
       "in": "Schade"
     },
     {
       "out": "João Pedro",
-      "in": "Isak"
+      "in": "Kostoulas"
     }
   ],
   "alerts": [],
-  "expected_points": 68.1,
+  "expected_points": 66.17,
   "site_url": "https://Numchai2545.github.io/fpl-assistant",
   "candidates": [
     {
       "rank": 1,
-      "name": "Calvert-Lewin",
-      "price": 6.0,
-      "ep": 26.68,
-      "gain": 10.19,
+      "name": "Dasilva",
+      "price": 4.0,
+      "ep": 20.14,
+      "gain": 11.02,
       "fixtures": [
-        "GW6 ARS (A) [5]",
-        "GW7 MUN (H) [4]",
-        "GW8 SUN (A) [3]",
-        "GW9 BOU (A) [3]",
-        "GW10 TOT (H) [2]"
+        "GW6 NEW (H) [3]",
+        "GW7 TOT (A) [3]",
+        "GW8 FUL (H) [2]",
+        "GW9 SUN (H) [3]",
+        "GW10 EVE (A) [3]"
       ]
     },
     {
       "rank": 2,
-      "name": "Kostoulas",
-      "price": 5.6,
-      "ep": 25.12,
-      "gain": 8.63,
+      "name": "Egan",
+      "price": 4.1,
+      "ep": 16.75,
+      "gain": 7.64,
       "fixtures": [
-        "GW6 SUN (A) [3]",
-        "GW7 CRY (H) [2]",
-        "GW8 LIV (A) [4]",
-        "GW9 MCI (A) [5]",
-        "GW10 BRE (H) [3]"
+        "GW6 EVE (H) [3]",
+        "GW7 FUL (A) [3]",
+        "GW8 BRE (H) [3]",
+        "GW9 IPS (H) [2]",
+        "GW10 ARS (A) [5]"
       ]
     },
     {
       "rank": 3,
-      "name": "Emersonn",
-      "price": 5.5,
-      "ep": 23.68,
-      "gain": 7.19,
+      "name": "Diop",
+      "price": 4.0,
+      "ep": 16.61,
+      "gain": 7.49,
       "fixtures": [
         "GW6 FUL (H) [2]",
         "GW7 MCI (A) [5]",
@@ -63,27 +63,27 @@
     },
     {
       "rank": 4,
-      "name": "Gonzalo",
-      "price": 6.0,
-      "ep": 23.64,
-      "gain": 7.14,
+      "name": "O'Shea",
+      "price": 4.0,
+      "ep": 16.34,
+      "gain": 7.23,
       "fixtures": [
-        "GW6 IPS (A) [2]",
-        "GW7 HUL (H) [2]",
-        "GW8 COV (A) [2]",
-        "GW9 AVL (A) [3]",
-        "GW10 NEW (H) [3]"
+        "GW6 FUL (H) [2]",
+        "GW7 MCI (A) [5]",
+        "GW8 NFO (H) [3]",
+        "GW9 HUL (A) [2]",
+        "GW10 BOU (H) [3]"
       ]
     }
   ],
-  "built_at": "อาทิตย์ 27 ก.ย. 2569, 00:44 น.",
-  "built_at_iso": "2026-09-26T17:44:51.343273+00:00",
-  "fetched_at": "2026-09-26T17:44:49.881295+00:00",
+  "built_at": "พุธ 7 ต.ค. 2569, 15:35 น.",
+  "built_at_iso": "2026-10-07T08:35:55.255334+00:00",
+  "fetched_at": "2026-10-07T08:35:53.793040+00:00",
   "data_sources": [
     "network"
   ],
   "model_version": "0.3.0",
-  "plan_change": "แผนหลักยังเหมือนรายงานครั้งก่อน · EP GW นี้เปลี่ยน +0.0",
+  "plan_change": "แผนหลักเปลี่ยนจาก “พิจารณาย้าย 2 ตัว · กัปตัน Haaland” หลังดึงข้อมูลและคำนวณทุก scenario ใหม่",
   "scenarios": [
     {
       "transfers": 0,
@@ -98,18 +98,18 @@
       "transfers": 1,
       "variant": 1,
       "recommended": false,
-      "objective_gain": 5.077,
-      "next_gw_gain": 0.77,
+      "objective_gain": 6.151,
+      "next_gw_gain": 2.15,
       "moves": [
         {
-          "out": "Gabriel",
-          "in": "Tarkowski"
+          "out": "Cherki",
+          "in": "Schade"
         }
       ],
       "move_ids": [
         {
-          "out": 4,
-          "in": 229
+          "out": 399,
+          "in": 94
         }
       ]
     },
@@ -117,18 +117,18 @@
       "transfers": 1,
       "variant": 2,
       "recommended": false,
-      "objective_gain": 4.985,
-      "next_gw_gain": 1.41,
+      "objective_gain": 5.807,
+      "next_gw_gain": 1.53,
       "moves": [
         {
-          "out": "Cherki",
-          "in": "Schade"
+          "out": "João Pedro",
+          "in": "Kostoulas"
         }
       ],
       "move_ids": [
         {
-          "out": 399,
-          "in": 94
+          "out": 165,
+          "in": 138
         }
       ]
     },
@@ -136,26 +136,26 @@
       "transfers": 2,
       "variant": 1,
       "recommended": true,
-      "objective_gain": 11.222,
-      "next_gw_gain": 4.37,
+      "objective_gain": 11.775,
+      "next_gw_gain": 3.52,
       "moves": [
         {
-          "out": "Cherki",
+          "out": "Xhaka",
           "in": "Schade"
         },
         {
           "out": "João Pedro",
-          "in": "Isak"
+          "in": "Kostoulas"
         }
       ],
       "move_ids": [
         {
-          "out": 399,
+          "out": 544,
           "in": 94
         },
         {
           "out": 165,
-          "in": 379
+          "in": 138
         }
       ]
     },
@@ -163,26 +163,26 @@
       "transfers": 2,
       "variant": 2,
       "recommended": false,
-      "objective_gain": 10.655,
-      "next_gw_gain": 3.8,
+      "objective_gain": 11.482,
+      "next_gw_gain": 3.44,
       "moves": [
         {
-          "out": "Gabriel",
-          "in": "Tarkowski"
+          "out": "Xhaka",
+          "in": "Schade"
         },
         {
           "out": "João Pedro",
-          "in": "Isak"
+          "in": "Calvert-Lewin"
         }
       ],
       "move_ids": [
         {
-          "out": 4,
-          "in": 229
+          "out": 544,
+          "in": 94
         },
         {
           "out": 165,
-          "in": 379
+          "in": 346
         }
       ]
     }
