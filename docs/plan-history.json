@@ -394,5 +394,23 @@
     ],
     "expected_points": 66.17,
     "headline": "พิจารณาย้าย 2 ตัว · กัปตัน Haaland"
+  },
+  {
+    "built_at": "2026-10-09T08:57:49.689526+00:00",
+    "fetched_at": "2026-10-09T08:57:48.418537+00:00",
+    "gw": 6,
+    "model_version": "0.3.0",
+    "moves": [
+      {
+        "out": "Xhaka",
+        "in": "Schade"
+      },
+      {
+        "out": "João Pedro",
+        "in": "Kostoulas"
+      }
+    ],
+    "expected_points": 66.17,
+    "headline": "พิจารณาย้าย 2 ตัว · กัปตัน Haaland"
   }
 ]
