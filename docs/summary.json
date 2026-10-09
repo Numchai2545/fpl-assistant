@@ -3,20 +3,20 @@
   "deadline": "2026-10-10T10:00:00+00:00",
   "deadline_local": "เสาร์ 10 ต.ค. 2569, 17:00 น.",
   "headline": "พิจารณาย้าย 2 ตัว · กัปตัน Haaland",
-  "detail": "ดีกว่าแผนไม่ย้าย 11.8 คะแนนแผนสุทธิ. คาดการณ์ 66 แต้มใน GW6",
+  "detail": "ดีกว่าแผนไม่ย้าย 8.8 คะแนนแผนสุทธิ. คาดการณ์ 67 แต้มใน GW6",
   "captain": "Haaland",
   "moves": [
     {
-      "out": "Xhaka",
-      "in": "Schade"
+      "out": "Gabriel",
+      "in": "Tarkowski"
     },
     {
-      "out": "João Pedro",
-      "in": "Kostoulas"
+      "out": "Xhaka",
+      "in": "Schade"
     }
   ],
   "alerts": [],
-  "expected_points": 66.17,
+  "expected_points": 67.07,
   "site_url": "https://Numchai2545.github.io/fpl-assistant",
   "candidates": [
     {
@@ -76,14 +76,14 @@
       ]
     }
   ],
-  "built_at": "ศุกร์ 9 ต.ค. 2569, 15:57 น.",
-  "built_at_iso": "2026-10-09T08:57:49.689526+00:00",
-  "fetched_at": "2026-10-09T08:57:48.418537+00:00",
+  "built_at": "เสาร์ 10 ต.ค. 2569, 02:32 น.",
+  "built_at_iso": "2026-10-09T19:32:05.834135+00:00",
+  "fetched_at": "2026-10-09T19:32:04.415939+00:00",
   "data_sources": [
     "network"
   ],
   "model_version": "0.3.0",
-  "plan_change": "แผนหลักยังเหมือนรายงานครั้งก่อน · EP GW นี้เปลี่ยน +0.0",
+  "plan_change": "แผนหลักเปลี่ยนจาก “พิจารณาย้าย 2 ตัว · กัปตัน Haaland” หลังดึงข้อมูลและคำนวณทุก scenario ใหม่",
   "scenarios": [
     {
       "transfers": 0,
@@ -98,8 +98,8 @@
       "transfers": 1,
       "variant": 1,
       "recommended": false,
-      "objective_gain": 6.151,
-      "next_gw_gain": 2.15,
+      "objective_gain": 5.624,
+      "next_gw_gain": 2.02,
       "moves": [
         {
           "out": "Cherki",
@@ -117,18 +117,18 @@
       "transfers": 1,
       "variant": 2,
       "recommended": false,
-      "objective_gain": 5.807,
-      "next_gw_gain": 1.53,
+      "objective_gain": 4.915,
+      "next_gw_gain": 1.04,
       "moves": [
         {
-          "out": "João Pedro",
-          "in": "Kostoulas"
+          "out": "Gabriel",
+          "in": "Tarkowski"
         }
       ],
       "move_ids": [
         {
-          "out": 165,
-          "in": 138
+          "out": 4,
+          "in": 229
         }
       ]
     },
@@ -136,26 +136,26 @@
       "transfers": 2,
       "variant": 1,
       "recommended": true,
-      "objective_gain": 11.775,
-      "next_gw_gain": 3.52,
+      "objective_gain": 8.813,
+      "next_gw_gain": 3.03,
       "moves": [
+        {
+          "out": "Gabriel",
+          "in": "Tarkowski"
+        },
         {
           "out": "Xhaka",
           "in": "Schade"
-        },
-        {
-          "out": "João Pedro",
-          "in": "Kostoulas"
         }
       ],
       "move_ids": [
         {
-          "out": 544,
-          "in": 94
+          "out": 4,
+          "in": 229
         },
         {
-          "out": 165,
-          "in": 138
+          "out": 544,
+          "in": 94
         }
       ]
     },
@@ -163,26 +163,26 @@
       "transfers": 2,
       "variant": 2,
       "recommended": false,
-      "objective_gain": 11.482,
-      "next_gw_gain": 3.44,
+      "objective_gain": 8.812,
+      "next_gw_gain": 3.27,
       "moves": [
         {
-          "out": "Xhaka",
-          "in": "Schade"
+          "out": "Gabriel",
+          "in": "Tarkowski"
         },
         {
-          "out": "João Pedro",
-          "in": "Calvert-Lewin"
+          "out": "Cherki",
+          "in": "Saka"
         }
       ],
       "move_ids": [
         {
-          "out": 544,
-          "in": 94
+          "out": 4,
+          "in": 229
         },
         {
-          "out": 165,
-          "in": 346
+          "out": 399,
+          "in": 12
         }
       ]
     }
