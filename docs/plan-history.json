@@ -448,5 +448,27 @@
     ],
     "expected_points": 67.07,
     "headline": "พิจารณาย้าย 2 ตัว · กัปตัน Haaland"
+  },
+  {
+    "built_at": "2026-10-10T18:32:28.082475+00:00",
+    "fetched_at": "2026-10-10T18:32:27.455513+00:00",
+    "gw": 7,
+    "model_version": "0.3.0",
+    "moves": [
+      {
+        "out": "Maguire",
+        "in": "De Cuyper"
+      },
+      {
+        "out": "Gabriel",
+        "in": "Vuskovic"
+      },
+      {
+        "out": "Cherki",
+        "in": "Rogers"
+      }
+    ],
+    "expected_points": 60.04,
+    "headline": "พิจารณาย้าย 3 ตัว · กัปตัน Groß"
   }
 ]
