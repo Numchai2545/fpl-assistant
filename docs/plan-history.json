@@ -430,5 +430,23 @@
     ],
     "expected_points": 67.07,
     "headline": "พิจารณาย้าย 2 ตัว · กัปตัน Haaland"
+  },
+  {
+    "built_at": "2026-10-10T08:27:03.908227+00:00",
+    "fetched_at": "2026-10-10T08:27:02.995481+00:00",
+    "gw": 6,
+    "model_version": "0.3.0",
+    "moves": [
+      {
+        "out": "Gabriel",
+        "in": "Tarkowski"
+      },
+      {
+        "out": "Xhaka",
+        "in": "Schade"
+      }
+    ],
+    "expected_points": 67.07,
+    "headline": "พิจารณาย้าย 2 ตัว · กัปตัน Haaland"
   }
 ]
