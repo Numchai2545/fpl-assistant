@@ -470,5 +470,27 @@
     ],
     "expected_points": 60.04,
     "headline": "พิจารณาย้าย 3 ตัว · กัปตัน Groß"
+  },
+  {
+    "built_at": "2026-10-11T08:45:13.682965+00:00",
+    "fetched_at": "2026-10-11T08:45:12.321414+00:00",
+    "gw": 7,
+    "model_version": "0.3.0",
+    "moves": [
+      {
+        "out": "Maguire",
+        "in": "De Cuyper"
+      },
+      {
+        "out": "Gabriel",
+        "in": "Vuskovic"
+      },
+      {
+        "out": "Cherki",
+        "in": "Rogers"
+      }
+    ],
+    "expected_points": 60.22,
+    "headline": "พิจารณาย้าย 3 ตัว · กัปตัน Groß"
   }
 ]

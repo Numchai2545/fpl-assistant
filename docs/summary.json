@@ -3,7 +3,7 @@
   "deadline": "2026-10-17T10:00:00+00:00",
   "deadline_local": "เสาร์ 17 ต.ค. 2569, 17:00 น.",
   "headline": "พิจารณาย้าย 3 ตัว · กัปตัน Groß",
-  "detail": "ดีกว่าแผนไม่ย้าย 13.3 คะแนนแผนสุทธิ. คาดการณ์ 60 แต้มใน GW7",
+  "detail": "ดีกว่าแผนไม่ย้าย 13.5 คะแนนแผนสุทธิ. คาดการณ์ 60 แต้มใน GW7. ราคา: Rogers มีแรงซื้อสูงและเสี่ยงขึ้นราคา",
   "captain": "Groß",
   "moves": [
     {
@@ -20,15 +20,15 @@
     }
   ],
   "alerts": [],
-  "expected_points": 60.04,
+  "expected_points": 60.22,
   "site_url": "https://Numchai2545.github.io/fpl-assistant",
   "candidates": [
     {
       "rank": 1,
       "name": "Rogers",
       "price": 7.8,
-      "ep": 27.43,
-      "gain": 12.45,
+      "ep": 27.48,
+      "gain": 12.5,
       "fixtures": [
         "GW7 EVE (A) [3]",
         "GW8 TOT (H) [2]",
@@ -41,7 +41,7 @@
       "rank": 2,
       "name": "Mbeumo",
       "price": 7.9,
-      "ep": 24.68,
+      "ep": 24.67,
       "gain": 9.69,
       "fixtures": [
         "GW7 LEE (A) [3]",
@@ -55,7 +55,7 @@
       "rank": 3,
       "name": "Cunha",
       "price": 7.9,
-      "ep": 22.58,
+      "ep": 22.57,
       "gain": 7.59,
       "fixtures": [
         "GW7 LEE (A) [3]",
@@ -69,8 +69,8 @@
       "rank": 4,
       "name": "Mainoo",
       "price": 5.5,
-      "ep": 22.43,
-      "gain": 7.45,
+      "ep": 22.5,
+      "gain": 7.52,
       "fixtures": [
         "GW7 LEE (A) [3]",
         "GW8 BOU (H) [3]",
@@ -80,14 +80,14 @@
       ]
     }
   ],
-  "built_at": "อาทิตย์ 11 ต.ค. 2569, 01:32 น.",
-  "built_at_iso": "2026-10-10T18:32:28.082475+00:00",
-  "fetched_at": "2026-10-10T18:32:27.455513+00:00",
+  "built_at": "อาทิตย์ 11 ต.ค. 2569, 15:45 น.",
+  "built_at_iso": "2026-10-11T08:45:13.682965+00:00",
+  "fetched_at": "2026-10-11T08:45:12.321414+00:00",
   "data_sources": [
     "network"
   ],
   "model_version": "0.3.0",
-  "plan_change": "แผนหลักเปลี่ยนจาก “พิจารณาย้าย 2 ตัว · กัปตัน Haaland” หลังดึงข้อมูลและคำนวณทุก scenario ใหม่",
+  "plan_change": "แผนหลักยังเหมือนรายงานครั้งก่อน · EP GW นี้เปลี่ยน +0.2",
   "scenarios": [
     {
       "transfers": 0,
@@ -102,8 +102,8 @@
       "transfers": 1,
       "variant": 1,
       "recommended": false,
-      "objective_gain": 5.528,
-      "next_gw_gain": 2.92,
+      "objective_gain": 5.471,
+      "next_gw_gain": 2.89,
       "moves": [
         {
           "out": "Gabriel",
@@ -121,8 +121,8 @@
       "transfers": 1,
       "variant": 2,
       "recommended": false,
-      "objective_gain": 4.343,
-      "next_gw_gain": 1.74,
+      "objective_gain": 4.354,
+      "next_gw_gain": 1.77,
       "moves": [
         {
           "out": "Cherki",
@@ -140,8 +140,8 @@
       "transfers": 2,
       "variant": 1,
       "recommended": false,
-      "objective_gain": 9.744,
-      "next_gw_gain": 4.66,
+      "objective_gain": 9.802,
+      "next_gw_gain": 4.67,
       "moves": [
         {
           "out": "Gabriel",
@@ -167,26 +167,26 @@
       "transfers": 2,
       "variant": 2,
       "recommended": false,
-      "objective_gain": 9.452,
-      "next_gw_gain": 5.24,
+      "objective_gain": 9.343,
+      "next_gw_gain": 4.21,
       "moves": [
         {
-          "out": "Maguire",
+          "out": "Gabriel",
           "in": "De Cuyper"
         },
         {
-          "out": "Gabriel",
-          "in": "Vuskovic"
+          "out": "Cherki",
+          "in": "Mbeumo"
         }
       ],
       "move_ids": [
         {
-          "out": 418,
+          "out": 4,
           "in": 115
         },
         {
-          "out": 4,
-          "in": 504
+          "out": 399,
+          "in": 427
         }
       ]
     },
@@ -194,7 +194,7 @@
       "transfers": 3,
       "variant": 1,
       "recommended": true,
-      "objective_gain": 13.344,
+      "objective_gain": 13.472,
       "next_gw_gain": 6.98,
       "moves": [
         {
@@ -229,7 +229,7 @@
       "transfers": 3,
       "variant": 2,
       "recommended": false,
-      "objective_gain": 13.004,
+      "objective_gain": 13.164,
       "next_gw_gain": 6.85,
       "moves": [
         {
