@@ -536,5 +536,27 @@
     ],
     "expected_points": 64.92,
     "headline": "พิจารณาย้าย 3 ตัว · กัปตัน Groß"
+  },
+  {
+    "built_at": "2026-10-12T22:08:02.529770+00:00",
+    "fetched_at": "2026-10-12T22:08:01.634885+00:00",
+    "gw": 7,
+    "model_version": "0.3.0",
+    "moves": [
+      {
+        "out": "Greaves",
+        "in": "De Cuyper"
+      },
+      {
+        "out": "Gabriel",
+        "in": "Tarkowski"
+      },
+      {
+        "out": "Ødegaard",
+        "in": "Dewsbury-Hall"
+      }
+    ],
+    "expected_points": 64.92,
+    "headline": "พิจารณาย้าย 3 ตัว · กัปตัน Groß"
   }
 ]

@@ -3,11 +3,11 @@
   "deadline": "2026-10-17T10:00:00+00:00",
   "deadline_local": "เสาร์ 17 ต.ค. 2569, 17:00 น.",
   "headline": "พิจารณาย้าย 3 ตัว · กัปตัน Groß",
-  "detail": "ดีกว่าแผนไม่ย้าย 13.0 คะแนนแผนสุทธิ. คาดการณ์ 65 แต้มใน GW7",
+  "detail": "ดีกว่าแผนไม่ย้าย 13.2 คะแนนแผนสุทธิ. คาดการณ์ 65 แต้มใน GW7",
   "captain": "Groß",
   "moves": [
     {
-      "out": "Maguire",
+      "out": "Greaves",
       "in": "De Cuyper"
     },
     {
@@ -16,7 +16,7 @@
     },
     {
       "out": "Ødegaard",
-      "in": "Rogers"
+      "in": "Dewsbury-Hall"
     }
   ],
   "alerts": [],
@@ -27,8 +27,8 @@
       "rank": 1,
       "name": "O'Shea",
       "price": 4.0,
-      "ep": 19.11,
-      "gain": 12.13,
+      "ep": 20.49,
+      "gain": 13.64,
       "fixtures": [
         "GW7 MCI (A) [5]",
         "GW8 NFO (H) [3]",
@@ -41,8 +41,8 @@
       "rank": 2,
       "name": "Dasilva",
       "price": 4.0,
-      "ep": 18.28,
-      "gain": 11.3,
+      "ep": 19.41,
+      "gain": 12.55,
       "fixtures": [
         "GW7 TOT (A) [3]",
         "GW8 FUL (H) [2]",
@@ -55,8 +55,8 @@
       "rank": 3,
       "name": "Egan",
       "price": 4.1,
-      "ep": 16.45,
-      "gain": 9.47,
+      "ep": 16.26,
+      "gain": 9.41,
       "fixtures": [
         "GW7 FUL (A) [3]",
         "GW8 BRE (H) [3]",
@@ -67,27 +67,27 @@
     },
     {
       "rank": 4,
-      "name": "Mendy",
-      "price": 4.1,
-      "ep": 15.58,
-      "gain": 8.6,
+      "name": "Diop",
+      "price": 4.0,
+      "ep": 16.01,
+      "gain": 9.15,
       "fixtures": [
-        "GW7 FUL (A) [3]",
-        "GW8 BRE (H) [3]",
-        "GW9 IPS (H) [2]",
-        "GW10 ARS (A) [5]",
-        "GW11 BHA (H) [3]"
+        "GW7 MCI (A) [5]",
+        "GW8 NFO (H) [3]",
+        "GW9 HUL (A) [2]",
+        "GW10 BOU (H) [3]",
+        "GW11 TOT (A) [3]"
       ]
     }
   ],
-  "built_at": "จันทร์ 12 ต.ค. 2569, 16:07 น.",
-  "built_at_iso": "2026-10-12T09:07:54.609179+00:00",
-  "fetched_at": "2026-10-12T09:07:53.190836+00:00",
+  "built_at": "อังคาร 13 ต.ค. 2569, 05:08 น.",
+  "built_at_iso": "2026-10-12T22:08:02.529770+00:00",
+  "fetched_at": "2026-10-12T22:08:01.634885+00:00",
   "data_sources": [
     "network"
   ],
   "model_version": "0.3.0",
-  "plan_change": "แผนหลักยังเหมือนรายงานครั้งก่อน · EP GW นี้เปลี่ยน -0.0",
+  "plan_change": "แผนหลักเปลี่ยนจาก “พิจารณาย้าย 3 ตัว · กัปตัน Groß” หลังดึงข้อมูลและคำนวณทุก scenario ใหม่",
   "scenarios": [
     {
       "transfers": 0,
@@ -102,8 +102,8 @@
       "transfers": 1,
       "variant": 1,
       "recommended": false,
-      "objective_gain": 5.624,
-      "next_gw_gain": 2.93,
+      "objective_gain": 5.702,
+      "next_gw_gain": 3.31,
       "moves": [
         {
           "out": "Gabriel",
@@ -121,8 +121,8 @@
       "transfers": 1,
       "variant": 2,
       "recommended": false,
-      "objective_gain": 5.28,
-      "next_gw_gain": 2.58,
+      "objective_gain": 5.347,
+      "next_gw_gain": 2.99,
       "moves": [
         {
           "out": "Gabriel",
@@ -140,11 +140,11 @@
       "transfers": 2,
       "variant": 1,
       "recommended": false,
-      "objective_gain": 10.616,
-      "next_gw_gain": 5.84,
+      "objective_gain": 9.865,
+      "next_gw_gain": 5.89,
       "moves": [
         {
-          "out": "Maguire",
+          "out": "Greaves",
           "in": "De Cuyper"
         },
         {
@@ -154,7 +154,7 @@
       ],
       "move_ids": [
         {
-          "out": 418,
+          "out": 306,
           "in": 115
         },
         {
@@ -167,8 +167,8 @@
       "transfers": 2,
       "variant": 2,
       "recommended": false,
-      "objective_gain": 9.009,
-      "next_gw_gain": 4.23,
+      "objective_gain": 9.11,
+      "next_gw_gain": 5.15,
       "moves": [
         {
           "out": "Gabriel",
@@ -176,7 +176,7 @@
         },
         {
           "out": "Ødegaard",
-          "in": "Rogers"
+          "in": "Dewsbury-Hall"
         }
       ],
       "move_ids": [
@@ -186,7 +186,7 @@
         },
         {
           "out": 15,
-          "in": 40
+          "in": 236
         }
       ]
     },
@@ -194,43 +194,8 @@
       "transfers": 3,
       "variant": 1,
       "recommended": true,
-      "objective_gain": 13.047,
-      "next_gw_gain": 7.14,
-      "moves": [
-        {
-          "out": "Maguire",
-          "in": "De Cuyper"
-        },
-        {
-          "out": "Gabriel",
-          "in": "Tarkowski"
-        },
-        {
-          "out": "Ødegaard",
-          "in": "Rogers"
-        }
-      ],
-      "move_ids": [
-        {
-          "out": 418,
-          "in": 115
-        },
-        {
-          "out": 4,
-          "in": 229
-        },
-        {
-          "out": 15,
-          "in": 40
-        }
-      ]
-    },
-    {
-      "transfers": 3,
-      "variant": 2,
-      "recommended": false,
-      "objective_gain": 12.915,
-      "next_gw_gain": 7.37,
+      "objective_gain": 13.2,
+      "next_gw_gain": 7.73,
       "moves": [
         {
           "out": "Greaves",
@@ -257,6 +222,41 @@
         {
           "out": 15,
           "in": 236
+        }
+      ]
+    },
+    {
+      "transfers": 3,
+      "variant": 2,
+      "recommended": false,
+      "objective_gain": 12.666,
+      "next_gw_gain": 7.19,
+      "moves": [
+        {
+          "out": "Dubravka",
+          "in": "Verbruggen"
+        },
+        {
+          "out": "Greaves",
+          "in": "De Cuyper"
+        },
+        {
+          "out": "Gabriel",
+          "in": "Tarkowski"
+        }
+      ],
+      "move_ids": [
+        {
+          "out": 497,
+          "in": 109
+        },
+        {
+          "out": 306,
+          "in": 115
+        },
+        {
+          "out": 4,
+          "in": 229
         }
       ]
     }
