@@ -3,7 +3,7 @@
   "deadline": "2026-10-17T10:00:00+00:00",
   "deadline_local": "เสาร์ 17 ต.ค. 2569, 17:00 น.",
   "headline": "พิจารณาย้าย 3 ตัว · กัปตัน Groß",
-  "detail": "ดีกว่าแผนไม่ย้าย 13.6 คะแนนแผนสุทธิ. คาดการณ์ 64 แต้มใน GW7",
+  "detail": "ดีกว่าแผนไม่ย้าย 13.9 คะแนนแผนสุทธิ. คาดการณ์ 64 แต้มใน GW7",
   "captain": "Groß",
   "moves": [
     {
@@ -20,11 +20,25 @@
     }
   ],
   "alerts": [],
-  "expected_points": 63.92,
+  "expected_points": 63.73,
   "site_url": "https://Numchai2545.github.io/fpl-assistant",
   "candidates": [
     {
       "rank": 1,
+      "name": "Dasilva",
+      "price": 4.0,
+      "ep": 21.89,
+      "gain": 15.67,
+      "fixtures": [
+        "GW7 TOT (A) [3]",
+        "GW8 FUL (H) [2]",
+        "GW9 SUN (H) [3]",
+        "GW10 EVE (A) [3]",
+        "GW11 CRY (H) [2]"
+      ]
+    },
+    {
+      "rank": 2,
       "name": "O'Shea",
       "price": 4.0,
       "ep": 20.49,
@@ -35,20 +49,6 @@
         "GW9 HUL (A) [2]",
         "GW10 BOU (H) [3]",
         "GW11 TOT (A) [3]"
-      ]
-    },
-    {
-      "rank": 2,
-      "name": "Dasilva",
-      "price": 4.0,
-      "ep": 19.41,
-      "gain": 13.2,
-      "fixtures": [
-        "GW7 TOT (A) [3]",
-        "GW8 FUL (H) [2]",
-        "GW9 SUN (H) [3]",
-        "GW10 EVE (A) [3]",
-        "GW11 CRY (H) [2]"
       ]
     },
     {
@@ -80,14 +80,14 @@
       ]
     }
   ],
-  "built_at": "อังคาร 13 ต.ค. 2569, 16:21 น.",
-  "built_at_iso": "2026-10-13T09:21:41.596755+00:00",
-  "fetched_at": "2026-10-13T09:21:40.193148+00:00",
+  "built_at": "พุธ 14 ต.ค. 2569, 03:15 น.",
+  "built_at_iso": "2026-10-13T20:15:00.392655+00:00",
+  "fetched_at": "2026-10-13T20:14:59.491186+00:00",
   "data_sources": [
     "network"
   ],
   "model_version": "0.3.0",
-  "plan_change": "แผนหลักยังเหมือนรายงานครั้งก่อน · EP GW นี้เปลี่ยน -1.0",
+  "plan_change": "แผนหลักยังเหมือนรายงานครั้งก่อน · EP GW นี้เปลี่ยน -0.2",
   "scenarios": [
     {
       "transfers": 0,
@@ -102,8 +102,8 @@
       "transfers": 1,
       "variant": 1,
       "recommended": false,
-      "objective_gain": 5.829,
-      "next_gw_gain": 3.3,
+      "objective_gain": 5.938,
+      "next_gw_gain": 3.27,
       "moves": [
         {
           "out": "Gabriel",
@@ -121,7 +121,7 @@
       "transfers": 1,
       "variant": 2,
       "recommended": false,
-      "objective_gain": 5.474,
+      "objective_gain": 5.638,
       "next_gw_gain": 2.99,
       "moves": [
         {
@@ -140,8 +140,8 @@
       "transfers": 2,
       "variant": 1,
       "recommended": false,
-      "objective_gain": 10.077,
-      "next_gw_gain": 5.89,
+      "objective_gain": 10.201,
+      "next_gw_gain": 5.85,
       "moves": [
         {
           "out": "Greaves",
@@ -167,8 +167,8 @@
       "transfers": 2,
       "variant": 2,
       "recommended": false,
-      "objective_gain": 9.308,
-      "next_gw_gain": 5.14,
+      "objective_gain": 9.438,
+      "next_gw_gain": 5.11,
       "moves": [
         {
           "out": "Gabriel",
@@ -194,8 +194,8 @@
       "transfers": 3,
       "variant": 1,
       "recommended": true,
-      "objective_gain": 13.563,
-      "next_gw_gain": 7.73,
+      "objective_gain": 13.856,
+      "next_gw_gain": 7.69,
       "moves": [
         {
           "out": "Greaves",
@@ -229,8 +229,8 @@
       "transfers": 3,
       "variant": 2,
       "recommended": false,
-      "objective_gain": 13.032,
-      "next_gw_gain": 7.19,
+      "objective_gain": 13.346,
+      "next_gw_gain": 7.13,
       "moves": [
         {
           "out": "Dubravka",
