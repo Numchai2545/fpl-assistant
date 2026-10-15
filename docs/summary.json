@@ -80,9 +80,9 @@
       ]
     }
   ],
-  "built_at": "พฤหัสบดี 15 ต.ค. 2569, 01:34 น.",
-  "built_at_iso": "2026-10-14T18:34:27.285548+00:00",
-  "fetched_at": "2026-10-14T18:34:26.057915+00:00",
+  "built_at": "พฤหัสบดี 15 ต.ค. 2569, 14:22 น.",
+  "built_at_iso": "2026-10-15T07:22:47.750510+00:00",
+  "fetched_at": "2026-10-15T07:22:46.714656+00:00",
   "data_sources": [
     "network"
   ],
@@ -140,11 +140,11 @@
       "transfers": 2,
       "variant": 1,
       "recommended": false,
-      "objective_gain": 10.201,
-      "next_gw_gain": 5.85,
+      "objective_gain": 10.212,
+      "next_gw_gain": 5.78,
       "moves": [
         {
-          "out": "Greaves",
+          "out": "Maguire",
           "in": "De Cuyper"
         },
         {
@@ -154,7 +154,7 @@
       ],
       "move_ids": [
         {
-          "out": 306,
+          "out": 418,
           "in": 115
         },
         {
