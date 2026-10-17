@@ -126,6 +126,19 @@ class TransferAdvice:
     reason: str
 
 
+@dataclass
+class TransferPriority:
+    """A stable next move after the preceding priorities, never a competing plan."""
+
+    rank: int
+    candidate: TransferCandidate
+    bank_after: float
+    gain_after_hit: float
+    cumulative_gain: float
+    cumulative_hit_cost: int
+    worth_considering: bool
+
+
 def outlook_by_player(ep_rows: pd.DataFrame, matches: int) -> tuple[dict[int, float], dict[int, list[dict]]]:
     """Sum each player's next N actual fixtures, preserving blanks and doubles."""
     if ep_rows.empty:
@@ -197,7 +210,9 @@ def _has_bench_cover(out_id: int, xi: set[int], squad: list[int],
 def analyse_transfers(ep_rows: pd.DataFrame, players: pd.DataFrame,
                       current_squad: list[int], bank: float,
                       free_transfers: int, cfg: Config,
-                      selling_price: dict[int, float] | None = None) -> TransferAdvice:
+                      selling_price: dict[int, float] | None = None,
+                      sellable: set[int] | None = None,
+                      excluded_in: set[int] | None = None) -> TransferAdvice:
     """Rank legal replacements and return one evidence-based transfer decision.
 
     Ownership is intentionally absent. The manager wants fixture-adjusted EP,
@@ -218,13 +233,13 @@ def analyse_transfers(ep_rows: pd.DataFrame, players: pd.DataFrame,
 
     pairs: list[TransferCandidate] = []
     for out_id in owned:
-        if out_id in locked:
+        if out_id in locked or (sellable is not None and out_id not in sellable):
             continue
         out_pos = int(players.element_type[out_id])
         out_club = int(players.team[out_id])
         funds = float(sell_at.get(out_id, players.price[out_id])) + float(bank)
         band = players[(players.element_type == out_pos)
-                       & (~players.index.isin(owned_set))
+                       & (~players.index.isin(owned_set | (excluded_in or set())))
                        & (players.p_available > 0.25)
                        & (players.p_start >= min_start)
                        & (players.price <= funds + 1e-9)]
@@ -278,6 +293,48 @@ def analyse_transfers(ep_rows: pd.DataFrame, players: pd.DataFrame,
                               text("emergency_gain", gain=net))
     return TransferAdvice(out_id, candidates, False, False, threshold,
                           text("no_ft"))
+
+
+def rank_transfer_priorities(ep_rows: pd.DataFrame, players: pd.DataFrame,
+                             current_squad: list[int], bank: float,
+                             free_transfers: int, cfg: Config,
+                             selling_price: dict[int, float] | None = None) -> list[TransferPriority]:
+    """Build one greedy upgrade order whose every prefix is budget/club valid.
+
+    The manager chooses where to stop. Later rows cannot rewrite earlier buys,
+    spend the same bank twice, sell a new arrival or buy an outgoing player back.
+    This ranks marginal upgrades; it does not claim a global multi-move optimum.
+    """
+    original = set(current_squad)
+    squad = list(current_squad)
+    cash = float(bank)
+    priorities: list[TransferPriority] = []
+    total_gain = 0.0
+    matches = int(cfg.get("planning", "outlook_matches", default=5))
+    limit = max(0, int(cfg.get("planning", "priority_count", default=5)))
+    for rank in range(1, min(limit, len(original)) + 1):
+        advice = analyse_transfers(
+            ep_rows, players, squad, cash, max(0, free_transfers - rank + 1), cfg,
+            selling_price=selling_price, sellable=original & set(squad), excluded_in=original)
+        if not advice.candidates:
+            break
+        candidate = advice.candidates[0]
+        if (candidate.gain <= 0 or candidate.out_matches < matches
+                or len(candidate.fixtures) < matches):
+            break
+        sale = float((selling_price or {}).get(candidate.out_id, players.price[candidate.out_id]))
+        cash = round(cash + sale - float(players.price[candidate.in_id]), 1)
+        squad[squad.index(candidate.out_id)] = candidate.in_id
+        hit = HIT_COST if rank > free_transfers else 0
+        total_gain += candidate.gain - hit
+        priorities.append(TransferPriority(
+            rank=rank, candidate=candidate, bank_after=cash,
+            gain_after_hit=candidate.gain - hit, cumulative_gain=total_gain,
+            cumulative_hit_cost=HIT_COST * max(0, rank - free_transfers),
+            worth_considering=(candidate.gain - hit >= advice.threshold
+                               and (hit == 0 or (rank == 1 and advice.hit))),
+        ))
+    return priorities
 
 
 def choose_candidates(ep_grid: pd.DataFrame, players: pd.DataFrame,

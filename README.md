@@ -65,7 +65,7 @@ Add `-v` before the subcommand for debug logging: `python -m fplbot -v build`.
 fetch.py         official FPL API  ->  data/snapshots/<date>/*.json
 features.py      raw JSON          ->  player rates, team strength, fixture schedule
 model.py         rates + fixtures  ->  expected points per player per gameweek
-optimize.py      EP + prices       ->  hold / multi-transfer scenarios
+optimize.py      EP + prices       ->  cumulative transfer priorities + current XI
 report.py        the analysis      ->  docs/index.html + docs/summary.json
 calendar_feed.py the fixture list  ->  docs/deadlines.ics
 ```
@@ -109,31 +109,18 @@ fixtures. The report selects the squad slot with the largest upgrade and shows
 the best three or four same-position replacements that fit the bank and
 three-per-club rule. Ownership is displayed but never changes the ranking.
 
-The main recommendation uses the best legal same-position upgrade over five
-actual fixtures, with at least +3.0 EP and complete fixture coverage on both
-sides. Otherwise it recommends holding. A qualifying move is forced into a
-complete budget-valid scenario; if that solve fails, the report holds instead.
-The separate discounted team objective includes captain, bench, future moves,
-hits and transfer friction. Its gain is for comparing scenarios, not the +3.0
-recommendation gate. A short remaining season window is displayed with its
-actual match count and never treated as a complete five-match forecast.
+The dashboard shows one cumulative priority order. Each row chooses the largest
+remaining legal same-position upgrade, using the bank and club slots left after
+previous rows. Earlier pairs never change when the manager chooses more moves.
+Every prefix is affordable; bought players cannot be sold again in the chain.
+This greedy order is not claimed to be a global multi-transfer optimum.
 
-The dashboard compares holding with each available free-transfer count as time
-permits. Paid moves are reserved for the explicit emergency policy. A saved
-user choice is re-solved exactly and labelled separately from the model's
-recommendation; it never overrides the recommendation badge or threshold.
-
-The integer programme (`PuLP` + CBC) then builds a legal squad, XI, bench order,
-captain and vice-captain consistently for every scenario.
-
-Constraints, all enforced simultaneously:
-
-- 15 players — 2 GKP, 5 DEF, 5 MID, 3 FWD; max 3 per club
-- an XI of 11 with at least 1 GKP, 3 DEF, 2 MID, 1 FWD
-- budget: actual transfer cash flow using reconstructed selling prices
-- one free transfer per gameweek, banked up to five
-- hold plus 1..N free-transfer scenarios, up to the current bank
-- squad continuity: each gameweek's fifteen is the previous fifteen, plus buys, minus sells
+A move needs complete five-fixture coverage and at least +3.0 net EP to be
+endorsed. Extra transfers display their four-point cost; the emergency policy
+still gates paid recommendations. The manager decides how many rows to use.
+Skipping rows or choosing other replacements requires a fresh budget check.
+Ownership remains display-only. CBC separately selects the XI, bench, captain
+and vice-captain from the current owned squad, without assuming transfers.
 
 ---
 
@@ -150,7 +137,7 @@ Everything personal lives in `config.yaml`. The fields worth knowing:
 | `planning.comparison_count` | Affordable peers shown when a squad player is clicked. Currently 8. |
 | `planning.min_candidate_start` | Hides replacement candidates with a very low projected chance of starting. Currently 0.50. |
 | `strategy.mode` | Legacy compatibility only; ownership never changes EP in any mode. |
-| `planning.scenario_time_budget` | Shared solve budget for all scenarios, in seconds. Currently 150. |
+| `planning.priority_count` | Maximum cumulative priority rows displayed. Currently 5. |
 | `planning.build_time_budget` | Entire local web build budget including subprocesses, in seconds. Currently 300. |
 | `planning.stale_after_hours` | Age of the oldest decision input that triggers a warning. Currently 24. |
 | `model.cameo_minutes` | Conditional cameo duration used in the defensive-contribution mixture. Currently 14 minutes. |
@@ -176,11 +163,6 @@ GitHub Pages also supports a free, queued mobile refresh request. It opens a
 GitHub issue that only the repository owner can use to trigger a fresh build;
 no token is stored in the PWA and no FPL account action is automated.
 
-Saved scenario links include a fingerprint of the reviewed report and moves.
-Keep the complete prefilled issue title. If the report changes before the
-request runs, reopen the latest dashboard and select again; an old scenario
-number is never silently applied to a new report. Local `select-plan` calls
-also require `--fingerprint` from the scenario in `docs/summary.json`.
 
 A build keeps the previous report when the public transfer history, permanent
 squad/bank, or holding baseline cannot be verified. After a Free Hit deadline,

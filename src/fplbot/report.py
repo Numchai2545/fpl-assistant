@@ -248,7 +248,8 @@ def build_context(*, cfg: Config, bootstrap: dict, teams: pd.DataFrame,
                   transfer_advice, selling_price: dict[int, float],
                   scenarios=None, provenance: dict | None = None,
                   live: dict | None = None,
-                  scoring_warnings: list[str] | None = None) -> dict:
+                  scoring_warnings: list[str] | None = None,
+                  priorities=None) -> dict:
     gw = int(event["id"])
     built_iso = datetime.now(timezone.utc).isoformat()
     horizon_gws = list(ep_grid.columns)
@@ -418,6 +419,44 @@ def build_context(*, cfg: Config, bootstrap: dict, teams: pd.DataFrame,
         reason = (text("unverified_move") if transfer_advice.recommend else transfer_advice.reason)
         detail = f"{reason}. " + text("estimated", ep=first.expected_points, gw=gw)
     action = {"headline": headline, "detail": detail, "moves": moves}
+    priority_rows = []
+    for priority in priorities or []:
+        candidate = priority.candidate
+        outgoing, incoming = players.loc[candidate.out_id], players.loc[candidate.in_id]
+        priority_rows.append({
+            "rank": priority.rank,
+            "out_id": candidate.out_id, "in_id": candidate.in_id,
+            "out": str(outgoing["name"]), "in": str(incoming["name"]),
+            "position": POSITIONS[int(outgoing.element_type)],
+            "out_team": str(outgoing.team_name), "in_team": str(incoming.team_name),
+            "sell_price": float(selling_price.get(candidate.out_id, outgoing.price)),
+            "buy_price": float(incoming.price), "out_ep": candidate.out_ep,
+            "in_ep": candidate.in_ep, "gain": candidate.gain,
+            "net_gain": priority.gain_after_hit,
+            "bank_after": priority.bank_after, "cumulative_gain": priority.cumulative_gain,
+            "hit_cost": priority.cumulative_hit_cost,
+            "paid": priority.rank > free_transfers,
+            "worth_considering": priority.worth_considering,
+            "matches": len(candidate.fixtures),
+            "availability": float(incoming.p_available), "starts": float(incoming.p_start),
+            "fixtures": [f"GW{f['gw']} {teams.short_name.get(f['opponent'], '?')} "
+                         f"({'H' if f['is_home'] else 'A'})" for f in candidate.fixtures],
+        })
+    if priorities is not None:
+        first_priority = priority_rows[0] if priority_rows else None
+        if first_priority and first_priority["worth_considering"]:
+            moves = [{"out": first_priority["out"], "in": first_priority["in"], "in_": first_priority["in"]}]
+            headline = text("priority_headline", out=first_priority["out"], incoming=first_priority["in"])
+            detail = text("gain", gain=first_priority["net_gain"], matches=outlook_matches,
+                          threshold=transfer_advice.threshold)
+        else:
+            moves = []
+            headline = text("hold", captain=captain_name)
+            detail = transfer_advice.reason
+        action = {"headline": headline, "detail": detail, "moves": moves}
+        for row in transfer_candidates:
+            row["recommended"] = bool(first_priority and first_priority["worth_considering"]
+                                       and row["name"] == first_priority["in"])
 
     clashes = []
     proposed = set(first.squad)
@@ -555,6 +594,7 @@ def build_context(*, cfg: Config, bootstrap: dict, teams: pd.DataFrame,
         "formation": formation,
         "captains": captains, "transfer_out": transfer_out,
         "transfer_candidates": transfer_candidates,
+        "transfer_priorities": priority_rows,
         "outlook_matches": outlook_matches,
         "min_transfer_gain": transfer_advice.threshold,
         "plan": plan_rows, "plan_notes": text("partial_analysis") if plan.notes else "",
@@ -590,6 +630,7 @@ def render(context: dict, cfg: Config) -> Path:
     context.setdefault("scoring_warnings", [])
     context.setdefault("actual_lineup_note", text("actual_lineup"))
     context.setdefault("min_transfer_gain", 3.0)
+    context.setdefault("transfer_priorities", [])
     context["asset_version"] = hashlib.sha256((WEB_DIR / "sports-ui.css").read_bytes()).hexdigest()[:12]
     context.setdefault("plan_change", "")
     context.setdefault("clashes", [])
@@ -631,6 +672,7 @@ def render(context: dict, cfg: Config) -> Path:
         "decision_sources": context["decision_sources"],
         "stale_after_hours": context["stale_after_hours"],
         "analysis_warnings": context["analysis_warnings"],
+        "priorities": context["transfer_priorities"],
         "plan_change": context["plan_change"], "scenarios": [{
             "transfers": s["transfers"], "variant": s["variant"],
             "recommended": s["recommended"],

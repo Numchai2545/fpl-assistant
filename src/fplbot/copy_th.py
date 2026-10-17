@@ -52,6 +52,7 @@ COPY = {
     "incomplete_fixtures": "โปรแกรมที่ยืนยันแล้วยังไม่ครบ {matches} นัดทั้งสองฝั่ง — เก็บ transfer ไว้ก่อน",
     "hold": "แนะนำให้เก็บ transfer · กัปตัน {captain}",
     "move": "พิจารณา {out} → {incoming} · กัปตัน {captain}",
+    "priority_headline": "ลำดับแรก: {out} → {incoming}",
     "gain": "เพิ่มสุทธิ {gain:+.1f} EP ใน {matches} นัด (เกณฑ์ +{threshold:.1f})",
     "unverified_move": "คู่ย้ายที่ผ่านเกณฑ์ยังคำนวณแผนถูกกติกาไม่สำเร็จ จึงแนะนำให้เก็บ transfer ก่อน",
     "estimated": "คาดการณ์ {ep:.1f} แต้มใน GW{gw}",
@@ -65,7 +66,7 @@ COPY = {
     "selected_unavailable": "แผนที่บันทึกไว้ไม่พร้อมใช้งานในรอบนี้ คำแนะนำหลักยังเป็นผลของโมเดล",
     "stage_fetch": "กำลังดึงข้อมูลทีมและโปรแกรม",
     "stage_features": "กำลังเตรียมข้อมูลและโอกาสลงเล่น",
-    "stage_solve": "กำลังเปรียบเทียบแผนและตรวจงบ",
+    "stage_solve": "กำลังจัดอันดับการย้ายและจัด XI",
     "stage_output": "กำลังสร้างรายงาน",
     "build_timeout": "หมดเวลารวมในการอัปเดต รายงานเดิมยังเปิดดูได้",
 }

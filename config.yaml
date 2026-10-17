@@ -30,6 +30,7 @@ planning:
   # only the next gameweek. Blank and double gameweeks remain visible.
   outlook_matches: 5
   candidate_count: 4        # alternatives shown for the selected weak link
+  priority_count: 5         # ranked upgrade rows; manager decides how many to act on
   comparison_count: 8       # top affordable peers shown when you click a player
   min_candidate_start: 0.50 # hide likely non-starters from replacement rankings
   min_transfer_gain: 3.0    # minimum five-match EP improvement to recommend a move

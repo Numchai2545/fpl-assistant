@@ -146,21 +146,20 @@ def build(args) -> int:
     locked = [int(p) for p in (cfg.get("strategy", "never_sell", default=[]) or [])]
     advice = optimize.analyse_transfers(
         ep_rows, players, current_squad, bank, ft, cfg, selling_price=sell_at)
-    log.info("solving hold and multi-transfer scenarios")
-    selected = state.load_selected(cfg.site_dir / "selected-plan.json", gw)
-    selected_moves = ([(int(m["out"]), int(m["in"])) for m in selected.get("move_ids", [])]
-                      if selected else None)
+    priorities = optimize.rank_transfer_priorities(
+        ep_rows, players, current_squad, bank, ft, cfg, selling_price=sell_at)
+    log.info("solving current squad lineup")
     try:
-        scenarios = optimize.solve_scenarios(
-            ep_grid, players, current_squad, bank, ft, cfg,
-            selling_price=sell_at, locked=locked, advice=advice,
-            selected_moves=selected_moves,
-            deadline=deadline - float(cfg.get("planning", "output_time_reserve", default=10)),
-        )
+        remaining = deadline - time.monotonic() - float(cfg.get("planning", "output_time_reserve", default=10))
+        if remaining <= 0:
+            raise RuntimeError("build time budget exhausted")
+        plan = optimize.solve(
+            ep_grid.iloc[:, :1], players, current_squad, bank, ft, cfg,
+            selling_price=sell_at, locked=locked, hold_first_week=True,
+            time_limit=min(remaining, float(cfg.get("planning", "solver_time_limit", default=180))))
     except RuntimeError as exc:
         log.error("cannot compare against holding (%s) — keeping the previous report", exc)
         return 2
-    plan = next(s.plan for s in scenarios if s.recommended)
     log.info("solver: %s  objective %.1f  budget %.1fm",
              plan.status, plan.objective, plan.budget)
 
@@ -187,7 +186,7 @@ def build(args) -> int:
         ep_rows=ep_rows, ep_grid=ep_grid, plan=plan, entry=entry,
         current_squad=current_squad, free_transfers=ft,
         bank=bank, squad_value=squad_value, event=event,
-        transfer_advice=advice, selling_price=sell_at, scenarios=scenarios,
+        transfer_advice=advice, selling_price=sell_at, priorities=priorities,
         provenance=client.provenance, live=live,
         scoring_warnings=scoring_warnings,
     )

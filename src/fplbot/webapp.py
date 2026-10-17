@@ -135,6 +135,7 @@ class DashboardHandler(SimpleHTTPRequestHandler):
         def progress(line: str) -> None:
             for marker, key in (("building features", "stage_features"),
                                 ("solving hold", "stage_solve"),
+                                ("solving current squad", "stage_solve"),
                                 ("dashboard written", "stage_output")):
                 if marker in line:
                     self.server.build_stage = copy_text(key)
