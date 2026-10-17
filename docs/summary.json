@@ -2,8 +2,8 @@
   "gw": 7,
   "deadline": "2026-10-17T10:00:00+00:00",
   "deadline_local": "เสาร์ 17 ต.ค. 2569, 17:00 น.",
-  "headline": "พิจารณา Greaves → Dasilva · กัปตัน Groß",
-  "detail": "เพิ่มสุทธิ +14.5 EP ใน 5 นัด (เกณฑ์ +3.0). คาดการณ์ 57.5 แต้มใน GW7",
+  "headline": "ลำดับแรก: Greaves → Dasilva",
+  "detail": "เพิ่มสุทธิ +14.5 EP ใน 5 นัด (เกณฑ์ +3.0)",
   "captain": "Groß",
   "moves": [
     {
@@ -12,7 +12,7 @@
     }
   ],
   "alerts": [],
-  "expected_points": 57.45,
+  "expected_points": 56.05,
   "site_url": "https://Numchai2545.github.io/fpl-assistant",
   "candidates": [
     {
@@ -72,463 +72,434 @@
       ]
     }
   ],
-  "built_at": "เสาร์ 17 ต.ค. 2569, 15:09 น.",
-  "built_at_iso": "2026-10-17T08:09:33.412932+00:00",
-  "fetched_at": "2026-10-17T08:08:55.234495+00:00",
+  "built_at": "เสาร์ 17 ต.ค. 2569, 15:29 น.",
+  "built_at_iso": "2026-10-17T08:29:51.277905+00:00",
+  "fetched_at": "2026-10-17T08:29:43.115573+00:00",
   "data_sources": [
     "network"
   ],
-  "model_version": "0.4.0",
+  "model_version": "0.5.0",
   "decision_sources": [
     {
       "name": "bootstrap",
-      "fetched_at": "2026-10-17T08:08:55.234495+00:00",
+      "fetched_at": "2026-10-17T08:29:43.115573+00:00",
       "source": "network"
     },
     {
       "name": "fixtures",
-      "fetched_at": "2026-10-17T08:08:55.246536+00:00",
+      "fetched_at": "2026-10-17T08:29:43.130397+00:00",
       "source": "network"
     },
     {
       "name": "entry_entry6014213",
-      "fetched_at": "2026-10-17T08:08:55.377710+00:00",
+      "fetched_at": "2026-10-17T08:29:43.263928+00:00",
       "source": "network"
     },
     {
       "name": "entry_history_entry6014213",
-      "fetched_at": "2026-10-17T08:08:55.469002+00:00",
+      "fetched_at": "2026-10-17T08:29:43.272900+00:00",
       "source": "network"
     },
     {
       "name": "entry_transfers_entry6014213",
-      "fetched_at": "2026-10-17T08:08:55.560241+00:00",
+      "fetched_at": "2026-10-17T08:29:43.282492+00:00",
       "source": "network"
     },
     {
       "name": "picks_gw6_entry6014213",
-      "fetched_at": "2026-10-17T08:08:55.653598+00:00",
+      "fetched_at": "2026-10-17T08:29:43.291245+00:00",
       "source": "network"
     },
     {
       "name": "element_4",
-      "fetched_at": "2026-10-17T08:08:55.709426+00:00",
+      "fetched_at": "2026-10-17T08:29:43.349445+00:00",
       "source": "network"
     },
     {
       "name": "element_15",
-      "fetched_at": "2026-10-17T08:08:55.713976+00:00",
+      "fetched_at": "2026-10-17T08:29:43.357823+00:00",
       "source": "network"
     },
     {
       "name": "element_41",
-      "fetched_at": "2026-10-17T08:08:55.717842+00:00",
+      "fetched_at": "2026-10-17T08:29:43.366401+00:00",
       "source": "network"
     },
     {
       "name": "element_45",
-      "fetched_at": "2026-10-17T08:08:55.721665+00:00",
+      "fetched_at": "2026-10-17T08:29:43.374889+00:00",
       "source": "network"
     },
     {
       "name": "element_53",
-      "fetched_at": "2026-10-17T08:08:55.725482+00:00",
+      "fetched_at": "2026-10-17T08:29:43.385130+00:00",
       "source": "network"
     },
     {
       "name": "element_79",
-      "fetched_at": "2026-10-17T08:08:55.730449+00:00",
+      "fetched_at": "2026-10-17T08:29:43.393018+00:00",
       "source": "network"
     },
     {
       "name": "element_87",
-      "fetched_at": "2026-10-17T08:08:55.736482+00:00",
+      "fetched_at": "2026-10-17T08:29:43.400953+00:00",
       "source": "network"
     },
     {
       "name": "element_101",
-      "fetched_at": "2026-10-17T08:08:55.741460+00:00",
+      "fetched_at": "2026-10-17T08:29:43.408998+00:00",
       "source": "network"
     },
     {
       "name": "element_105",
-      "fetched_at": "2026-10-17T08:08:55.745430+00:00",
+      "fetched_at": "2026-10-17T08:29:43.416718+00:00",
       "source": "network"
     },
     {
       "name": "element_109",
-      "fetched_at": "2026-10-17T08:08:55.749879+00:00",
+      "fetched_at": "2026-10-17T08:29:43.425397+00:00",
       "source": "network"
     },
     {
       "name": "element_110",
-      "fetched_at": "2026-10-17T08:08:55.755499+00:00",
+      "fetched_at": "2026-10-17T08:29:43.433735+00:00",
       "source": "network"
     },
     {
       "name": "element_113",
-      "fetched_at": "2026-10-17T08:08:55.759657+00:00",
+      "fetched_at": "2026-10-17T08:29:43.442642+00:00",
       "source": "network"
     },
     {
       "name": "element_115",
-      "fetched_at": "2026-10-17T08:08:55.763459+00:00",
+      "fetched_at": "2026-10-17T08:29:43.450797+00:00",
       "source": "network"
     },
     {
       "name": "element_124",
-      "fetched_at": "2026-10-17T08:08:55.767961+00:00",
+      "fetched_at": "2026-10-17T08:29:43.458791+00:00",
       "source": "network"
     },
     {
       "name": "element_127",
-      "fetched_at": "2026-10-17T08:08:55.772569+00:00",
+      "fetched_at": "2026-10-17T08:29:43.467509+00:00",
       "source": "network"
     },
     {
       "name": "element_138",
-      "fetched_at": "2026-10-17T08:08:55.776481+00:00",
+      "fetched_at": "2026-10-17T08:29:43.475880+00:00",
       "source": "network"
     },
     {
       "name": "element_165",
-      "fetched_at": "2026-10-17T08:08:55.780274+00:00",
+      "fetched_at": "2026-10-17T08:29:43.483726+00:00",
       "source": "network"
     },
     {
       "name": "element_166",
-      "fetched_at": "2026-10-17T08:08:55.783954+00:00",
+      "fetched_at": "2026-10-17T08:29:43.493730+00:00",
       "source": "network"
     },
     {
       "name": "element_173",
-      "fetched_at": "2026-10-17T08:08:55.787940+00:00",
+      "fetched_at": "2026-10-17T08:29:43.501767+00:00",
       "source": "network"
     },
     {
       "name": "element_176",
-      "fetched_at": "2026-10-17T08:08:55.791816+00:00",
+      "fetched_at": "2026-10-17T08:29:43.509900+00:00",
       "source": "network"
     },
     {
       "name": "element_194",
-      "fetched_at": "2026-10-17T08:08:55.795830+00:00",
+      "fetched_at": "2026-10-17T08:29:43.517895+00:00",
       "source": "network"
     },
     {
       "name": "element_229",
-      "fetched_at": "2026-10-17T08:08:55.800521+00:00",
+      "fetched_at": "2026-10-17T08:29:43.526174+00:00",
       "source": "network"
     },
     {
       "name": "element_236",
-      "fetched_at": "2026-10-17T08:08:55.804487+00:00",
+      "fetched_at": "2026-10-17T08:29:43.534390+00:00",
       "source": "network"
     },
     {
       "name": "element_249",
-      "fetched_at": "2026-10-17T08:08:55.808249+00:00",
+      "fetched_at": "2026-10-17T08:29:43.543015+00:00",
       "source": "network"
     },
     {
       "name": "element_305",
-      "fetched_at": "2026-10-17T08:08:55.812782+00:00",
+      "fetched_at": "2026-10-17T08:29:43.551157+00:00",
       "source": "network"
     },
     {
       "name": "element_306",
-      "fetched_at": "2026-10-17T08:08:55.817592+00:00",
+      "fetched_at": "2026-10-17T08:29:43.559671+00:00",
       "source": "network"
     },
     {
       "name": "element_332",
-      "fetched_at": "2026-10-17T08:08:55.821718+00:00",
+      "fetched_at": "2026-10-17T08:29:43.568352+00:00",
       "source": "network"
     },
     {
       "name": "element_384",
-      "fetched_at": "2026-10-17T08:08:55.825642+00:00",
+      "fetched_at": "2026-10-17T08:29:43.577274+00:00",
       "source": "network"
     },
     {
       "name": "element_385",
-      "fetched_at": "2026-10-17T08:08:55.829986+00:00",
+      "fetched_at": "2026-10-17T08:29:43.586054+00:00",
       "source": "network"
     },
     {
       "name": "element_397",
-      "fetched_at": "2026-10-17T08:08:55.834693+00:00",
+      "fetched_at": "2026-10-17T08:29:43.594471+00:00",
       "source": "network"
     },
     {
       "name": "element_399",
-      "fetched_at": "2026-10-17T08:08:55.838512+00:00",
+      "fetched_at": "2026-10-17T08:29:43.602925+00:00",
       "source": "network"
     },
     {
       "name": "element_400",
-      "fetched_at": "2026-10-17T08:08:55.843070+00:00",
+      "fetched_at": "2026-10-17T08:29:43.611383+00:00",
       "source": "network"
     },
     {
       "name": "element_411",
-      "fetched_at": "2026-10-17T08:08:55.846865+00:00",
+      "fetched_at": "2026-10-17T08:29:43.627560+00:00",
       "source": "network"
     },
     {
       "name": "element_418",
-      "fetched_at": "2026-10-17T08:08:55.851121+00:00",
+      "fetched_at": "2026-10-17T08:29:43.636424+00:00",
       "source": "network"
     },
     {
       "name": "element_426",
-      "fetched_at": "2026-10-17T08:08:55.856058+00:00",
+      "fetched_at": "2026-10-17T08:29:43.645282+00:00",
       "source": "network"
     },
     {
       "name": "element_428",
-      "fetched_at": "2026-10-17T08:08:55.859973+00:00",
+      "fetched_at": "2026-10-17T08:29:43.654252+00:00",
       "source": "network"
     },
     {
       "name": "element_449",
-      "fetched_at": "2026-10-17T08:08:55.863930+00:00",
+      "fetched_at": "2026-10-17T08:29:43.663207+00:00",
       "source": "network"
     },
     {
       "name": "element_496",
-      "fetched_at": "2026-10-17T08:08:55.867665+00:00",
+      "fetched_at": "2026-10-17T08:29:43.671969+00:00",
       "source": "network"
     },
     {
       "name": "element_497",
-      "fetched_at": "2026-10-17T08:08:55.871799+00:00",
+      "fetched_at": "2026-10-17T08:29:43.680384+00:00",
       "source": "network"
     },
     {
       "name": "element_504",
-      "fetched_at": "2026-10-17T08:08:55.875781+00:00",
+      "fetched_at": "2026-10-17T08:29:43.689099+00:00",
       "source": "network"
     },
     {
       "name": "element_526",
-      "fetched_at": "2026-10-17T08:08:55.880324+00:00",
+      "fetched_at": "2026-10-17T08:29:43.698491+00:00",
       "source": "network"
     },
     {
       "name": "element_544",
-      "fetched_at": "2026-10-17T08:08:55.885113+00:00",
+      "fetched_at": "2026-10-17T08:29:43.784346+00:00",
       "source": "network"
     },
     {
       "name": "element_552",
-      "fetched_at": "2026-10-17T08:08:55.889001+00:00",
+      "fetched_at": "2026-10-17T08:29:43.793438+00:00",
       "source": "network"
     },
     {
       "name": "element_599",
-      "fetched_at": "2026-10-17T08:08:55.892758+00:00",
+      "fetched_at": "2026-10-17T08:29:43.801693+00:00",
       "source": "network"
     },
     {
       "name": "element_649",
-      "fetched_at": "2026-10-17T08:08:55.896624+00:00",
+      "fetched_at": "2026-10-17T08:29:43.810349+00:00",
       "source": "network"
     },
     {
       "name": "element_656",
-      "fetched_at": "2026-10-17T08:08:55.900168+00:00",
+      "fetched_at": "2026-10-17T08:29:43.818107+00:00",
       "source": "network"
     }
   ],
   "stale_after_hours": 24.0,
   "analysis_warnings": [],
-  "plan_change": "แผนหลักเปลี่ยนจาก “พิจารณาย้าย 3 ตัว · กัปตัน Groß” หลังดึงข้อมูลและคำนวณ scenario ใหม่",
-  "scenarios": [
+  "priorities": [
     {
-      "transfers": 0,
-      "variant": 1,
-      "recommended": false,
-      "selected": false,
-      "objective_gain": 0.0,
-      "next_gw_gain": 0.0,
-      "moves": [],
-      "move_ids": [],
-      "fingerprint": "36f5a672cfa89e4f47b5b9d543e4ff5532e1554a9f1a3b55b6491cbf8cf04781"
+      "rank": 1,
+      "out_id": 306,
+      "in_id": 176,
+      "out": "Greaves",
+      "in": "Dasilva",
+      "position": "DEF",
+      "out_team": "IPS",
+      "in_team": "COV",
+      "sell_price": 3.9,
+      "buy_price": 4.0,
+      "out_ep": 7.4100129102246175,
+      "in_ep": 21.88543356756114,
+      "gain": 14.475420657336523,
+      "net_gain": 14.475420657336523,
+      "bank_after": 0.1,
+      "cumulative_gain": 14.475420657336523,
+      "hit_cost": 0,
+      "paid": false,
+      "worth_considering": true,
+      "matches": 5,
+      "availability": 1.0,
+      "starts": 1.0,
+      "fixtures": [
+        "GW7 TOT (A)",
+        "GW8 FUL (H)",
+        "GW9 SUN (H)",
+        "GW10 EVE (A)",
+        "GW11 CRY (H)"
+      ]
     },
     {
-      "transfers": 1,
-      "variant": 1,
-      "recommended": true,
-      "selected": false,
-      "objective_gain": 2.689,
-      "next_gw_gain": 1.4,
-      "moves": [
-        {
-          "out": "Greaves",
-          "in": "Dasilva"
-        }
-      ],
-      "move_ids": [
-        {
-          "out": 306,
-          "in": 176
-        }
-      ],
-      "fingerprint": "cd00aaf1c6f439de4b073998f9445007a990540d859f4bbbb715ad6259aec6d4"
+      "rank": 2,
+      "out_id": 4,
+      "in_id": 115,
+      "out": "Gabriel",
+      "in": "De Cuyper",
+      "position": "DEF",
+      "out_team": "ARS",
+      "in_team": "BHA",
+      "sell_price": 7.9,
+      "buy_price": 5.2,
+      "out_ep": 14.188315260079229,
+      "in_ep": 25.78204408169007,
+      "gain": 11.593728821610842,
+      "net_gain": 11.593728821610842,
+      "bank_after": 2.8,
+      "cumulative_gain": 26.069149478947367,
+      "hit_cost": 0,
+      "paid": false,
+      "worth_considering": true,
+      "matches": 5,
+      "availability": 1.0,
+      "starts": 1.0,
+      "fixtures": [
+        "GW7 CRY (H)",
+        "GW8 LIV (A)",
+        "GW9 MCI (A)",
+        "GW10 BRE (H)",
+        "GW11 HUL (A)"
+      ]
     },
     {
-      "transfers": 2,
-      "variant": 1,
-      "recommended": false,
-      "selected": false,
-      "objective_gain": 10.235,
-      "next_gw_gain": 5.79,
-      "moves": [
-        {
-          "out": "Maguire",
-          "in": "De Cuyper"
-        },
-        {
-          "out": "Gabriel",
-          "in": "Tarkowski"
-        }
-      ],
-      "move_ids": [
-        {
-          "out": 418,
-          "in": 115
-        },
-        {
-          "out": 4,
-          "in": 229
-        }
-      ],
-      "fingerprint": "b7a53c7c48a3ed0826d023506205c5d0df448f015a35ef92c88113e5d941f6cb"
+      "rank": 3,
+      "out_id": 497,
+      "in_id": 109,
+      "out": "Dubravka",
+      "in": "Verbruggen",
+      "position": "GKP",
+      "out_team": "TOT",
+      "in_team": "BHA",
+      "sell_price": 4.0,
+      "buy_price": 4.6,
+      "out_ep": 0.7727125986445349,
+      "in_ep": 21.44312003350052,
+      "gain": 20.670407434855985,
+      "net_gain": 20.670407434855985,
+      "bank_after": 2.2,
+      "cumulative_gain": 46.739556913803355,
+      "hit_cost": 0,
+      "paid": false,
+      "worth_considering": true,
+      "matches": 5,
+      "availability": 1.0,
+      "starts": 1.0,
+      "fixtures": [
+        "GW7 CRY (H)",
+        "GW8 LIV (A)",
+        "GW9 MCI (A)",
+        "GW10 BRE (H)",
+        "GW11 HUL (A)"
+      ]
     },
     {
-      "transfers": 3,
-      "variant": 1,
-      "recommended": false,
-      "selected": false,
-      "objective_gain": 13.834,
-      "next_gw_gain": 7.69,
-      "moves": [
-        {
-          "out": "Greaves",
-          "in": "De Cuyper"
-        },
-        {
-          "out": "Gabriel",
-          "in": "Tarkowski"
-        },
-        {
-          "out": "Ødegaard",
-          "in": "Dewsbury-Hall"
-        }
-      ],
-      "move_ids": [
-        {
-          "out": 306,
-          "in": 115
-        },
-        {
-          "out": 4,
-          "in": 229
-        },
-        {
-          "out": 15,
-          "in": 236
-        }
-      ],
-      "fingerprint": "e95b53bcfc402cb4b546f8ae2b742d4839666d014e1d0448f0031236de786768"
+      "rank": 4,
+      "out_id": 418,
+      "in_id": 229,
+      "out": "Maguire",
+      "in": "Tarkowski",
+      "position": "DEF",
+      "out_team": "MUN",
+      "in_team": "EVE",
+      "sell_price": 4.8,
+      "buy_price": 6.2,
+      "out_ep": 14.18046439065953,
+      "in_ep": 25.157992513175003,
+      "gain": 10.977528122515473,
+      "net_gain": 6.977528122515473,
+      "bank_after": 0.8,
+      "cumulative_gain": 53.71708503631883,
+      "hit_cost": 4,
+      "paid": true,
+      "worth_considering": false,
+      "matches": 5,
+      "availability": 1.0,
+      "starts": 1.0,
+      "fixtures": [
+        "GW7 CHE (H)",
+        "GW8 ARS (A)",
+        "GW9 NEW (A)",
+        "GW10 COV (H)",
+        "GW11 BRE (A)"
+      ]
     },
     {
-      "transfers": 1,
-      "variant": 2,
-      "recommended": false,
-      "selected": false,
-      "objective_gain": 5.966,
-      "next_gw_gain": 3.28,
-      "moves": [
-        {
-          "out": "Gabriel",
-          "in": "De Cuyper"
-        }
-      ],
-      "move_ids": [
-        {
-          "out": 4,
-          "in": 115
-        }
-      ],
-      "fingerprint": "69380a4b69055dd016625112b740d65b140f7487b4404280a8e9cf76aaa4b437"
-    },
-    {
-      "transfers": 2,
-      "variant": 2,
-      "recommended": false,
-      "selected": false,
-      "objective_gain": 9.437,
-      "next_gw_gain": 5.12,
-      "moves": [
-        {
-          "out": "Gabriel",
-          "in": "De Cuyper"
-        },
-        {
-          "out": "Ødegaard",
-          "in": "Dewsbury-Hall"
-        }
-      ],
-      "move_ids": [
-        {
-          "out": 4,
-          "in": 115
-        },
-        {
-          "out": 15,
-          "in": 236
-        }
-      ],
-      "fingerprint": "b44b7cb86e05d5d1fff869ca992b6cab1eea6c20aea3bc945c996ee1d33c5227"
-    },
-    {
-      "transfers": 3,
-      "variant": 2,
-      "recommended": false,
-      "selected": false,
-      "objective_gain": 13.324,
-      "next_gw_gain": 7.13,
-      "moves": [
-        {
-          "out": "Dubravka",
-          "in": "Verbruggen"
-        },
-        {
-          "out": "Greaves",
-          "in": "De Cuyper"
-        },
-        {
-          "out": "Gabriel",
-          "in": "Tarkowski"
-        }
-      ],
-      "move_ids": [
-        {
-          "out": 497,
-          "in": 109
-        },
-        {
-          "out": 306,
-          "in": 115
-        },
-        {
-          "out": 4,
-          "in": 229
-        }
-      ],
-      "fingerprint": "7e8a828059422b76e16042836f1533f629e26fa1ccd0c400f32c46b123bc96d5"
+      "rank": 5,
+      "out_id": 15,
+      "in_id": 236,
+      "out": "Ødegaard",
+      "in": "Dewsbury-Hall",
+      "position": "MID",
+      "out_team": "ARS",
+      "in_team": "EVE",
+      "sell_price": 6.6,
+      "buy_price": 6.6,
+      "out_ep": 19.407802199669046,
+      "in_ep": 25.999425538141374,
+      "gain": 6.591623338472328,
+      "net_gain": 2.5916233384723277,
+      "bank_after": 0.8,
+      "cumulative_gain": 56.30870837479115,
+      "hit_cost": 8,
+      "paid": true,
+      "worth_considering": false,
+      "matches": 5,
+      "availability": 1.0,
+      "starts": 1.0,
+      "fixtures": [
+        "GW7 CHE (H)",
+        "GW8 ARS (A)",
+        "GW9 NEW (A)",
+        "GW10 COV (H)",
+        "GW11 BRE (A)"
+      ]
     }
-  ]
+  ],
+  "plan_change": "แผนหลักยังเหมือนรายงานครั้งก่อน · EP GW นี้เปลี่ยน -1.4",
+  "scenarios": []
 }

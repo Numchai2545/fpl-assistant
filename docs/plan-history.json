@@ -726,5 +726,19 @@
     ],
     "expected_points": 57.45,
     "headline": "พิจารณา Greaves → Dasilva · กัปตัน Groß"
+  },
+  {
+    "built_at": "2026-10-17T08:29:51.277905+00:00",
+    "fetched_at": "2026-10-17T08:29:43.115573+00:00",
+    "gw": 7,
+    "model_version": "0.5.0",
+    "moves": [
+      {
+        "out": "Greaves",
+        "in": "Dasilva"
+      }
+    ],
+    "expected_points": 56.05,
+    "headline": "ลำดับแรก: Greaves → Dasilva"
   }
 ]
