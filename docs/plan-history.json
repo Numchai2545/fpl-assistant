@@ -740,5 +740,19 @@
     ],
     "expected_points": 56.05,
     "headline": "ลำดับแรก: Greaves → Dasilva"
+  },
+  {
+    "built_at": "2026-10-17T17:06:49.375786+00:00",
+    "fetched_at": "2026-10-17T17:06:43.088201+00:00",
+    "gw": 8,
+    "model_version": "0.5.0",
+    "moves": [
+      {
+        "out": "Dubravka",
+        "in": "Tzolakis"
+      }
+    ],
+    "expected_points": 52.64,
+    "headline": "ลำดับแรก: Dubravka → Tzolakis"
   }
 ]
