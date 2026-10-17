@@ -7,6 +7,7 @@ file straight from disk and it still works.
 from __future__ import annotations
 
 import json
+import hashlib
 import shutil
 from datetime import datetime, timezone
 from pathlib import Path
@@ -16,10 +17,13 @@ from zoneinfo import ZoneInfo
 import pandas as pd
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from .config import POSITIONS, Config
+from .config import POSITIONS, MAX_SAVED_TRANSFERS, Config
+from . import __version__
 from .optimize import outlook_by_player
+from .state import scenario_fingerprint
+from .copy_th import text
 
-MODEL_VERSION = "0.3.0"
+MODEL_VERSION = __version__
 WEB_DIR = Path(__file__).resolve().parents[2] / "web"
 
 
@@ -52,7 +56,7 @@ def _rank(value) -> str:
 
 def _opponent_label(rows: pd.DataFrame, teams: pd.DataFrame) -> str:
     if rows.empty:
-        return "ไม่มีเกม"
+        return text("no_game")
     parts = []
     for _, r in rows.iterrows():
         short = teams.short_name.get(int(r.opponent), "?")
@@ -81,35 +85,35 @@ def squad_alerts(players: pd.DataFrame, squad: list[int], xi: list[int],
         news = (p.get("news") or "").strip()
 
         if p.p_available < 0.5:
-            flags.append({"tag": "ไม่พร้อมลง", "severity": "high", "name": p["name"],
+            flags.append({"tag": text("unavailable"), "severity": "high", "name": p["name"],
                           "in_xi": in_xi,
-                          "detail": news or "FPL ติดธงว่าไม่พร้อมลงเล่น"})
+                          "detail": news or text("unavailable_news")})
             if in_xi:
-                alerts.append(f"{p['name']} ไม่พร้อมลง แต่ยังอยู่ในตัวจริง"
+                alerts.append(text("unavailable_xi", name=p["name"])
                               + (f" — {news}" if news else ""))
         elif p.p_available < 1.0:
-            flags.append({"tag": "ต้องลุ้น", "severity": "medium", "name": p["name"],
+            flags.append({"tag": text("doubtful"), "severity": "medium", "name": p["name"],
                           "in_xi": in_xi,
-                          "detail": news or "FPL ระบุว่ามีโอกาสไม่ได้ลง"})
+                          "detail": news or text("doubtful_news")})
             if in_xi:
-                alerts.append(f"{p['name']} ยังไม่ชัวร์ว่าได้ลง"
+                alerts.append(text("doubtful_xi", name=p["name"])
                               + (f" — {news}" if news else ""))
         elif p.p_start < 0.55 and p.minutes > 0:
-            flags.append({"tag": "หมุนเวียน", "severity": "medium", "name": p["name"],
+            flags.append({"tag": text("rotation"), "severity": "medium", "name": p["name"],
                           "in_xi": in_xi,
-                          "detail": f"ลงตัวจริงแค่ {p.p_start:.0%} ของนัดที่ทีมเตะ"})
+                          "detail": text("rotation_detail", probability=float(p.p_start))})
 
         if int(p.get("yellow_cards", 0)) >= 4:
-            flags.append({"tag": "เสี่ยงโดนแบน", "severity": "medium", "name": p["name"],
+            flags.append({"tag": text("suspension"), "severity": "medium", "name": p["name"],
                           "in_xi": in_xi,
-                          "detail": f"ใบเหลือง {int(p.yellow_cards)} ใบ — อีกใบเดียวโดนแบน"})
+                          "detail": text("suspension_detail", cards=int(p.yellow_cards))})
 
     # A captain who does not play is the most expensive single thing that can go
     # wrong in a gameweek, so it leads regardless of what else is flagged.
     if captain is not None and captain in players.index:
         cap = players.loc[captain]
         if cap.p_available < 1.0:
-            alerts.insert(0, f"กัปตัน {cap['name']} ไม่ชัวร์ว่าได้ลง — เปลี่ยนกัปตันด่วน")
+            alerts.insert(0, text("captain_alert", name=cap["name"]))
 
     flags.sort(key=lambda f: (f["severity"] != "high", not f["in_xi"]))
     return flags, alerts
@@ -144,17 +148,17 @@ def chip_signals(cfg: Config, ep_rows: pd.DataFrame, players: pd.DataFrame,
                 bench_gain = sum(float(ep_by_gw.get((gw, pid), 0.0)) for pid in week.bench)
                 estimates = []
                 if tc_available:
-                    estimates.append(f"TC เพิ่มได้ราว {tc_gain:.1f} EP")
+                    estimates.append(text("tc_gain", gain=tc_gain))
                 if bb_available:
-                    estimates.append(f"BB ปลดล็อกม้านั่งราว {bench_gain:.1f} EP")
+                    estimates.append(text("bb_gain", gain=bench_gain))
                 if estimates:
                     suffix = " (" + " · ".join(estimates) + ")"
             signals.append(
-                f"GW{gw} มี Double Gameweek ในทีม — พิจารณา {chips}{suffix} หลังเช็กข่าวตัวจริง")
+                text("double_chip", gw=gw, chips=chips, suffix=suffix))
         playable = sum(games.get(int(players.team[p]), 0) > 0
                        and float(players.p_available[p]) >= 0.5 for p in owned)
         if owned and playable < 11 and fh_available:
-            signals.append(f"GW{gw} ทีมปัจจุบันมีผู้เล่นพร้อมโปรแกรมเพียง {playable} คน — พิจารณา Free Hit")
+            signals.append(text("blank_chip", gw=gw, players=playable))
     return signals[:4]
 
 
@@ -170,12 +174,15 @@ def player_comparisons(cfg: Config, ep_rows: pd.DataFrame, players: pd.DataFrame
     squad_set = set(squad)
     club_counts = players.loc[[p for p in squad if p in players.index]].team.value_counts()
 
-    remaining_bank = float(bank)
-    if transfer_advice.recommend and transfer_advice.out_id is not None:
-        incoming = transfer_advice.candidates[0].in_id
-        remaining_bank += float(selling_price.get(
-            transfer_advice.out_id, players.price[transfer_advice.out_id]))
-        remaining_bank -= float(players.price[incoming])
+    # Cash belongs to the displayed complete squad, not the independent
+    # single-slot candidate advice (which can recommend a different move).
+    owned = set(current_squad)
+    remaining_bank = (float(bank)
+                      + sum(float(selling_price.get(p, players.price[p]))
+                            for p in owned - squad_set)
+                      - sum(float(players.price[p]) for p in squad_set - owned))
+    if remaining_bank < -1e-7:
+        raise ValueError("displayed scenario exceeds the verified transfer budget")
 
     def row(pid: int, selected: bool) -> dict:
         p = players.loc[pid]
@@ -240,8 +247,10 @@ def build_context(*, cfg: Config, bootstrap: dict, teams: pd.DataFrame,
                   bank: float, squad_value: float, event: dict,
                   transfer_advice, selling_price: dict[int, float],
                   scenarios=None, provenance: dict | None = None,
-                  live: dict | None = None) -> dict:
+                  live: dict | None = None,
+                  scoring_warnings: list[str] | None = None) -> dict:
     gw = int(event["id"])
+    built_iso = datetime.now(timezone.utc).isoformat()
     horizon_gws = list(ep_grid.columns)
     tz = ZoneInfo(cfg.get("notify", "timezone", default="Asia/Bangkok"))
     deadline = datetime.fromisoformat(event["deadline_time"].replace("Z", "+00:00"))
@@ -282,9 +291,15 @@ def build_context(*, cfg: Config, bootstrap: dict, teams: pd.DataFrame,
                  f"{formation_counts['FWD']}")
 
     scenario_cards = []
+    scenario_comparisons = {}
     plan_request_base = cfg.get("notify", "plan_request_url", default="") or ""
     for index, scenario in enumerate(scenarios or []):
         week = scenario.plan.gameweeks[0]
+        move_ids = [{"out": int(o), "in": int(i)} for o, i in week.moves]
+        fingerprint = scenario_fingerprint(gw, built_iso, move_ids)
+        scenario_comparisons[str(index)] = player_comparisons(
+            cfg, ep_rows, players, teams, week.squad, current_squad, bank,
+            selling_price, transfer_advice)
         cards = [card(p, week.captain, week.vice) for p in week.xi]
         counts = {pos: sum(int(players.element_type[p]) == pos for p in week.xi)
                   for pos in (2, 3, 4)}
@@ -292,6 +307,8 @@ def build_context(*, cfg: Config, bootstrap: dict, teams: pd.DataFrame,
             "index": index, "transfers": scenario.transfers,
             "variant": scenario.variant,
             "recommended": scenario.recommended,
+            "selected": scenario.selected,
+            "solver_status": text("optimal" if scenario.plan.status == "Optimal" else "feasible"),
             "objective_gain": scenario.objective_gain,
             "next_gw_gain": scenario.next_gw_gain,
             "formation": f"{counts[2]}-{counts[3]}-{counts[4]}",
@@ -302,8 +319,8 @@ def build_context(*, cfg: Config, bootstrap: dict, teams: pd.DataFrame,
             "captain": id_to_name.get(week.captain, "—"),
             "moves": [{"out": id_to_name.get(o, str(o)),
                        "in": id_to_name.get(i, str(i))} for o, i in week.moves],
-            "move_ids": [{"out": int(o), "in": int(i)} for o, i in week.moves],
-            "select_url": (f"{plan_request_base}&title={quote(f'[select-plan] GW{gw} scenario {index}')}"
+            "move_ids": move_ids, "fingerprint": fingerprint,
+            "select_url": (f"{plan_request_base}&title={quote(f'[select-plan] GW{gw} scenario {index} {fingerprint}')}"
                            if plan_request_base else ""),
         })
 
@@ -338,6 +355,7 @@ def build_context(*, cfg: Config, bootstrap: dict, teams: pd.DataFrame,
             "price": float(selling_price.get(out_id, outgoing.price)),
             "ep": float(transfer_advice.candidates[0].out_ep)
                    if transfer_advice.candidates else 0.0,
+            "matches": transfer_advice.candidates[0].out_matches if transfer_advice.candidates else 0,
             "price_signal": str(outgoing.get("price_change_signal", "stable")),
         }
 
@@ -352,6 +370,8 @@ def build_context(*, cfg: Config, bootstrap: dict, teams: pd.DataFrame,
         ]
         ownership = pd.to_numeric(incoming.selected_by_percent, errors="coerce")
         candidate_rows = ep_rows[ep_rows.player_id == candidate.in_id]
+        candidate_rows = candidate_rows.sort_values(
+            ["gw", "kickoff"] if "kickoff" in candidate_rows else ["gw"], na_position="first")
         component_cols = ["ep_minutes", "ep_goals", "ep_assists", "ep_clean_sheet",
                           "ep_defcon", "ep_bonus", "ep_saves", "ep_cards", "ep_conceded"]
         components = {name.removeprefix("ep_"): float(candidate_rows[name].head(outlook_matches).sum())
@@ -365,6 +385,7 @@ def build_context(*, cfg: Config, bootstrap: dict, teams: pd.DataFrame,
             "ep_next": float(ep_this.get(candidate.in_id, 0.0)),
             "ep": candidate.in_ep, "gain": candidate.gain,
             "net_gain": candidate.net_gain, "fixtures": fixture_labels,
+            "matches": len(candidate.fixtures),
             "recommended": candidate.in_id in chosen_incoming,
             "price_signal": str(incoming.get("price_change_signal", "stable")),
             "price_risk": float(incoming.get("price_risk_score", 0.0)),
@@ -377,24 +398,25 @@ def build_context(*, cfg: Config, bootstrap: dict, teams: pd.DataFrame,
     captain_name = id_to_name.get(first.captain, "—")
     if moves:
         if len(moves) == 1:
-            headline = f"พิจารณา {moves[0]['out']} → {moves[0]['in_']} · กัปตัน {captain_name}"
+            headline = text("move", out=moves[0]["out"], incoming=moves[0]["in_"], captain=captain_name)
         else:
-            headline = f"พิจารณาย้าย {len(moves)} ตัว · กัปตัน {captain_name}"
-        selected_scenario = next((s for s in scenario_cards if s["recommended"]), None)
-        gain_text = (f"ดีกว่าแผนไม่ย้าย {selected_scenario['objective_gain']:.1f} คะแนนแผนสุทธิ"
-                     if selected_scenario else transfer_advice.reason)
-        detail = f"{gain_text}. คาดการณ์ {first.expected_points:.0f} แต้มใน GW{gw}"
+            headline = text("multi_move", count=len(moves), captain=captain_name)
+        best = transfer_advice.candidates[0] if transfer_advice.candidates else None
+        gain_text = (text("gain", gain=best.net_gain, matches=outlook_matches,
+                           threshold=transfer_advice.threshold) if best else transfer_advice.reason)
+        detail = f"{gain_text}. " + text("estimated", ep=first.expected_points, gw=gw)
         recommended = next((p for p in transfer_candidates if p["recommended"]), None)
         urgency = []
         if recommended and recommended["price_signal"] == "rising" and recommended["price_risk"] >= 0.5:
-            urgency.append(f"{recommended['name']} มีแรงซื้อสูงและเสี่ยงขึ้นราคา")
+            urgency.append(text("price_rising", name=recommended["name"]))
         if transfer_out and transfer_out["price_signal"] == "falling":
-            urgency.append(f"{transfer_out['name']} มีแรงขายสูงและเสี่ยงลงราคา")
+            urgency.append(text("price_falling", name=transfer_out["name"]))
         if urgency:
-            detail += ". ราคา: " + " · ".join(urgency)
+            detail += text("price_prefix") + " · ".join(urgency)
     else:
-        headline = f"แนะนำให้เก็บ transfer · กัปตัน {captain_name}"
-        detail = f"{transfer_advice.reason}. คาดการณ์ {first.expected_points:.0f} แต้มใน GW{gw}"
+        headline = text("hold", captain=captain_name)
+        reason = (text("unverified_move") if transfer_advice.recommend else transfer_advice.reason)
+        detail = f"{reason}. " + text("estimated", ep=first.expected_points, gw=gw)
     action = {"headline": headline, "detail": detail, "moves": moves}
 
     clashes = []
@@ -407,7 +429,7 @@ def build_context(*, cfg: Config, bootstrap: dict, teams: pd.DataFrame,
             if defender not in players.index or int(players.element_type[defender]) not in (1, 2):
                 continue
             if int(players.team[defender]) in opponents:
-                clashes.append(f"{id_to_name[attacker]} เกมรุก พบแนวรับของ {id_to_name[defender]}")
+                clashes.append(text("fixture_clash", attacker=id_to_name[attacker], defender=id_to_name[defender]))
 
     # ---- the horizon plan -------------------------------------------------
     max_ep = max((w.expected_points for w in plan.gameweeks), default=1.0) or 1.0
@@ -418,7 +440,7 @@ def build_context(*, cfg: Config, bootstrap: dict, teams: pd.DataFrame,
             summary = ", ".join(
                 f"{id_to_name.get(o, o)} → {id_to_name.get(i, i)}" for o, i in pairs)
         else:
-            summary = "เก็บ transfer ไว้"
+            summary = text("hold_short")
         plan_rows.append({
             "gw": w.gw, "summary": summary, "hits": w.hits,
             "captain": id_to_name.get(w.captain, "—"),
@@ -463,10 +485,7 @@ def build_context(*, cfg: Config, bootstrap: dict, teams: pd.DataFrame,
     if history.get("current"):
         last_gw_points = history["current"][-1].get("points", 0)
 
-    fetched_values = [v.get("fetched_at") for v in (provenance or {}).values()
-                      if v.get("fetched_at")]
-    built_iso = datetime.now(timezone.utc).isoformat()
-    fetched_iso = max(fetched_values) if fetched_values else built_iso
+    fetched_iso, decision_sources = decision_freshness(provenance or {}, built_iso)
     try:
         fetched_human = _thai_datetime(
             datetime.fromisoformat(fetched_iso).astimezone(tz))
@@ -483,23 +502,25 @@ def build_context(*, cfg: Config, bootstrap: dict, teams: pd.DataFrame,
     signature = [{"out": m["out"], "in": m["in"]} for m in moves]
     if previous and previous.get("moves") == signature:
         delta = first.expected_points - float(previous.get("expected_points", first.expected_points))
-        plan_change = f"แผนหลักยังเหมือนรายงานครั้งก่อน · EP GW นี้เปลี่ยน {delta:+.1f}"
+        plan_change = text("same_plan", gain=delta)
     elif previous:
-        old = previous.get("headline", "แผนเดิม")
-        plan_change = f"แผนหลักเปลี่ยนจาก “{old}” หลังดึงข้อมูลและคำนวณทุก scenario ใหม่"
+        old = previous.get("headline", text("old_plan"))
+        plan_change = text("changed_plan", old=old)
     else:
-        plan_change = "นี่คือแผนฐานฉบับแรกที่บันทึกไว้"
+        plan_change = text("first_plan")
 
     sources = sorted({v.get("source", "unknown") for v in (provenance or {}).values()})
     source_label = ({"network"} if set(sources) == {"network"} else set(sources))
+    missing_counts = sorted(set(range(min(MAX_SAVED_TRANSFERS, free_transfers) + 1))
+                            - {s.transfers for s in (scenarios or [])}) if scenarios else []
     if source_label == {"network"}:
-        data_status = "ข้อมูลสดจาก FPL"
+        data_status = text("source_network")
     elif "offline" in sources:
-        data_status = "ข้อมูลออฟไลน์ที่บันทึกไว้"
+        data_status = text("source_offline")
     elif "cache" in sources:
-        data_status = "ข้อมูลแคช"
+        data_status = text("source_cache")
     else:
-        data_status = "ไม่ทราบที่มาข้อมูล"
+        data_status = text("source_unknown")
 
     return {
         "title": cfg.get("output", "title", default="FPL Assistant"),
@@ -507,6 +528,15 @@ def build_context(*, cfg: Config, bootstrap: dict, teams: pd.DataFrame,
         "captain_name": captain_name,
         "built_at": _thai_datetime(datetime.now(tz)), "built_at_iso": built_iso,
         "fetched_at_iso": fetched_iso, "fetched_at_human": fetched_human,
+        "decision_sources": decision_sources,
+        "stale_after_hours": float(cfg.get("planning", "stale_after_hours", default=24)),
+        "actual_lineup_note": text("actual_lineup"),
+        "analysis_warnings": ([text("partial_analysis")] if plan.notes else [])
+                             + ([text("feasible")] if plan.status != "Optimal" else [])
+                             + ([text("scoring")] if scoring_warnings else [])
+                             + ([text("missing_counts", counts=", ".join(map(str, missing_counts)))] if missing_counts else [])
+                             + ([text("selected_unavailable")] if any("saved choice" in n for n in plan.notes) else []),
+        "scoring_warnings": scoring_warnings or [],
         "data_sources": sources, "data_status": data_status,
         "deadline_iso": deadline.isoformat(),
         "deadline_human": f"{int(hours_left // 24)}d {int(hours_left % 24)}h" if hours_left >= 24
@@ -526,17 +556,20 @@ def build_context(*, cfg: Config, bootstrap: dict, teams: pd.DataFrame,
         "captains": captains, "transfer_out": transfer_out,
         "transfer_candidates": transfer_candidates,
         "outlook_matches": outlook_matches,
-        "plan": plan_rows, "plan_notes": " ".join(plan.notes),
+        "min_transfer_gain": transfer_advice.threshold,
+        "plan": plan_rows, "plan_notes": text("partial_analysis") if plan.notes else "",
         "fixture_grid": fixture_grid, "flags": flags[:10], "alerts": alerts,
         "chip_signals": chips,
         "player_comparisons": comparisons,
+        "scenario_comparisons": scenario_comparisons,
         "scenario_cards": scenario_cards, "plan_change": plan_change,
         "clashes": sorted(set(clashes)), "live": live,
         "refresh_request_url": cfg.get("notify", "refresh_request_url", default="") or "",
         "site_url": (cfg.get("notify", "site_url", default="") or "").rstrip("/"),
         "remind_hours": [int(h) for h in cfg.get(
             "notify", "remind_hours_before", default=[24])],
-        "model_version": MODEL_VERSION, "solver_status": plan.status,
+        "model_version": MODEL_VERSION,
+        "solver_status": text("optimal" if plan.status == "Optimal" else "feasible"),
     }
 
 
@@ -548,8 +581,16 @@ def render(context: dict, cfg: Config) -> Path:
     context.setdefault("fetched_at_iso", context["built_at_iso"])
     context.setdefault("fetched_at_human", context.get("built_at", context["built_at_iso"]))
     context.setdefault("data_sources", ["unknown"])
-    context.setdefault("data_status", "ไม่ทราบที่มาข้อมูล")
+    context.setdefault("data_status", text("source_unknown"))
     context.setdefault("scenario_cards", [])
+    context.setdefault("scenario_comparisons", {})
+    context.setdefault("decision_sources", [])
+    context.setdefault("stale_after_hours", 24)
+    context.setdefault("analysis_warnings", [])
+    context.setdefault("scoring_warnings", [])
+    context.setdefault("actual_lineup_note", text("actual_lineup"))
+    context.setdefault("min_transfer_gain", 3.0)
+    context["asset_version"] = hashlib.sha256((WEB_DIR / "sports-ui.css").read_bytes()).hexdigest()[:12]
     context.setdefault("plan_change", "")
     context.setdefault("clashes", [])
     context.setdefault("live", None)
@@ -587,12 +628,17 @@ def render(context: dict, cfg: Config) -> Path:
         "built_at": context["built_at"], "built_at_iso": context["built_at_iso"],
         "fetched_at": context["fetched_at_iso"],
         "data_sources": context["data_sources"], "model_version": MODEL_VERSION,
+        "decision_sources": context["decision_sources"],
+        "stale_after_hours": context["stale_after_hours"],
+        "analysis_warnings": context["analysis_warnings"],
         "plan_change": context["plan_change"], "scenarios": [{
             "transfers": s["transfers"], "variant": s["variant"],
             "recommended": s["recommended"],
+            "selected": s.get("selected", False),
             "objective_gain": round(s["objective_gain"], 3),
             "next_gw_gain": round(s["next_gw_gain"], 3), "moves": s["moves"],
             "move_ids": s["move_ids"],
+            "fingerprint": s["fingerprint"],
         } for s in context["scenario_cards"]],
     }
     summary_path = out_dir / "summary.json"
@@ -616,3 +662,21 @@ def render(context: dict, cfg: Config) -> Path:
     history_tmp.write_text(json.dumps(history[-100:], indent=2, ensure_ascii=False), encoding="utf-8")
     history_tmp.replace(history_path)
     return index
+
+
+def decision_freshness(provenance: dict, fallback: str) -> tuple[str, list[dict]]:
+    """A fresh live-score endpoint cannot hide older decision inputs."""
+    sources = []
+    for name, value in provenance.items():
+        if name.startswith("live_"):
+            continue
+        try:
+            stamp = datetime.fromisoformat(value["fetched_at"].replace("Z", "+00:00"))
+            if stamp.tzinfo is None:
+                continue
+        except (KeyError, ValueError, TypeError):
+            continue
+        sources.append({"name": name, "fetched_at": stamp.astimezone(timezone.utc).isoformat(),
+                        "source": value.get("source", "unknown")})
+    sources.sort(key=lambda s: s["fetched_at"])
+    return (sources[0]["fetched_at"] if sources else fallback), sources

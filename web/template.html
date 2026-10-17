@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
-<link rel="stylesheet" href="sports-ui.css">
+<link rel="stylesheet" href="sports-ui.css?v={{ asset_version }}">
 </head>
 <body>
 <div class="wrap">
@@ -45,9 +45,17 @@
     <button class="btn refreshbtn" type="submit" id="refresh-btn"><span class="refreshicon" aria-hidden="true">↻</span><span class="refresh-label">อัปเดตข้อมูลล่าสุด</span></button>
     <button class="btn installbtn" type="button" id="install-btn" hidden><span aria-hidden="true">↓</span> ติดตั้งแอป</button>
   </form>
-  <span class="stamp">{{ data_status }} · ดึงล่าสุด {{ fetched_at_human }} · วิเคราะห์ {{ built_at }}</span>
+  <span class="stamp">{{ data_status }} · ข้อมูลเก่าสุด {{ fetched_at_human }} · วิเคราะห์ {{ built_at }}</span>
   <div class="refresh-status" id="refresh-status" role="status" aria-live="polite" hidden></div>
 </div>
+
+<div class="data-state working" id="freshness-warning" role="status" hidden
+     data-fetched="{{ fetched_at_iso }}" data-stale-hours="{{ stale_after_hours }}"
+     data-known="{{ 'true' if decision_sources else 'false' }}"></div>
+<p class="sub lineup-note">{{ actual_lineup_note }}</p>
+{% for warning in analysis_warnings %}<div class="data-state working">{{ warning }}</div>{% endfor %}
+{% if scoring_warnings %}<details class="insight"><summary>รายละเอียดการตรวจสอบกฎคะแนน</summary>
+<ul>{% for warning in scoring_warnings %}<li>{{ warning }}</li>{% endfor %}</ul></details>{% endif %}
 
 {% if live %}
 <div class="data-state {{ 'working' if live.provisional else 'success' }}">
@@ -96,18 +104,20 @@
   {% if scenario_cards %}
   <div class="scenario-tabs" role="tablist" aria-label="เลือกแผนเปลี่ยนตัว">
     {% for s in scenario_cards %}
-    <button type="button" class="scenario-tab" data-scenario="{{ s.index }}" role="tab" aria-selected="{{ 'true' if s.recommended else 'false' }}">
+    <button type="button" class="scenario-tab" id="scenario-tab-{{ s.index }}" aria-controls="scenario-panel-{{ s.index }}" tabindex="{{ '0' if s.recommended else '-1' }}" data-scenario="{{ s.index }}" role="tab" aria-selected="{{ 'true' if s.recommended else 'false' }}">
       {{ 'ไม่ย้าย' if s.transfers == 0 else 'ย้าย ' ~ s.transfers ~ ' ตัว · ทางเลือก ' ~ s.variant }}
       {% if s.recommended %}<span>แนะนำ</span>{% endif %}
+      {% if s.selected %}<span>คุณบันทึกไว้</span>{% endif %}
     </button>
     {% endfor %}
   </div>
-  <p class="sub">“คะแนนแผนสุทธิ” รวม EP ตลอดช่วง {{ horizon }} GW แบบให้น้ำหนักนัดใกล้มากกว่า และหักต้นทุนความไม่แน่นอนของการใช้ transfer จึงไม่ใช่คะแนน FPL ที่จะได้รับตรงๆ</p>
+  <p class="sub">คำแนะนำหลักใช้ส่วนต่าง EP ของคู่ย้ายใน {{ outlook_matches }} นัด ต้องครบทั้งสองฝั่งและได้อย่างน้อย +{{ "%.1f"|format(min_transfer_gain) }} EP ส่วน “คะแนนแผนสุทธิ” รวมกัปตัน สำรอง hits และแผนอนาคตตลอด {{ horizon }} GW แบบลดน้ำหนักและหัก transfer friction ใช้เปรียบเทียบแผน ไม่ใช้แทนเกณฑ์แนะนำ</p>
   {% for s in scenario_cards %}
-  <div class="scenario-panel" data-scenario-panel="{{ s.index }}" role="tabpanel" {% if not s.recommended %}hidden{% endif %}>
+  <div class="scenario-panel" id="scenario-panel-{{ s.index }}" aria-labelledby="scenario-tab-{{ s.index }}" data-scenario-panel="{{ s.index }}" role="tabpanel" {% if not s.recommended %}hidden{% endif %}>
     <div class="scenario-summary">
       <b>{{ 'เก็บ transfer' if not s.moves else s.moves|map(attribute='out')|join(', ') ~ ' → ' ~ s.moves|map(attribute='in')|join(', ') }}</b>
       <span>GW ถัดไป {{ "%+.1f"|format(s.next_gw_gain) }} EP · คะแนนแผนสุทธิ {{ "%+.1f"|format(s.objective_gain) }} · กัปตัน {{ s.captain }}</span>
+      <span>{{ s.solver_status }}{% if s.selected %} · แผนที่คุณเลือกไว้{% endif %}</span>
       {% if s.select_url %}<a class="scenario-save" href="{{ s.select_url }}" target="_blank" rel="noopener">บันทึกแผนนี้</a>{% endif %}
     </div>
     <div class="pitch">
@@ -176,7 +186,7 @@
         <td class="pmeta">{{ p.opponent }}</td>
         <td class="r">{{ "%.2f"|format(p.exp_goals) }}</td>
         <td class="r">{{ "%.2f"|format(p.exp_assists) }}</td>
-        <td class="r">{{ "%.2f"|format(p.ep_bonus) }}</td>
+        <td class="r">{{ "%.1f"|format(p.ep_bonus) }}</td>
         <td class="r"><span class="meter"><span class="track"><span class="fill" style="width:{{ p.bar }}%"></span></span><b>{{ "%.1f"|format(p.ep) }}</b></span></td>
       </tr>
     {% endfor %}
@@ -191,7 +201,7 @@
   {% if transfer_out %}
   <p class="sub">
     เทียบตัวแทนตำแหน่ง {{ transfer_out.position }} กับ <b>{{ transfer_out.name }}</b>
-    (ราคาขาย £{{ "%.1f"|format(transfer_out.price) }}m · EP {{ outlook_matches }} นัด {{ "%.1f"|format(transfer_out.ep) }})
+    (ราคาขาย £{{ "%.1f"|format(transfer_out.price) }}m · EP {{ transfer_out.matches }}/{{ outlook_matches }} นัด {{ "%.1f"|format(transfer_out.ep) }})
     · เรียงจากผลต่าง EP โดยไม่ใช้ ownership จัดอันดับ
   </p>
   {% else %}
@@ -209,7 +219,7 @@
         <td class="r">{{ "%.1f"|format(p.ownership) }}</td>
         <td style="white-space:normal"><span class="pmeta">{{ p.fixtures|join(' · ') }}</span></td>
         <td class="r">{{ "%.1f"|format(p.ep_next) }}</td>
-        <td class="r"><b>{{ "%.1f"|format(p.ep) }}</b></td>
+        <td class="r"><b>{{ "%.1f"|format(p.ep) }}</b><br><small>{{ p.matches }}/{{ outlook_matches }} นัด</small></td>
         <td class="r" style="color:{{ 'var(--good)' if p.gain >= 3 else 'var(--ink-2)' }}">{{ "%+.1f"|format(p.net_gain) }}</td>
         <td class="r">{{ "%.0f%%"|format(p.availability * 100) }}</td>
       </tr>
@@ -329,6 +339,8 @@
   <summary><span class="summary-icon">DATA</span><span><strong>ข้อมูลมาจากไหนและเก็บที่ไหน</strong><small>ตรวจความสดและที่มาของรายงานนี้</small></span><span class="chevron">⌄</span></summary>
   <div class="insight-body">
     <p class="sub"><b>{{ data_status }}</b> · ดึงเมื่อ {{ fetched_at_human }} · วิเคราะห์เมื่อ {{ built_at }}</p>
+  <p class="sub">เวลาข้อมูลใช้แหล่งที่เก่าที่สุดในการวิเคราะห์ แยกจากคะแนนสดระหว่างแข่งขัน</p>
+  <ul>{% for source in decision_sources %}<li>{{ source.name }}: {{ source.fetched_at }} ({{ source.source }})</li>{% endfor %}</ul>
     <div class="flags">
       <div class="flag"><span class="tag">FPL</span><span>ข้อมูลทีม โปรแกรม ราคา ข่าว และคะแนนมาจาก public Fantasy Premier League API ไม่มีการล็อกอินหรือแก้ทีม</span></div>
       <div class="flag"><span class="tag">คอม</span><span>ข้อมูลดิบมีสำเนาตามเวลาที่ <code>data/snapshots/</code> และ projection ก่อน deadline อยู่ที่ <code>data/projections/</code></span></div>
@@ -358,24 +370,45 @@
 <footer>
   สร้างจาก Fantasy Premier League API เมื่อ {{ built_at }} · ตัวเลขคาดการณ์เป็นค่าประมาณเชิงสถิติ ไม่ใช่คำทำนายผลจริง
   โมเดล v{{ model_version }} &middot; สถานะ solver: {{ solver_status }}
+  <br>โมเดลยังไม่ได้คาลิเบรต · โอกาส autosub และการส่งคะแนนกัปตันต่อให้รองกัปตันยังเป็นข้อจำกัดของการคำนวณ
 </footer>
 </div>
 
 <script>
 (function () {
   var comparisons = {{ player_comparisons|tojson }};
+  var freshness = document.getElementById('freshness-warning');
+  function updateFreshness() {
+    var messages = [];
+    if (!navigator.onLine) messages.push('ออฟไลน์ — กำลังแสดงรายงานที่บันทึกไว้');
+    var fetched = Date.parse(freshness.dataset.fetched);
+    if (freshness.dataset.known !== 'true' || !Number.isFinite(fetched)) {
+      messages.push('ยังยืนยันอายุข้อมูลที่ใช้วิเคราะห์ไม่ได้');
+    } else if ((Date.now() - fetched) / 3600000 >= Number(freshness.dataset.staleHours)) {
+      messages.push('ข้อมูลเก่ากว่า ' + freshness.dataset.staleHours + ' ชั่วโมง กรุณาอัปเดตก่อนตัดสินใจ');
+    }
+    if (Date.parse({{ deadline_iso|tojson }}) <= Date.now()) messages.push('deadline ของรายงานนี้ผ่านแล้ว กรุณาเปิดรายงาน GW ถัดไป');
+    freshness.textContent = messages.join(' · ');
+    freshness.hidden = messages.length === 0;
+  }
+  updateFreshness();
+  window.addEventListener('offline', updateFreshness);
+  window.addEventListener('online', updateFreshness);
+  setInterval(updateFreshness, 30000);
+  var scenarioComparisons = {{ scenario_comparisons|tojson }};
   var modal = document.getElementById('player-modal');
   var compareTitle = document.getElementById('compare-title');
   var compareSub = document.getElementById('compare-sub');
   var compareBody = document.getElementById('compare-body');
-  var activePlayerId = null, compareSort = "ep", lastFocused = null;
+  var activePlayerId = null, activeScenario = null, compareSort = "ep", lastFocused = null;
   function fixtureScore(p) { var n=p.fixtures.map(function(x){var m=x.match(/\[(\d)\]/);return m?Number(m[1]):3;}); return n.reduce(function(a,b){return a+b;},0)/Math.max(n.length,1); }
   function openComparison(playerId) {
-    var data = comparisons[String(playerId)];
+    var source = activeScenario === null ? comparisons : scenarioComparisons[activeScenario];
+    var data = source && source[String(playerId)];
     if (!data) return;
     activePlayerId = playerId;
-    lastFocused = document.activeElement;
-    var chosen=data.rows.find(function(p){return p.selected;}) || data.rows[0];
+    if (modal.hidden) lastFocused = document.activeElement;
+    var chosen=data.rows.find(function(p){return p.selected;}) || data.rows[0] || {price:0};
     var rows=data.rows.slice().sort(function(a,b){if(compareSort==="price")return Math.abs(a.price-chosen.price)-Math.abs(b.price-chosen.price)||b.ep-a.ep;if(compareSort==="form")return b.form-a.form||b.ep-a.ep;if(compareSort==="fixtures")return fixtureScore(a)-fixtureScore(b)||b.ep-a.ep;return b.ep-a.ep;});
     document.querySelectorAll(".filterbtn").forEach(function(b){b.setAttribute("aria-selected",String(b.dataset.sort===compareSort));});
     compareTitle.textContent = data.name + ' เทียบกับตัวเลือกตำแหน่ง ' + data.position;
@@ -391,7 +424,7 @@
         '£' + p.price.toFixed(1),
         p.fixtures.join(' · '),
         p.form.toFixed(1),
-        p.ep.toFixed(1),
+        p.ep.toFixed(1) + ' (' + p.fixtures.length + '/{{ outlook_matches }})',
         (p.gain >= 0 ? '+' : '') + p.gain.toFixed(1),
         Math.round(p.availability * 100) + '%'
       ];
@@ -409,7 +442,11 @@
     document.getElementById('compare-close').focus();
   }
   document.querySelectorAll('.player-open').forEach(function (button) {
-    button.addEventListener('click', function () { openComparison(button.dataset.player); });
+    button.addEventListener('click', function () {
+      var panel = button.closest('[data-scenario-panel]');
+      activeScenario = panel ? panel.dataset.scenarioPanel : null;
+      openComparison(button.dataset.player);
+    });
   });
   document.querySelectorAll(".filterbtn").forEach(function(button){button.addEventListener("click",function(){compareSort=button.dataset.sort;if(activePlayerId)openComparison(activePlayerId);});});
   function closeComparison() {
@@ -433,8 +470,18 @@
   document.querySelectorAll('.scenario-tab').forEach(function (button) {
     button.addEventListener('click', function () {
       var id = button.dataset.scenario;
-      document.querySelectorAll('.scenario-tab').forEach(function (b) { b.setAttribute('aria-selected', String(b === button)); });
+      document.querySelectorAll('.scenario-tab').forEach(function (b) { b.setAttribute('aria-selected', String(b === button)); b.tabIndex = b === button ? 0 : -1; });
       document.querySelectorAll('.scenario-panel').forEach(function (panel) { panel.hidden = panel.dataset.scenarioPanel !== id; });
+    });
+    button.addEventListener('keydown', function (event) {
+      var tabs = Array.from(document.querySelectorAll('.scenario-tab'));
+      var index = tabs.indexOf(button), next = index;
+      if (event.key === 'ArrowRight') next = (index + 1) % tabs.length;
+      else if (event.key === 'ArrowLeft') next = (index + tabs.length - 1) % tabs.length;
+      else if (event.key === 'Home') next = 0;
+      else if (event.key === 'End') next = tabs.length - 1;
+      else return;
+      event.preventDefault(); tabs[next].click(); tabs[next].focus();
     });
   });
 
@@ -455,7 +502,16 @@
       refreshLabel.textContent = 'กำลังวิเคราะห์ข้อมูล…';
       refreshStatus.hidden = false;
       refreshStatus.className = 'refresh-status working';
-      refreshStatus.textContent = 'กำลังดึงข้อมูลล่าสุดและคำนวณหลายแผน ใช้เวลาประมาณ 20–90 วินาที';
+      refreshStatus.textContent = 'กำลังเริ่มอัปเดตข้อมูลและเปรียบเทียบแผน…';
+      var progressTimer = setInterval(async function () {
+        try {
+          var progress = await fetch('/refresh-status', {cache:'no-store'});
+          if (progress.ok) {
+            var status = await progress.json();
+            refreshStatus.textContent = status.stage + ' · ผ่านไป ' + status.elapsed_seconds + ' วินาที';
+          }
+        } catch (_) {}
+      }, 1000);
       try {
         var response = await fetch('/refresh', {
           method: 'POST', headers: { 'Accept': 'application/json' }
@@ -471,6 +527,8 @@
         refreshBtn.disabled = false;
         refreshBtn.classList.remove('loading');
         refreshLabel.textContent = 'ลองอัปเดตอีกครั้ง';
+      } finally {
+        clearInterval(progressTimer);
       }
     });
   } else {
@@ -559,7 +617,7 @@
   var target = new Date(el.dataset.deadline).getTime();
   function tick() {
     var ms = target - Date.now();
-    if (ms <= 0) { el.textContent = 'closed'; return; }
+    if (ms <= 0) { el.textContent = 'ปิดแล้ว'; return; }
     var h = Math.floor(ms / 3600000), m = Math.floor(ms % 3600000 / 60000);
     var d = Math.floor(h / 24);
     el.textContent = d >= 1 ? d + 'd ' + (h % 24) + 'h' : h + 'h ' + m + 'm';

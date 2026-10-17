@@ -11,15 +11,16 @@ from __future__ import annotations
 import argparse
 import logging
 import sys
+import time
 from datetime import datetime, timezone
 
 import pandas as pd
 
 from . import backtest, calendar_feed, features, model, optimize, report, state
-from .config import load_config, selling_fee, verify_scoring
-from .fetch import (FPLClient, apply_event_transfer_state, bank_and_value,
+from .config import ROOT, load_config, selling_fee, verify_scoring
+from .fetch import (FPLClient, bank_and_value,
                     current_gameweek, deadline_utc, free_transfers, next_gameweek,
-                    selling_prices)
+                    selling_prices, permanent_transfers, reconstruct_team)
 
 log = logging.getLogger("fplbot")
 
@@ -49,7 +50,9 @@ def _setup_logging(verbose: bool) -> None:
 
 def build(args) -> int:
     cfg = load_config(args.config)
-    client = FPLClient(cfg, offline=args.offline)
+    deadline = time.monotonic() + float(cfg.get("planning", "build_time_budget", default=300))
+    client = FPLClient(cfg, offline=args.offline,
+                       force_refresh=getattr(args, "fresh", False))
 
     log.info("fetching league data")
     bootstrap = client.bootstrap()
@@ -57,7 +60,8 @@ def build(args) -> int:
 
     # A scoring rule that changed under us would silently poison every expected
     # point, and nothing downstream would fail. Check it on every build.
-    for problem in verify_scoring(bootstrap):
+    scoring_warnings = verify_scoring(bootstrap)
+    for problem in scoring_warnings:
         log.warning("SCORING RULE MISMATCH — %s", problem)
 
     event = next_gameweek(bootstrap)
@@ -74,24 +78,15 @@ def build(args) -> int:
     bank, squad_value = bank_and_value(entry)
     ft = free_transfers(history)
 
-    last_finished = gw - 1
-    current_squad: list[int] = []
-    picks = None
-    try:
-        picks = client.entry_picks(last_finished)
-        current_squad = [int(p["element"]) for p in picks["picks"]]
-    except Exception as exc:  # first gameweek, or a private entry
-        log.error("could not read GW%s picks (%s) — keeping the previous report",
-                  last_finished, exc)
-        return 2
-
     try:
         transfers = client.entry_transfers()
+        current_squad, bank, moves_already_made, picks = reconstruct_team(
+            client, history, transfers, gw, bank)
+        transfers = permanent_transfers(transfers, history)
     except Exception as exc:
-        log.warning("could not read your transfer history (%s)", exc)
-        transfers = []
-    current_squad, bank, moves_already_made = apply_event_transfer_state(
-        current_squad, bank, transfers, gw)
+        log.error("cannot verify permanent squad and transfer budget (%s) — "
+                  "keeping the previous report", exc)
+        return 2
     if moves_already_made:
         ft = max(0, ft - moves_already_made)
         log.info("applied %d transfer(s) already made in GW%s; current bank %.1fm",
@@ -99,7 +94,10 @@ def build(args) -> int:
 
     log.info("building features")
     teams = features.build_teams(bootstrap)
-    players = features.build_players(bootstrap, teams, fixtures)
+    players = features.build_players(bootstrap, teams, fixtures, cfg)
+    if any(pid not in players.index for pid in current_squad):
+        log.error("squad contains unknown players — keeping the previous report")
+        return 2
     shortlist = features.minutes_shortlist(
         players, current_squad,
         int(cfg.get("planning", "minutes_shortlist", default=30)))
@@ -121,11 +119,13 @@ def build(args) -> int:
     players = features.apply_price_forecast(players, cfg)
     horizon = cfg.horizon
     outlook_matches = int(cfg.get("planning", "outlook_matches", default=5))
-    # Pull a little beyond the optimiser horizon so a blank gameweek does not
-    # leave a player's five-match buying window one fixture short.
+    # Candidate windows need all remaining dated fixtures, while the optimiser
+    # needs consecutive GWs (including league-wide blanks) for FT accounting.
+    last_gw = max((int(f["event"]) for f in fixtures if f.get("event") is not None),
+                  default=gw - 1)
     schedule = features.build_schedule(
-        fixtures, players, gw, max(horizon, outlook_matches + 2))
-    horizon_gws = sorted(schedule.gw.unique().tolist())[:horizon]
+        fixtures, players, gw, max(0, last_gw - gw + 1))
+    horizon_gws = list(range(gw, min(last_gw + 1, gw + horizon)))
     if not horizon_gws:
         log.error("no fixtures scheduled from GW%s onward — nothing to plan", gw)
         return 1
@@ -147,21 +147,19 @@ def build(args) -> int:
     advice = optimize.analyse_transfers(
         ep_rows, players, current_squad, bank, ft, cfg, selling_price=sell_at)
     log.info("solving hold and multi-transfer scenarios")
-    scenarios = optimize.solve_scenarios(
-        ep_grid, players, current_squad, bank, ft, cfg,
-        selling_price=sell_at, locked=locked,
-    )
     selected = state.load_selected(cfg.site_dir / "selected-plan.json", gw)
-    if selected:
-        wanted = sorted((int(m["out"]), int(m["in"])) for m in selected.get("move_ids", []))
-        matched = next((s for s in scenarios
-                        if sorted(s.plan.gameweeks[0].moves) == wanted), None)
-        if matched:
-            for scenario in scenarios:
-                scenario.recommended = scenario is matched
-            log.info("kept the explicitly selected GW%s scenario", gw)
-        else:
-            log.warning("saved GW%s scenario no longer matches a legal optimal plan", gw)
+    selected_moves = ([(int(m["out"]), int(m["in"])) for m in selected.get("move_ids", [])]
+                      if selected else None)
+    try:
+        scenarios = optimize.solve_scenarios(
+            ep_grid, players, current_squad, bank, ft, cfg,
+            selling_price=sell_at, locked=locked, advice=advice,
+            selected_moves=selected_moves,
+            deadline=deadline - float(cfg.get("planning", "output_time_reserve", default=10)),
+        )
+    except RuntimeError as exc:
+        log.error("cannot compare against holding (%s) — keeping the previous report", exc)
+        return 2
     plan = next(s.plan for s in scenarios if s.recommended)
     log.info("solver: %s  objective %.1f  budget %.1fm",
              plan.status, plan.objective, plan.budget)
@@ -191,12 +189,13 @@ def build(args) -> int:
         bank=bank, squad_value=squad_value, event=event,
         transfer_advice=advice, selling_price=sell_at, scenarios=scenarios,
         provenance=client.provenance, live=live,
+        scoring_warnings=scoring_warnings,
     )
     path = report.render(ctx, cfg)
     log.info("dashboard written to %s", path)
     projection = backtest.write_projection(
         cfg, event, players, ep_rows, plan, advice,
-        model_version=report.MODEL_VERSION)
+        model_version=report.MODEL_VERSION, provenance=client.provenance)
     if projection:
         log.info("pre-deadline projection frozen at %s", projection)
 
@@ -235,7 +234,7 @@ def check(args) -> int:
 def serve(args) -> int:
     from .webapp import serve as serve_dashboard
     cfg = load_config(args.config)
-    return serve_dashboard(cfg.site_dir, cfg.path.parent, port=args.port,
+    return serve_dashboard(cfg.site_dir, ROOT, port=args.port,
                            config_path=args.config, open_browser=not args.no_browser)
 
 
@@ -243,8 +242,12 @@ def run_backtest(args) -> int:
     cfg = load_config(args.config)
     client = FPLClient(cfg, offline=args.offline,
                        force_refresh=getattr(args, "fresh", False))
+    events = client.bootstrap().get("events", [])
+    first_deadline = min((deadline_utc(e) for e in events if e.get("deadline_time")), default=None)
+    season = (str(first_deadline.year if first_deadline.month >= 7 else first_deadline.year - 1)
+              if first_deadline else None)
     result = backtest.evaluate_projections(
-        cfg, client.element_summary, fixtures=client.fixtures())
+        cfg, client.element_summary, fixtures=client.fixtures(), season=season)
     if result["gameweeks"] == 0:
         print("ยังไม่มี projection ที่ deadline ผ่านแล้วสำหรับ backtest")
         return 0
@@ -258,7 +261,7 @@ def select_plan(args) -> int:
     cfg = load_config(args.config)
     payload = state.select_scenario(
         cfg.site_dir / "summary.json", cfg.site_dir / "selected-plan.json",
-        args.scenario)
+        args.scenario, expected_fingerprint=args.fingerprint)
     print(f"selected GW{payload['gw']} scenario {args.scenario}")
     return 0
 
@@ -297,6 +300,8 @@ def main(argv: list[str] | None = None) -> int:
 
     p_select = sub.add_parser("select-plan", help="persist a reviewed dashboard scenario")
     p_select.add_argument("--scenario", type=int, required=True)
+    p_select.add_argument("--fingerprint", required=True,
+                          help="identity of the scenario in the reviewed report")
     p_select.set_defaults(func=select_plan)
 
     args = parser.parse_args(argv)

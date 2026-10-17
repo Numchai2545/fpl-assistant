@@ -4,6 +4,7 @@ __pycache__/
 venv/
 .env
 .pytest_cache/
+.fpl-qa-*/
 .DS_Store
 .vscode/settings.json
 

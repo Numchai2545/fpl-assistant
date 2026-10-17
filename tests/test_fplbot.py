@@ -794,15 +794,15 @@ class TestCalendarFeed:
     def test_one_alarm_per_reminder_stage(self):
         from fplbot import calendar_feed
         ics = calendar_feed.build_ics(self._events([100.0]), remind_hours=[48, 24, 3])
-        assert "TRIGGER:-PT2880M" in ics   # 48h
-        assert "TRIGGER:-PT1440M" in ics   # 24h
-        assert "TRIGGER:-PT180M" in ics    # 3h
+        assert "TRIGGER;RELATED=END:-PT2880M" in ics   # 48h before deadline
+        assert "TRIGGER;RELATED=END:-PT1440M" in ics   # 24h before deadline
+        assert "TRIGGER;RELATED=END:-PT180M" in ics    # 3h before deadline
         assert ics.count("BEGIN:VALARM") == 3
 
     def test_default_calendar_has_only_the_24_hour_reminder(self):
         from fplbot import calendar_feed
         ics = calendar_feed.build_ics(self._events([100.0]))
-        assert "TRIGGER:-PT1440M" in ics
+        assert "TRIGGER;RELATED=END:-PT1440M" in ics
         assert ics.count("BEGIN:VALARM") == 1
 
     def test_uid_is_stable_across_rebuilds(self):
@@ -921,7 +921,8 @@ class TestSquadAlerts:
         from fplbot.report import squad_alerts
         players = self._players([{"id": 1, "name": "Xhaka", "yellow_cards": 4}])
         flags, _ = squad_alerts(players, [1], xi=[1], captain=None)
-        assert any(f["tag"] == "เสี่ยงโดนแบน" for f in flags)
+        assert any(f["tag"] == "ตรวจโทษแบน" for f in flags)
+        assert all("อีกใบเดียว" not in f["detail"] for f in flags)
 
     def test_high_severity_and_xi_problems_sort_first(self):
         from fplbot.report import squad_alerts
@@ -1084,7 +1085,10 @@ class TestVersion030:
                           {"transfers": 1, "moves": [{"out": "A", "in": "B"}],
                            "move_ids": [{"out": 1, "in": 2}]}],
         }), encoding="utf-8")
-        saved = state.select_scenario(summary, selected, 1)
+        fingerprint = state.scenario_fingerprint(
+            6, "2026-09-19T00:00:00+00:00", [{"out": 1, "in": 2}])
+        saved = state.select_scenario(summary, selected, 1,
+                                      expected_fingerprint=fingerprint)
         assert saved["move_ids"] == [{"out": 1, "in": 2}]
         assert state.load_selected(selected, 6)["transfers"] == 1
         assert state.load_selected(selected, 7) is None

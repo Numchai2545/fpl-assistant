@@ -18,10 +18,12 @@ player is sold or bought.
 from __future__ import annotations
 
 import logging
+import time
 from dataclasses import dataclass, field
 
 import pandas as pd
 import pulp
+from .copy_th import text
 
 from .config import (HIT_COST, MAX_PER_CLUB, MAX_SAVED_TRANSFERS, SQUAD_BY_POSITION,
                      SQUAD_SIZE, XI_MAX, XI_MIN, XI_SIZE, Config)
@@ -95,6 +97,7 @@ class TransferScenario:
     objective_gain: float = 0.0
     next_gw_gain: float = 0.0
     recommended: bool = False
+    selected: bool = False
 
 
 @dataclass
@@ -108,6 +111,7 @@ class TransferCandidate:
     gain: float
     net_gain: float
     fixtures: list[dict] = field(default_factory=list)
+    out_matches: int = 0
 
 
 @dataclass
@@ -236,23 +240,28 @@ def analyse_transfers(ep_rows: pd.DataFrame, players: pd.DataFrame,
                 out_id=out_id, in_id=in_id, out_ep=out_ep, in_ep=in_ep,
                 gain=in_ep - out_ep, net_gain=in_ep - out_ep,
                 fixtures=fixtures.get(in_id, []),
+                out_matches=len(fixtures.get(out_id, [])),
             ))
 
     if not pairs:
         return TransferAdvice(None, [], False, False, threshold,
-                              "ไม่พบตัวแทนที่ถูกกติกาและอยู่ในงบ")
+                              text("no_candidates"))
 
-    pairs.sort(key=lambda p: (p.gain, p.in_ep), reverse=True)
+    pairs.sort(key=lambda p: (p.out_matches >= matches and len(p.fixtures) >= matches,
+                              p.gain, p.in_ep), reverse=True)
     out_id = pairs[0].out_id
     candidates = [p for p in pairs if p.out_id == out_id][:count]
     best = candidates[0]
+    if best.out_matches < matches or len(best.fixtures) < matches:
+        return TransferAdvice(out_id, candidates, False, False, threshold,
+                              text("incomplete_fixtures", matches=matches))
     if best.gain < threshold:
         return TransferAdvice(out_id, candidates, False, False, threshold,
-                              f"ตัวเลือกที่ดีที่สุดเพิ่มเพียง {best.gain:.1f} แต้มใน {matches} นัด")
+                              text("small_gain", gain=best.gain, matches=matches))
 
     if free_transfers > 0:
         return TransferAdvice(out_id, candidates, True, False, threshold,
-                              f"เพิ่ม {best.gain:.1f} แต้มใน {matches} นัดและไม่เสียแต้ม")
+                              text("free_gain", gain=best.gain, matches=matches))
 
     first_gw = int(ep_rows.gw.min()) if not ep_rows.empty else 0
     next_ep = (ep_rows[ep_rows.gw == first_gw].groupby("player_id").ep.sum()
@@ -266,9 +275,9 @@ def analyse_transfers(ep_rows: pd.DataFrame, players: pd.DataFrame,
         candidate.net_gain = candidate.gain - HIT_COST
     if emergency and net >= threshold:
         return TransferAdvice(out_id, candidates, True, True, threshold,
-                              f"เหตุฉุกเฉิน: เพิ่มสุทธิ {net:.1f} แต้มหลังหัก 4 แต้ม")
+                              text("emergency_gain", gain=net))
     return TransferAdvice(out_id, candidates, False, False, threshold,
-                          "ไม่มี free transfer และยังไม่เข้าเงื่อนไขย้ายฉุกเฉิน")
+                          text("no_ft"))
 
 
 def choose_candidates(ep_grid: pd.DataFrame, players: pd.DataFrame,
@@ -303,7 +312,9 @@ def solve(ep_grid: pd.DataFrame, players: pd.DataFrame, current_squad: list[int]
           forced_first_move: tuple[int, int] | None = None,
           hold_first_week: bool = False,
           exact_first_moves: int | None = None,
-          forbidden_first_buys: list[set[int]] | None = None) -> Plan:
+          forbidden_first_buys: list[set[int]] | None = None,
+          forced_first_moves: list[tuple[int, int]] | None = None,
+          time_limit: float | None = None) -> Plan:
     gws = list(ep_grid.columns)
     pool_size = int(cfg.get("planning", "candidate_pool", default=200))
     cand = choose_candidates(ep_grid, players, current_squad, pool_size)
@@ -314,6 +325,10 @@ def solve(ep_grid: pd.DataFrame, players: pd.DataFrame, current_squad: list[int]
     for pid in (forced_first_move or ()):
         if pid in players.index and pid not in cand:
             cand.append(pid)
+    for pair in (forced_first_moves or []):
+        for pid in pair:
+            if pid in players.index and pid not in cand:
+                cand.append(pid)
 
     price = players.price.to_dict()
     pos = players.element_type.to_dict()
@@ -369,6 +384,8 @@ def solve(ep_grid: pd.DataFrame, players: pd.DataFrame, current_squad: list[int]
     ft = V("ft", gws, lowBound=0, upBound=MAX_SAVED_TRANSFERS, cat="Integer")
     ft_overflow = V("ft_overflow", gws, cat="Binary")
     cash = V("cash", gws, lowBound=0, cat="Continuous")
+    original_held = V("original_held", (owned, gws), cat="Binary")
+    original_sale = V("original_sale", (owned, gws), cat="Binary")
 
     # ---- objective --------------------------------------------------------
     prob += pulp.lpSum(
@@ -427,6 +444,12 @@ def solve(ep_grid: pd.DataFrame, players: pd.DataFrame, current_squad: list[int]
             previous = (1 if p in current_squad else 0) if i == 0 else squad[p][gws[i - 1]]
             prob += squad[p][g] == previous + buy[p][g] - sell[p][g]
             prob += buy[p][g] + sell[p][g] <= 1
+        for p in owned:
+            previous_original = 1 if i == 0 else original_held[p][gws[i - 1]]
+            prob += original_sale[p][g] <= previous_original
+            prob += original_sale[p][g] <= sell[p][g]
+            prob += original_sale[p][g] >= previous_original + sell[p][g] - 1
+            prob += original_held[p][g] == previous_original - original_sale[p][g]
         if i == 0 and fresh_build:
             prob += ft[g] == min(free_transfers, MAX_SAVED_TRANSFERS)
             prob += free_used[g] == 0
@@ -436,8 +459,11 @@ def solve(ep_grid: pd.DataFrame, players: pd.DataFrame, current_squad: list[int]
             prob += cash[g] == budget - pulp.lpSum(price[p] * buy[p][g] for p in cand)
             continue
         previous_cash = float(bank) if i == 0 else cash[gws[i - 1]]
-        sale_revenue = pulp.lpSum(
-            sell_at.get(p, price[p]) * sell[p][g] for p in cand)
+        # Only the initial holding carries the initial discounted selling price.
+        # A later repurchase resets the cost basis to today's fixed market price.
+        sale_revenue = (pulp.lpSum(price[p] * sell[p][g] for p in cand)
+                        + pulp.lpSum((sell_at.get(p, price[p]) - price[p])
+                                     * original_sale[p][g] for p in owned))
         purchase_cost = pulp.lpSum(price[p] * buy[p][g] for p in cand)
         prob += cash[g] == previous_cash + sale_revenue - purchase_cost
         moves = pulp.lpSum(buy[p][g] for p in cand)
@@ -471,6 +497,16 @@ def solve(ep_grid: pd.DataFrame, players: pd.DataFrame, current_squad: list[int]
             prob += moves == 0
         if i == 0 and exact_first_moves is not None:
             prob += moves == int(exact_first_moves)
+        if i == 0 and forced_first_moves is not None:
+            wanted_out = {o for o, _ in forced_first_moves}
+            wanted_in = {n for _, n in forced_first_moves}
+            if len(wanted_out) != len(forced_first_moves) or len(wanted_in) != len(forced_first_moves):
+                raise ValueError("saved transfers contain duplicate players")
+            if any(p not in owned for p in wanted_out) or any(p in owned for p in wanted_in):
+                raise ValueError("saved transfers no longer match the current squad")
+            for p in cand:
+                prob += sell[p][g] == int(p in wanted_out)
+                prob += buy[p][g] == int(p in wanted_in)
         if i == 0:
             for forbidden in (forbidden_first_buys or []):
                 members = [buy[p][g] for p in forbidden if p in cand]
@@ -489,15 +525,24 @@ def solve(ep_grid: pd.DataFrame, players: pd.DataFrame, current_squad: list[int]
                 <= MAX_SAVED_TRANSFERS - free_used[previous_gw]
     prob += pulp.lpSum(hits[g] for g in gws) <= max_hits_total // HIT_COST
 
-    time_limit = int(cfg.get("planning", "solver_time_limit", default=180))
+    time_limit = (float(cfg.get("planning", "solver_time_limit", default=180))
+                  if time_limit is None else time_limit)
     # PuLP 4 removes PULP_CBC_CMD. Use the supported COIN_CMD interface while
     # pointing it at the CBC binary bundled by the `pulp[cbc]` extra.
     cbc_path = getattr(pulp.apis.PULP_CBC_CMD, "pulp_cbc_path", None)
     prob.solve(pulp.COIN_CMD(path=cbc_path, msg=False, timeLimit=time_limit))
-    status = pulp.LpStatus[prob.status]
+    status = ("Optimal" if prob.status == pulp.LpStatusOptimal
+              and prob.sol_status == pulp.LpSolutionOptimal else
+              "Feasible" if prob.sol_status == pulp.LpSolutionIntegerFeasible else
+              pulp.LpStatus[prob.status])
     log.info("solver finished: %s (%d candidates, %d gameweeks)", status, len(cand), len(gws))
-    if status != "Optimal":
+    if status not in {"Optimal", "Feasible"}:
         raise RuntimeError(f"transfer plan has no usable solution: {status}")
+    # A timed-out incumbent is usable only if it is integral and satisfies every
+    # constraint. Never publish the LP relaxation as a legal squad.
+    if any(v.cat == "Integer" and (v.value() is None or abs(v.value() - round(v.value())) > 1e-5)
+           for v in prob.variables()) or not prob.valid(1e-5):
+        raise RuntimeError("solver returned an invalid or non-integral plan")
 
     plans: list[GameweekPlan] = []
     for g in gws:
@@ -551,42 +596,89 @@ def solve(ep_grid: pd.DataFrame, players: pd.DataFrame, current_squad: list[int]
 def solve_scenarios(ep_grid: pd.DataFrame, players: pd.DataFrame,
                     current_squad: list[int], bank: float, free_transfers: int,
                     cfg: Config, *, selling_price: dict[int, float] | None = None,
-                    locked: list[int] | None = None) -> list[TransferScenario]:
-    """Solve holding and each usable free-transfer count on the same horizon."""
+                    locked: list[int] | None = None,
+                    advice: TransferAdvice | None = None,
+                    selected_moves: list[tuple[int, int]] | None = None,
+                    deadline: float | None = None) -> list[TransferScenario]:
+    """Keep the five-fixture decision separate from exploratory team objectives.
+
+    Holding and the qualifying single-slot recommendation get time first. Each
+    transfer count gets one comparison before optional variants consume time.
+    Saved choices keep their own identity and never become model endorsements.
+    """
     maximum = min(MAX_SAVED_TRANSFERS, max(0, int(free_transfers)))
-    configured = int(cfg.get("planning", "scenario_max_transfers", default=maximum))
-    maximum = min(maximum, max(0, configured))
+    maximum = min(maximum, max(0, int(cfg.get(
+        "planning", "scenario_max_transfers", default=maximum))))
+    end = time.monotonic() + float(cfg.get("planning", "scenario_time_budget", default=150))
+    if deadline is not None:
+        end = min(end, deadline)
     scenarios: list[TransferScenario] = []
+    notes: list[str] = []
+
+    def run(count: int, *, forced: list[tuple[int, int]] | None = None, variant: int = 1,
+            excluded: list[set[int]] | None = None) -> TransferScenario | None:
+        remaining = end - time.monotonic()
+        if remaining <= 0:
+            notes.append(f"scenario count {count} skipped: runtime budget exhausted")
+            return None
+        try:
+            plan = solve(
+                ep_grid, players, current_squad, bank, free_transfers, cfg,
+                selling_price=selling_price, locked=locked,
+                hold_first_week=count == 0, exact_first_moves=count,
+                forced_first_moves=forced,
+                forbidden_first_buys=excluded,
+                time_limit=min(float(cfg.get("planning", "solver_time_limit", default=180)),
+                               remaining),
+            )
+        except (RuntimeError, ValueError) as exc:
+            notes.append(f"scenario count {count} unavailable: {exc}")
+            return None
+        scenario = TransferScenario(transfers=count, plan=plan, variant=variant)
+        scenarios.append(scenario)
+        return scenario
+
+    baseline = run(0)
+    if baseline is None:
+        raise RuntimeError("holding baseline is unavailable")
+    chosen = baseline
+    if advice is not None and advice.recommend and advice.candidates:
+        best = advice.candidates[0]
+        recommended = run(1, forced=[(best.out_id, best.in_id)])
+        if recommended is not None:
+            chosen = recommended
+        else:
+            notes.append("qualifying five-fixture move could not be verified; holding instead")
+    chosen.recommended = True
+
+    if selected_moves is not None:
+        wanted = set(selected_moves)
+        selected = next((s for s in scenarios if set(s.plan.gameweeks[0].moves) == wanted), None)
+        if selected is None:
+            if len(wanted) <= maximum or (advice is not None and advice.hit and len(wanted) == 1):
+                selected = run(len(wanted), forced=selected_moves)
+            else:
+                notes.append("saved choice no longer fits the available free transfers")
+        if selected is not None:
+            selected.selected = True
+        else:
+            notes.append("saved choice is unavailable; model recommendation is unchanged")
+
     alternatives = max(1, int(cfg.get("planning", "scenario_alternatives", default=2)))
-    for count in range(maximum + 1):
-        excluded: list[set[int]] = []
-        variants = 1 if count == 0 else alternatives
-        for variant in range(1, variants + 1):
-            try:
-                plan = solve(
-                    ep_grid, players, current_squad, bank, free_transfers, cfg,
-                    selling_price=selling_price, locked=locked,
-                    hold_first_week=count == 0, exact_first_moves=count,
-                    forbidden_first_buys=excluded,
-                )
-            except RuntimeError as exc:
-                log.warning("%d-transfer scenario variant %d unavailable: %s",
-                            count, variant, exc)
-                break
-            scenarios.append(TransferScenario(
-                transfers=count, plan=plan, variant=variant))
-            excluded.append(set(plan.gameweeks[0].buys))
-    if not scenarios:
-        raise RuntimeError("no transfer scenario has a usable optimal solution")
-    baseline = next((s for s in scenarios if s.transfers == 0), scenarios[0])
+    for variant in range(1, alternatives + 1):
+        for count in range(1, maximum + 1):
+            existing = [s for s in scenarios if s.transfers == count]
+            if len(existing) >= variant:
+                continue
+            excluded = [set(s.plan.gameweeks[0].buys) for s in existing]
+            run(count, variant=variant, excluded=excluded)
     for scenario in scenarios:
         scenario.objective_gain = scenario.plan.objective - baseline.plan.objective
-        scenario.next_gw_gain = (
-            scenario.plan.gameweeks[0].expected_points
-            - baseline.plan.gameweeks[0].expected_points
-        )
-    threshold = float(cfg.get("planning", "min_transfer_gain", default=3.0))
-    eligible = [s for s in scenarios if s.objective_gain >= threshold]
-    chosen = max(eligible or [baseline], key=lambda s: (s.plan.objective, -s.transfers))
-    chosen.recommended = True
+        scenario.next_gw_gain = (scenario.plan.gameweeks[0].expected_points
+                                 - baseline.plan.gameweeks[0].expected_points)
+    for note in dict.fromkeys(notes):
+        log.warning(note)
+    baseline.plan.notes.extend(dict.fromkeys(notes))
+    if chosen is not baseline:
+        chosen.plan.notes.extend(dict.fromkeys(notes))
     return scenarios

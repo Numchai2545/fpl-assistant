@@ -52,11 +52,17 @@ jobs:
           FPL_SITE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
         run: python -m fplbot -v build --fresh
 
-      - name: Persist the latest report and plan history
+      - name: Check frozen projection metadata
+        env:
+          PYTHONPATH: src
+        run: python scripts/check_projection.py
+
+      - name: Persist report, plan history and frozen projections
         run: |
           git config user.name "fpl-assistant[bot]"
           git config user.email "fpl-assistant[bot]@users.noreply.github.com"
           git add docs
+          if [ -d data/projections ]; then git add data/projections; fi
           git diff --cached --quiet || git commit -m "dashboard: refresh published report [skip ci]"
           git push
 
@@ -99,14 +105,15 @@ jobs:
         run: |
           python - <<'PY'
           import json, os, re, subprocess
-          match = re.fullmatch(r"\[select-plan\] GW(\d+) scenario (\d+)", os.environ["ISSUE_TITLE"])
+          match = re.fullmatch(r"\[select-plan\] GW(\d+) scenario (\d+) ([0-9a-f]{64})", os.environ["ISSUE_TITLE"])
           if not match:
               raise SystemExit("invalid selection title")
           with open("docs/summary.json", encoding="utf-8") as handle:
               report = json.load(handle)
           if int(match.group(1)) != int(report["gw"]):
               raise SystemExit("selection is for a stale gameweek")
-          subprocess.run(["python", "-m", "fplbot", "select-plan", "--scenario", match.group(2)], check=True)
+          subprocess.run(["python", "-m", "fplbot", "select-plan", "--scenario", match.group(2),
+                          "--fingerprint", match.group(3)], check=True)
           PY
       - name: Persist selection
         run: |

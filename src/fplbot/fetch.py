@@ -20,7 +20,7 @@ import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
-from .config import HIT_COST, MAX_SAVED_TRANSFERS, Config
+from .config import HIT_COST, MAX_SAVED_TRANSFERS, SQUAD_SIZE, Config
 
 log = logging.getLogger(__name__)
 
@@ -139,15 +139,15 @@ class FPLClient:
     # --------------------------------------------------------------- your team
     def entry(self, team_id: int | None = None) -> dict:
         tid = team_id or self.cfg.team_id
-        return self._get(f"entry/{tid}/", "entry")
+        return self._entry_get(f"entry/{tid}/", "entry", tid)
 
     def entry_history(self, team_id: int | None = None) -> dict:
         tid = team_id or self.cfg.team_id
-        return self._get(f"entry/{tid}/history/", "entry_history")
+        return self._entry_get(f"entry/{tid}/history/", "entry_history", tid)
 
     def entry_picks(self, gameweek: int, team_id: int | None = None) -> dict:
         tid = team_id or self.cfg.team_id
-        return self._get(f"entry/{tid}/event/{gameweek}/picks/", f"picks_gw{gameweek}")
+        return self._entry_get(f"entry/{tid}/event/{gameweek}/picks/", f"picks_gw{gameweek}", tid)
 
     def entry_transfers(self, team_id: int | None = None) -> list[dict]:
         """Every transfer you have made, with the price paid for each player.
@@ -156,7 +156,21 @@ class FPLClient:
         without logging in — `picks` does not carry them.
         """
         tid = team_id or self.cfg.team_id
-        return self._get(f"entry/{tid}/transfers/", "entry_transfers")
+        return self._entry_get(f"entry/{tid}/transfers/", "entry_transfers", tid)
+
+    def _entry_get(self, path: str, cache_name: str, tid: int) -> Any:
+        """Reuse legacy snapshots only when their entry identity is verified."""
+        qualified = f"{cache_name}_entry{tid}"
+        legacy = self.snapshot_dir / f"{cache_name}.json"
+        identity = self.snapshot_dir / "entry.json"
+        if (not self.force_refresh and not (self.snapshot_dir / f"{qualified}.json").exists()
+                and legacy.exists() and identity.exists()):
+            try:
+                if int(json.loads(identity.read_text(encoding="utf-8"))["id"]) == tid:
+                    return self._get(path, cache_name)
+            except (KeyError, ValueError, TypeError):
+                pass
+        return self._get(path, qualified)
 
     def event_live(self, event: int) -> dict:
         """Live points for a started gameweek; provisional until every match finishes."""
@@ -261,6 +275,62 @@ def apply_event_transfers(squad: list[int], transfers: list[dict] | None,
         current[current.index(out_id)] = in_id
         applied += 1
     return current, applied
+
+
+def permanent_transfers(transfers: list[dict], history: dict) -> list[dict]:
+    """Temporary Free Hit purchases must never replace permanent cost bases."""
+    temporary = {int(c["event"]) for c in history.get("chips", [])
+                 if c.get("name", "").lower() in {"freehit", "free_hit"}}
+    return [t for t in transfers if int(t.get("event") or 0) not in temporary]
+
+
+def reconstruct_team(client: FPLClient, history: dict, transfers: list[dict],
+                     event: int, bank: float) -> tuple[list[int], float, int, dict]:
+    """Recover the permanent team, stepping behind a temporary deadline squad.
+
+    Public picks can describe a Free Hit squad. Its bank and players cannot be
+    used as the starting point for next week's purchases.
+    """
+    base = event - 1
+    picks = client.entry_picks(base)
+    live_picks = picks
+    temporary = {int(c["event"]) for c in history.get("chips", [])
+                 if c.get("name", "").lower() in {"freehit", "free_hit"}}
+    if event in temporary:
+        raise ValueError("Free Hit is active; permanent transfer advice is unavailable")
+    if picks.get("active_chip") in {"freehit", "free_hit"}:
+        if base not in temporary:
+            raise ValueError("picks and chip history disagree; refresh both sources")
+    while base in temporary:
+        base -= 1
+        if base < 1:
+            raise ValueError("no permanent deadline squad available before Free Hit")
+        picks = client.entry_picks(base)
+        if picks.get("active_chip") in {"freehit", "free_hit"}:
+            if base not in temporary:
+                raise ValueError("picks and chip history disagree; refresh both sources")
+    if base != event - 1:
+        recorded = picks.get("entry_history", {}).get("bank")
+        if recorded is None:
+            recorded = next((r.get("bank") for r in history.get("current", [])
+                             if int(r.get("event", 0)) == base), None)
+        if recorded is None:
+            raise ValueError("permanent pre-Free-Hit bank is unavailable")
+        bank = int(recorded) / 10.0
+    squad = [int(p["element"]) for p in picks["picks"]]
+    current_moves = 0
+    for gw in range(base + 1, event + 1):
+        if gw in temporary:
+            continue
+        rows = [t for t in transfers if int(t.get("event") or 0) == gw]
+        squad, bank, applied = apply_event_transfer_state(squad, bank, rows, gw)
+        if applied != len(rows):
+            raise ValueError("transfer history does not match the permanent squad")
+        if gw == event:
+            current_moves = applied
+    if len(squad) != SQUAD_SIZE or len(set(squad)) != SQUAD_SIZE or bank < -1e-9:
+        raise ValueError("invalid reconstructed squad or bank")
+    return squad, bank, current_moves, live_picks
 
 
 def purchase_prices(squad: list[int], transfers: list[dict] | None, players) -> dict[int, float]:

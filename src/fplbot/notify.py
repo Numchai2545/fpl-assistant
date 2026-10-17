@@ -19,6 +19,7 @@ from datetime import datetime, timezone
 import requests
 
 from .config import Config
+from .copy_th import text as copy_text
 
 log = logging.getLogger(__name__)
 
@@ -33,10 +34,10 @@ def _summary(cfg: Config) -> dict | None:
 
 def _fmt_left(hours_left: float) -> str:
     if hours_left >= 24:
-        return f"อีก {int(hours_left // 24)} วัน {int(hours_left % 24)} ชม."
+        return copy_text("notify_days", days=int(hours_left // 24), hours=int(hours_left % 24))
     if hours_left >= 1:
-        return f"อีก {int(hours_left)} ชม."
-    return f"อีก {max(0, int(hours_left * 60))} นาที"
+        return copy_text("notify_hours", hours=int(hours_left))
+    return copy_text("notify_minutes", minutes=max(0, int(hours_left * 60)))
 
 
 def compose(summary: dict, hours_left: float, stage: float | None = None,
@@ -48,19 +49,26 @@ def compose(summary: dict, hours_left: float, stage: float | None = None,
     for attention.
     """
     urgent = stage is not None and stage <= 6
-    head = "🚨 ใกล้ปิดแล้ว" if urgent else "⚽ เตือนจัดตัว"
+    head = copy_text("notify_urgent" if urgent else "notify_normal")
 
-    lines = [f"{head} — *GW{summary['gw']}* ปิด{_fmt_left(hours_left)}"]
+    lines = [copy_text("notify_header", heading=head, gw=summary["gw"], left=_fmt_left(hours_left))]
     when = (summary.get("deadline_local") or "").strip()
     if when:
         lines.append(f"_{when}_")
     lines.append("")
+    try:
+        fetched = datetime.fromisoformat(summary["fetched_at"])
+        age = (datetime.now(timezone.utc) - fetched).total_seconds() / 3600
+        if age >= float(summary.get("stale_after_hours", 24)):
+            lines.append(copy_text("notify_stale"))
+    except (KeyError, ValueError, TypeError):
+        lines.append(copy_text("notify_stale"))
 
     # Anything unavailable in the XI goes above the fold: this is the failure
     # that actually costs points when a deadline is missed.
     alerts = summary.get("alerts") or []
     if alerts:
-        lines.append("*⚠️ ต้องแก้ก่อนปิด*")
+        lines.append(copy_text("notify_alerts"))
         lines += [f"• {a}" for a in alerts[:4]]
         lines.append("")
 
@@ -68,22 +76,23 @@ def compose(summary: dict, hours_left: float, stage: float | None = None,
 
     moves = summary.get("moves") or []
     if moves:
-        lines.append("*เปลี่ยนตัว*")
+        lines.append(copy_text("notify_moves"))
         lines += [f"• {m['out']} ➜ {m['in']}" for m in moves]
         lines.append("")
 
-    lines.append(f"คาดการณ์ {summary['expected_points']:.0f} แต้ม")
+    lines.append(copy_text("notify_points", points=summary["expected_points"]))
+    lines.append(copy_text("actual_lineup"))
 
     if not urgent:
         plan = summary.get("plan") or []
         if len(plan) > 1:
-            lines += ["", "_สัปดาห์ถัดไป_"]
+            lines += ["", copy_text("notify_next")]
             for week in plan[1:4]:
                 lines.append(f"GW{week['gw']}: {week['summary']}")
 
     url = summary.get("site_url")
     if url:
-        lines += ["", f"ดูรายละเอียด: {url}"]
+        lines += ["", copy_text("notify_link", url=url)]
     return "\n".join(line for line in lines if line is not None)
 
 
@@ -99,8 +108,19 @@ def send_telegram(text: str) -> bool:
                              json=payload, timeout=20)
 
     base = {"chat_id": chat_id, "text": text, "disable_web_page_preview": True}
-    resp = post({**base, "parse_mode": "Markdown"})
-    if resp.status_code == 200:
+    try:
+        resp = post({**base, "parse_mode": "Markdown"})
+    except requests.RequestException:
+        # Exception text may contain the request URL and therefore the token.
+        log.error("telegram network request failed; delivery remains unconfirmed")
+        return False
+    def confirmed(response: requests.Response) -> bool:
+        try:
+            return response.status_code == 200 and response.json().get("ok") is True
+        except (ValueError, AttributeError):
+            return False
+
+    if confirmed(resp):
         return True
 
     # A player name containing an underscore or asterisk makes Telegram reject
@@ -108,8 +128,12 @@ def send_telegram(text: str) -> bool:
     # it unformatted rather than losing it.
     log.warning("telegram rejected the formatted message (%s); retrying as plain text",
                 resp.text[:160])
-    resp = post(base)
-    if resp.status_code != 200:
+    try:
+        resp = post(base)
+    except requests.RequestException:
+        log.error("telegram plain-text retry failed; delivery remains unconfirmed")
+        return False
+    if not confirmed(resp):
         log.error("telegram rejected the plain message too: %s", resp.text[:300])
         return False
     return True
@@ -159,7 +183,6 @@ def send_if_due(cfg: Config, force: bool = False) -> int:
     if not cfg.get("notify", "telegram", "enabled", default=False):
         log.warning("telegram disabled in config; printing instead")
         print(text)
-        _record(cfg, summary, stage, force)
         return 0
     if not send_telegram(text):
         # Deliberately do not record: a failed send must be retried on the next

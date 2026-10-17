@@ -109,11 +109,19 @@ fixtures. The report selects the squad slot with the largest upgrade and shows
 the best three or four same-position replacements that fit the bank and
 three-per-club rule. Ownership is displayed but never changes the ranking.
 
-A scenario is recommended only when it adds at least 3.0 expected points over
-the common planning horizon. The dashboard always compares holding with using
-each available free-transfer count, while the Candidate table explains the
-same-position five-fixture alternatives. Paid moves remain outside the normal
-scenario list and are reserved for explicit emergency analysis.
+The main recommendation uses the best legal same-position upgrade over five
+actual fixtures, with at least +3.0 EP and complete fixture coverage on both
+sides. Otherwise it recommends holding. A qualifying move is forced into a
+complete budget-valid scenario; if that solve fails, the report holds instead.
+The separate discounted team objective includes captain, bench, future moves,
+hits and transfer friction. Its gain is for comparing scenarios, not the +3.0
+recommendation gate. A short remaining season window is displayed with its
+actual match count and never treated as a complete five-match forecast.
+
+The dashboard compares holding with each available free-transfer count as time
+permits. Paid moves are reserved for the explicit emergency policy. A saved
+user choice is re-solved exactly and labelled separately from the model's
+recommendation; it never overrides the recommendation badge or threshold.
 
 The integer programme (`PuLP` + CBC) then builds a legal squad, XI, bench order,
 captain and vice-captain consistently for every scenario.
@@ -141,7 +149,11 @@ Everything personal lives in `config.yaml`. The fields worth knowing:
 | `planning.candidate_count` | Replacement alternatives shown for the selected weak link. Currently 4. |
 | `planning.comparison_count` | Affordable peers shown when a squad player is clicked. Currently 8. |
 | `planning.min_candidate_start` | Hides replacement candidates with a very low projected chance of starting. Currently 0.50. |
-| `strategy.mode` | `balanced` keeps ownership out of the ranking, as requested. |
+| `strategy.mode` | Legacy compatibility only; ownership never changes EP in any mode. |
+| `planning.scenario_time_budget` | Shared solve budget for all scenarios, in seconds. Currently 150. |
+| `planning.build_time_budget` | Entire local web build budget including subprocesses, in seconds. Currently 300. |
+| `planning.stale_after_hours` | Age of the oldest decision input that triggers a warning. Currently 24. |
+| `model.cameo_minutes` | Conditional cameo duration used in the defensive-contribution mixture. Currently 14 minutes. |
 | `model.recent_form_weight` | Weight given to current FPL form when projecting points. Currently 0.15. |
 | `model.auto_sub_slot_probability` | Estimated rescue value of GK and outfield bench slots 1–3. |
 | `planning.minutes_shortlist` | Maximum plausible targets whose match histories are fetched, in addition to the current squad. |
@@ -164,14 +176,37 @@ GitHub Pages also supports a free, queued mobile refresh request. It opens a
 GitHub issue that only the repository owner can use to trigger a fresh build;
 no token is stored in the PWA and no FPL account action is automated.
 
+Saved scenario links include a fingerprint of the reviewed report and moves.
+Keep the complete prefilled issue title. If the report changes before the
+request runs, reopen the latest dashboard and select again; an old scenario
+number is never silently applied to a new report. Local `select-plan` calls
+also require `--fingerprint` from the scenario in `docs/summary.json`.
+
+A build keeps the previous report when the public transfer history, permanent
+squad/bank, or holding baseline cannot be verified. After a Free Hit deadline,
+the permanent squad and bank are recovered from the preceding permanent picks;
+temporary Free Hit purchases are excluded from selling-price reconstruction.
+If public history identifies an active Free Hit for the target GW, permanent
+transfer advice is withheld. Availability of pre-deadline chip state still
+depends on what the public API exposes.
+
 ---
 
 ## Calibration and remaining roadmap
 
-Version 0.3 blends recent match histories into expected minutes, assigns the
-four bench slots explicitly, freezes pre-deadline projections for leakage-safe
-backtesting, quantifies Double Gameweek chip upside, and flags price pressure
-without letting it affect candidate ranking.
+Version 0.4 uses conditional start/cameo probabilities for defensive contribution,
+preserves blank GWs in the planning timeline, and resets a player's selling-cost
+basis after a repurchase under the fixed-price assumption. It distinguishes a
+verified feasible CBC incumbent from a proven optimum; neither proves the model
+predicts real points accurately. Autosubs and vice-captain fallback remain
+approximations, and the model is still uncalibrated.
+
+Pre-deadline projections include the model version, configuration hash, season,
+and source timestamps. The Pages workflow validates and commits these small
+JSON records alongside the report; raw API snapshots stay uncommitted.
+Backtests separate results by model/configuration, position and availability,
+and filter the outcome season. Samples are a selected shortlist, not an
+unbiased evaluation of the whole league.
 
 Run `python -m fplbot backtest` after a projected gameweek finishes. It compares
 model MAE and bias with FPL's captured `ep_next`; results are written to
@@ -192,13 +227,14 @@ requirements-lock.txt        reproducible versions used by CI
 open_fpl_web.bat            ASCII launcher alias
 run_weekly.bat              silent local web launcher
 start_fpl_server.py         background server entry point used at Windows sign-in
-.github/workflows/          optional manual verification only
+.github/workflows/          Pages builds, owner issue requests, twice-daily fallback, manual verification
 src/fplbot/
     fetch.py                API client + snapshot cache
     features.py             player rates, team strength, fixture schedule
     model.py                expected points
     optimize.py             ranked transfer advice + legal lineup solver
     report.py               dashboard rendering
+    copy_th.py              shared Thai decision and notification copy
     cli.py                  command line
 web/                        HTML template, PWA manifest, service worker, icons
 tests/seed_offline_fixture.py   build a frozen dataset for offline work

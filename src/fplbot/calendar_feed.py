@@ -85,7 +85,10 @@ def build_ics(events: list[dict], *, site_url: str = "", calendar_name: str = "F
 
         gw = int(ev["id"])
         # Stable across rebuilds so subscribers update rather than duplicate.
-        uid = hashlib.sha1(f"fpl-gw{gw}-{raw}".encode()).hexdigest()[:20]
+        season_start = min(datetime.fromisoformat(e["deadline_time"].replace("Z", "+00:00"))
+                           for e in events if e.get("deadline_time"))
+        season_year = season_start.year if season_start.month >= 7 else season_start.year - 1
+        uid = hashlib.sha1(f"fpl-{season_year}-gw{gw}".encode()).hexdigest()[:20]
 
         lines += [
             "BEGIN:VEVENT",
@@ -107,7 +110,7 @@ def build_ics(events: list[dict], *, site_url: str = "", calendar_name: str = "F
             lines += [
                 "BEGIN:VALARM",
                 "ACTION:DISPLAY",
-                f"TRIGGER:-PT{mins}M",
+                f"TRIGGER;RELATED=END:-PT{mins}M",
                 _fold(f"DESCRIPTION:{_escape(f'FPL GW{gw} ปิดในอีก {hours:g} ชม.')}"),
                 "END:VALARM",
             ]

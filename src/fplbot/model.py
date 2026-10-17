@@ -145,11 +145,10 @@ def expected_points(players: pd.DataFrame, teams: pd.DataFrame,
 
     # ---- defensive contribution ------------------------------------------
     thresholds = s.element_type.map(DEFCON_THRESHOLD)
-    lam_dc = (s.dc90 * minutes_share).clip(lower=0.0)
-    p_defcon = np.where(
-        thresholds.isna(), 0.0,
-        1.0 - poisson.cdf(thresholds.fillna(99).to_numpy() - 1, lam_dc.to_numpy()),
-    )
+    p_defcon = defensive_contribution_probability(
+        s.dc90.to_numpy(), thresholds.to_numpy(dtype=float),
+        s.p_start.to_numpy(), s.p_any_minutes.to_numpy(), s.exp_minutes.to_numpy(),
+        float(cfg.get("model", "cameo_minutes", default=14.0)))
     s["p_defcon"] = p_defcon
     s["ep_defcon"] = p_defcon * DEFCON_POINTS
 
@@ -187,15 +186,31 @@ def _expected_concede_penalty(lam: np.ndarray) -> np.ndarray:
 
 
 def _apply_strategy(s: pd.DataFrame, cfg: Config) -> pd.DataFrame:
-    mode = cfg.get("strategy", "mode", default="balanced")
-    weight = float(cfg.get("strategy", "differential_weight", default=0.0) or 0.0)
-    if mode == "balanced" or weight == 0.0:
-        return s
-    own = pd.to_numeric(s.selected_by_percent, errors="coerce").fillna(0.0)
-    tilt = (own - 50.0) / 50.0          # +1 when everyone owns them, -1 when nobody does
-    sign = 1.0 if mode == "template" else -1.0
-    s["ep"] = s.ep + sign * weight * tilt
+    """Keep legacy configs readable without letting ownership alter canonical EP."""
     return s
+
+
+def defensive_contribution_probability(rate: np.ndarray, threshold: np.ndarray,
+                                       p_start: np.ndarray, p_any: np.ndarray,
+                                       minutes: np.ndarray,
+                                       cameo_minutes: float) -> np.ndarray:
+    """Average conditional tails, rather than applying a tail to mean minutes.
+
+    This remains a two-state minutes approximation, not a calibrated appearance
+    simulation. The absent state contributes exactly zero probability.
+    """
+    starts = np.minimum(np.clip(p_start, 0, 1), np.clip(p_any, 0, 1))
+    cameo = np.maximum(np.clip(p_any, 0, 1) - starts, 0)
+    short_minutes = np.clip(cameo_minutes, 0, 90)
+    start_minutes = np.divide(np.maximum(minutes - cameo * short_minutes, 0), starts,
+                              out=np.zeros_like(minutes, dtype=float), where=starts > 0)
+    start_minutes = np.clip(start_minutes, 0, 90)
+    short_minutes = np.minimum(short_minutes, np.divide(
+        minutes, cameo, out=np.zeros_like(minutes, dtype=float), where=cameo > 0))
+    cut = np.nan_to_num(threshold, nan=np.inf) - 1
+    return np.where(np.isnan(threshold), 0,
+                    starts * poisson.sf(cut, np.maximum(rate, 0) * start_minutes / 90)
+                    + cameo * poisson.sf(cut, np.maximum(rate, 0) * short_minutes / 90))
 
 
 def per_gameweek(ep_rows: pd.DataFrame, horizon_gws: list[int]) -> pd.DataFrame:

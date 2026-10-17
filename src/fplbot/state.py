@@ -1,21 +1,35 @@
 """Persist an explicitly selected scenario without touching the FPL account."""
 from __future__ import annotations
 
+import hashlib
 import json
 from datetime import datetime, timezone
 from pathlib import Path
 
 
-def select_scenario(summary_path: Path, selected_path: Path, index: int) -> dict:
+def scenario_fingerprint(gw: int, built_at: str, move_ids: list[dict]) -> str:
+    """Bind a selection to the exact report and moves the manager reviewed."""
+    canonical = [int(gw), built_at,
+                 sorted((int(m["out"]), int(m["in"])) for m in move_ids)]
+    return hashlib.sha256(json.dumps(canonical, separators=(",", ":")).encode()).hexdigest()
+
+
+def select_scenario(summary_path: Path, selected_path: Path, index: int,
+                    *, expected_fingerprint: str) -> dict:
     summary = json.loads(summary_path.read_text(encoding="utf-8"))
     scenarios = summary.get("scenarios") or []
     if index < 0 or index >= len(scenarios):
         raise ValueError(f"scenario {index} is not available")
     scenario = scenarios[index]
+    fingerprint = scenario_fingerprint(
+        summary["gw"], summary["built_at_iso"], scenario.get("move_ids", []))
+    if expected_fingerprint != fingerprint:
+        raise ValueError("reviewed report changed; reopen the dashboard before selecting")
     payload = {
         "schema_version": 1,
         "selected_at": datetime.now(timezone.utc).isoformat(),
         "source_report_built_at": summary.get("built_at_iso"),
+        "fingerprint": fingerprint,
         "gw": int(summary["gw"]),
         "scenario_index": index,
         "transfers": int(scenario["transfers"]),

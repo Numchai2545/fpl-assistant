@@ -11,7 +11,7 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
-from .config import POSITIONS, STATUS_UNAVAILABLE
+from .config import POSITIONS, STATUS_UNAVAILABLE, Config
 
 NUMERIC_FIELDS = [
     "minutes", "starts", "goals_scored", "assists", "clean_sheets", "saves",
@@ -55,7 +55,7 @@ def build_teams(bootstrap: dict) -> pd.DataFrame:
 
 
 def build_players(bootstrap: dict, teams: pd.DataFrame,
-                   fixtures: list[dict] | None = None) -> pd.DataFrame:
+                   fixtures: list[dict] | None = None, cfg: Config | None = None) -> pd.DataFrame:
     df = pd.DataFrame(bootstrap["elements"])
     for col in NUMERIC_FIELDS:
         if col in df.columns:
@@ -87,7 +87,8 @@ def build_players(bootstrap: dict, teams: pd.DataFrame,
     p_cameo = ((1 - df.start_rate) * df.p_available * 0.35).clip(0.0, 1.0)
     df["p_60plus"] = df.p_start * p60_given_start
     df["p_any_minutes"] = (df.p_start + p_cameo).clip(0.0, 1.0)
-    df["exp_minutes"] = (df.p_start * df.min_per_start + p_cameo * 14.0).clip(0.0, 90.0)
+    cameo_minutes = float(cfg.get("model", "cameo_minutes", default=14.0)) if cfg else 14.0
+    df["exp_minutes"] = (df.p_start * df.min_per_start + p_cameo * cameo_minutes).clip(0.0, 90.0)
 
     # ---- set pieces -------------------------------------------------------
     pen = pd.to_numeric(df.get("penalties_order"), errors="coerce")
