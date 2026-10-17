@@ -712,5 +712,19 @@
     ],
     "expected_points": 63.73,
     "headline": "พิจารณาย้าย 3 ตัว · กัปตัน Groß"
+  },
+  {
+    "built_at": "2026-10-17T08:09:33.412932+00:00",
+    "fetched_at": "2026-10-17T08:08:55.234495+00:00",
+    "gw": 7,
+    "model_version": "0.4.0",
+    "moves": [
+      {
+        "out": "Greaves",
+        "in": "Dasilva"
+      }
+    ],
+    "expected_points": 57.45,
+    "headline": "พิจารณา Greaves → Dasilva · กัปตัน Groß"
   }
 ]
