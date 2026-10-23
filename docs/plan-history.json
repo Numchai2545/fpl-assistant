@@ -894,5 +894,19 @@
     ],
     "expected_points": 56.51,
     "headline": "ลำดับแรก: Dubravka → Verbruggen"
+  },
+  {
+    "built_at": "2026-10-23T07:25:35.984893+00:00",
+    "fetched_at": "2026-10-23T07:25:31.166778+00:00",
+    "gw": 8,
+    "model_version": "0.5.0",
+    "moves": [
+      {
+        "out": "Dubravka",
+        "in": "Verbruggen"
+      }
+    ],
+    "expected_points": 56.51,
+    "headline": "ลำดับแรก: Dubravka → Verbruggen"
   }
 ]
