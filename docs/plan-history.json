@@ -922,5 +922,19 @@
     ],
     "expected_points": 43.54,
     "headline": "ลำดับแรก: Dubravka → Tzolakis"
+  },
+  {
+    "built_at": "2026-10-24T07:15:07.740823+00:00",
+    "fetched_at": "2026-10-24T07:14:59.801261+00:00",
+    "gw": 9,
+    "model_version": "0.5.0",
+    "moves": [
+      {
+        "out": "Dubravka",
+        "in": "Tzolakis"
+      }
+    ],
+    "expected_points": 43.53,
+    "headline": "ลำดับแรก: Dubravka → Tzolakis"
   }
 ]
