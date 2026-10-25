@@ -964,5 +964,19 @@
     ],
     "expected_points": 48.95,
     "headline": "ลำดับแรก: Dubravka → Suzuki"
+  },
+  {
+    "built_at": "2026-10-25T17:38:05.314557+00:00",
+    "fetched_at": "2026-10-25T17:37:56.281234+00:00",
+    "gw": 9,
+    "model_version": "0.5.0",
+    "moves": [
+      {
+        "out": "Dubravka",
+        "in": "Suzuki"
+      }
+    ],
+    "expected_points": 50.77,
+    "headline": "ลำดับแรก: Dubravka → Suzuki"
   }
 ]
