@@ -978,5 +978,19 @@
     ],
     "expected_points": 50.77,
     "headline": "ลำดับแรก: Dubravka → Suzuki"
+  },
+  {
+    "built_at": "2026-10-27T07:45:24.098139+00:00",
+    "fetched_at": "2026-10-27T07:45:18.175423+00:00",
+    "gw": 9,
+    "model_version": "0.5.0",
+    "moves": [
+      {
+        "out": "Dubravka",
+        "in": "Trafford"
+      }
+    ],
+    "expected_points": 50.82,
+    "headline": "ลำดับแรก: Dubravka → Trafford"
   }
 ]

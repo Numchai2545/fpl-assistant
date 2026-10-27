@@ -2,41 +2,41 @@
   "gw": 9,
   "deadline": "2026-10-31T11:00:00+00:00",
   "deadline_local": "เสาร์ 31 ต.ค. 2569, 18:00 น.",
-  "headline": "ลำดับแรก: Dubravka → Suzuki",
-  "detail": "เพิ่มสุทธิ +19.2 EP ใน 5 นัด (เกณฑ์ +3.0)",
+  "headline": "ลำดับแรก: Dubravka → Trafford",
+  "detail": "เพิ่มสุทธิ +19.6 EP ใน 5 นัด (เกณฑ์ +3.0)",
   "captain": "Haaland",
   "moves": [
     {
       "out": "Dubravka",
-      "in": "Suzuki"
+      "in": "Trafford"
     }
   ],
   "alerts": [
     "Thomas ยังไม่ชัวร์ว่าได้ลง — Unspecified injury - 75% chance of playing"
   ],
-  "expected_points": 50.77,
+  "expected_points": 50.82,
   "site_url": "https://Numchai2545.github.io/fpl-assistant",
   "candidates": [
     {
       "rank": 1,
-      "name": "Suzuki",
+      "name": "Trafford",
       "price": 5.0,
-      "ep": 19.98,
-      "gain": 19.22,
+      "ep": 20.41,
+      "gain": 19.65,
       "fixtures": [
-        "GW9 FUL (H) [2]",
-        "GW10 MUN (A) [4]",
-        "GW11 SUN (H) [3]",
-        "GW12 IPS (A) [2]",
-        "GW13 EVE (H) [3]"
+        "GW9 BOU (A) [3]",
+        "GW10 TOT (H) [2]",
+        "GW11 CHE (A) [4]",
+        "GW12 COV (H) [2]",
+        "GW13 MCI (A) [5]"
       ]
     },
     {
       "rank": 2,
       "name": "Verbruggen",
       "price": 4.6,
-      "ep": 19.71,
-      "gain": 18.95,
+      "ep": 19.65,
+      "gain": 18.88,
       "fixtures": [
         "GW9 MCI (A) [5]",
         "GW10 BRE (H) [3]",
@@ -74,9 +74,9 @@
       ]
     }
   ],
-  "built_at": "จันทร์ 26 ต.ค. 2569, 00:38 น.",
-  "built_at_iso": "2026-10-25T17:38:05.314557+00:00",
-  "fetched_at": "2026-10-25T17:37:56.281234+00:00",
+  "built_at": "อังคาร 27 ต.ค. 2569, 14:45 น.",
+  "built_at_iso": "2026-10-27T07:45:24.098139+00:00",
+  "fetched_at": "2026-10-27T07:45:18.175423+00:00",
   "data_sources": [
     "network"
   ],
@@ -84,262 +84,262 @@
   "decision_sources": [
     {
       "name": "bootstrap",
-      "fetched_at": "2026-10-25T17:37:56.281234+00:00",
+      "fetched_at": "2026-10-27T07:45:18.175423+00:00",
       "source": "network"
     },
     {
       "name": "fixtures",
-      "fetched_at": "2026-10-25T17:37:56.295569+00:00",
+      "fetched_at": "2026-10-27T07:45:18.196989+00:00",
       "source": "network"
     },
     {
       "name": "entry_entry6014213",
-      "fetched_at": "2026-10-25T17:37:56.476346+00:00",
+      "fetched_at": "2026-10-27T07:45:18.399151+00:00",
       "source": "network"
     },
     {
       "name": "entry_history_entry6014213",
-      "fetched_at": "2026-10-25T17:37:56.623389+00:00",
+      "fetched_at": "2026-10-27T07:45:18.724023+00:00",
       "source": "network"
     },
     {
       "name": "entry_transfers_entry6014213",
-      "fetched_at": "2026-10-25T17:37:57.181417+00:00",
+      "fetched_at": "2026-10-27T07:45:18.740192+00:00",
       "source": "network"
     },
     {
       "name": "picks_gw8_entry6014213",
-      "fetched_at": "2026-10-25T17:37:57.332067+00:00",
+      "fetched_at": "2026-10-27T07:45:19.083799+00:00",
       "source": "network"
     },
     {
       "name": "element_1",
-      "fetched_at": "2026-10-25T17:37:57.388445+00:00",
+      "fetched_at": "2026-10-27T07:45:19.124414+00:00",
       "source": "network"
     },
     {
       "name": "element_4",
-      "fetched_at": "2026-10-25T17:37:57.394322+00:00",
+      "fetched_at": "2026-10-27T07:45:19.140619+00:00",
       "source": "network"
     },
     {
       "name": "element_10",
-      "fetched_at": "2026-10-25T17:37:57.399472+00:00",
+      "fetched_at": "2026-10-27T07:45:19.156545+00:00",
       "source": "network"
     },
     {
       "name": "element_13",
-      "fetched_at": "2026-10-25T17:37:57.404649+00:00",
+      "fetched_at": "2026-10-27T07:45:19.172417+00:00",
       "source": "network"
     },
     {
       "name": "element_15",
-      "fetched_at": "2026-10-25T17:37:57.410436+00:00",
+      "fetched_at": "2026-10-27T07:45:19.188468+00:00",
       "source": "network"
     },
     {
       "name": "element_31",
-      "fetched_at": "2026-10-25T17:37:57.416644+00:00",
+      "fetched_at": "2026-10-27T07:45:19.204081+00:00",
       "source": "network"
     },
     {
       "name": "element_53",
-      "fetched_at": "2026-10-25T17:37:57.424151+00:00",
+      "fetched_at": "2026-10-27T07:45:19.219746+00:00",
       "source": "network"
     },
     {
       "name": "element_60",
-      "fetched_at": "2026-10-25T17:37:57.429368+00:00",
+      "fetched_at": "2026-10-27T07:45:19.235771+00:00",
       "source": "network"
     },
     {
       "name": "element_68",
-      "fetched_at": "2026-10-25T17:37:57.434056+00:00",
+      "fetched_at": "2026-10-27T07:45:19.252468+00:00",
       "source": "network"
     },
     {
       "name": "element_79",
-      "fetched_at": "2026-10-25T17:37:57.438713+00:00",
+      "fetched_at": "2026-10-27T07:45:19.269015+00:00",
       "source": "network"
     },
     {
       "name": "element_101",
-      "fetched_at": "2026-10-25T17:37:57.444420+00:00",
+      "fetched_at": "2026-10-27T07:45:19.285203+00:00",
       "source": "network"
     },
     {
       "name": "element_106",
-      "fetched_at": "2026-10-25T17:37:57.449458+00:00",
+      "fetched_at": "2026-10-27T07:45:19.301356+00:00",
       "source": "network"
     },
     {
       "name": "element_109",
-      "fetched_at": "2026-10-25T17:37:57.454483+00:00",
+      "fetched_at": "2026-10-27T07:45:19.421611+00:00",
       "source": "network"
     },
     {
       "name": "element_115",
-      "fetched_at": "2026-10-25T17:37:57.459127+00:00",
+      "fetched_at": "2026-10-27T07:45:19.437652+00:00",
       "source": "network"
     },
     {
       "name": "element_124",
-      "fetched_at": "2026-10-25T17:37:57.464297+00:00",
+      "fetched_at": "2026-10-27T07:45:19.453438+00:00",
       "source": "network"
     },
     {
       "name": "element_129",
-      "fetched_at": "2026-10-25T17:37:57.469211+00:00",
+      "fetched_at": "2026-10-27T07:45:19.469568+00:00",
       "source": "network"
     },
     {
       "name": "element_138",
-      "fetched_at": "2026-10-25T17:37:57.474074+00:00",
+      "fetched_at": "2026-10-27T07:45:19.485395+00:00",
       "source": "network"
     },
     {
       "name": "element_148",
-      "fetched_at": "2026-10-25T17:37:57.479110+00:00",
+      "fetched_at": "2026-10-27T07:45:19.500994+00:00",
       "source": "network"
     },
     {
       "name": "element_156",
-      "fetched_at": "2026-10-25T17:37:57.483542+00:00",
+      "fetched_at": "2026-10-27T07:45:19.622906+00:00",
       "source": "network"
     },
     {
       "name": "element_165",
-      "fetched_at": "2026-10-25T17:37:57.490992+00:00",
+      "fetched_at": "2026-10-27T07:45:19.639046+00:00",
       "source": "network"
     },
     {
       "name": "element_166",
-      "fetched_at": "2026-10-25T17:37:57.502026+00:00",
+      "fetched_at": "2026-10-27T07:45:19.655091+00:00",
       "source": "network"
     },
     {
       "name": "element_173",
-      "fetched_at": "2026-10-25T17:37:57.507758+00:00",
+      "fetched_at": "2026-10-27T07:45:19.670946+00:00",
       "source": "network"
     },
     {
       "name": "element_229",
-      "fetched_at": "2026-10-25T17:37:57.512538+00:00",
+      "fetched_at": "2026-10-27T07:45:19.688162+00:00",
       "source": "network"
     },
     {
       "name": "element_236",
-      "fetched_at": "2026-10-25T17:37:57.523913+00:00",
+      "fetched_at": "2026-10-27T07:45:19.704024+00:00",
       "source": "network"
     },
     {
       "name": "element_249",
-      "fetched_at": "2026-10-25T17:37:57.528451+00:00",
+      "fetched_at": "2026-10-27T07:45:19.719361+00:00",
       "source": "network"
     },
     {
       "name": "element_250",
-      "fetched_at": "2026-10-25T17:37:57.533410+00:00",
+      "fetched_at": "2026-10-27T07:45:19.735192+00:00",
       "source": "network"
     },
     {
       "name": "element_257",
-      "fetched_at": "2026-10-25T17:37:57.537662+00:00",
+      "fetched_at": "2026-10-27T07:45:19.751409+00:00",
       "source": "network"
     },
     {
       "name": "element_258",
-      "fetched_at": "2026-10-25T17:37:57.541951+00:00",
+      "fetched_at": "2026-10-27T07:45:19.767296+00:00",
       "source": "network"
     },
     {
       "name": "element_261",
-      "fetched_at": "2026-10-25T17:37:57.551451+00:00",
+      "fetched_at": "2026-10-27T07:45:20.113598+00:00",
       "source": "network"
     },
     {
       "name": "element_305",
-      "fetched_at": "2026-10-25T17:37:57.556854+00:00",
+      "fetched_at": "2026-10-27T07:45:20.130205+00:00",
       "source": "network"
     },
     {
       "name": "element_306",
-      "fetched_at": "2026-10-25T17:37:57.564654+00:00",
+      "fetched_at": "2026-10-27T07:45:20.146500+00:00",
+      "source": "network"
+    },
+    {
+      "name": "element_334",
+      "fetched_at": "2026-10-27T07:45:20.162541+00:00",
       "source": "network"
     },
     {
       "name": "element_346",
-      "fetched_at": "2026-10-25T17:37:57.569551+00:00",
+      "fetched_at": "2026-10-27T07:45:20.178200+00:00",
       "source": "network"
     },
     {
       "name": "element_379",
-      "fetched_at": "2026-10-25T17:37:57.580307+00:00",
+      "fetched_at": "2026-10-27T07:45:20.194101+00:00",
+      "source": "network"
+    },
+    {
+      "name": "element_385",
+      "fetched_at": "2026-10-27T07:45:20.209813+00:00",
       "source": "network"
     },
     {
       "name": "element_399",
-      "fetched_at": "2026-10-25T17:37:57.585733+00:00",
+      "fetched_at": "2026-10-27T07:45:20.336824+00:00",
       "source": "network"
     },
     {
       "name": "element_400",
-      "fetched_at": "2026-10-25T17:37:57.591409+00:00",
+      "fetched_at": "2026-10-27T07:45:20.352860+00:00",
       "source": "network"
     },
     {
       "name": "element_411",
-      "fetched_at": "2026-10-25T17:37:57.596404+00:00",
+      "fetched_at": "2026-10-27T07:45:20.370371+00:00",
       "source": "network"
     },
     {
       "name": "element_426",
-      "fetched_at": "2026-10-25T17:37:57.601066+00:00",
+      "fetched_at": "2026-10-27T07:45:20.386114+00:00",
       "source": "network"
     },
     {
       "name": "element_427",
-      "fetched_at": "2026-10-25T17:37:57.605995+00:00",
+      "fetched_at": "2026-10-27T07:45:20.401498+00:00",
       "source": "network"
     },
     {
       "name": "element_496",
-      "fetched_at": "2026-10-25T17:37:57.611011+00:00",
+      "fetched_at": "2026-10-27T07:45:20.417170+00:00",
       "source": "network"
     },
     {
       "name": "element_497",
-      "fetched_at": "2026-10-25T17:37:57.614990+00:00",
+      "fetched_at": "2026-10-27T07:45:20.433040+00:00",
       "source": "network"
     },
     {
       "name": "element_504",
-      "fetched_at": "2026-10-25T17:37:57.620046+00:00",
+      "fetched_at": "2026-10-27T07:45:20.559673+00:00",
       "source": "network"
     },
     {
       "name": "element_544",
-      "fetched_at": "2026-10-25T17:37:57.625708+00:00",
-      "source": "network"
-    },
-    {
-      "name": "element_566",
-      "fetched_at": "2026-10-25T17:37:57.630937+00:00",
-      "source": "network"
-    },
-    {
-      "name": "element_597",
-      "fetched_at": "2026-10-25T17:37:57.635921+00:00",
+      "fetched_at": "2026-10-27T07:45:20.679790+00:00",
       "source": "network"
     },
     {
       "name": "element_599",
-      "fetched_at": "2026-10-25T17:37:57.640809+00:00",
+      "fetched_at": "2026-10-27T07:45:20.696100+00:00",
       "source": "network"
     },
     {
       "name": "element_650",
-      "fetched_at": "2026-10-25T17:37:57.646129+00:00",
+      "fetched_at": "2026-10-27T07:45:20.711666+00:00",
       "source": "network"
     }
   ],
@@ -349,20 +349,20 @@
     {
       "rank": 1,
       "out_id": 497,
-      "in_id": 597,
+      "in_id": 385,
       "out": "Dubravka",
-      "in": "Suzuki",
+      "in": "Trafford",
       "position": "GKP",
       "out_team": "TOT",
-      "in_team": "AVL",
+      "in_team": "LEE",
       "sell_price": 4.0,
       "buy_price": 5.0,
       "out_ep": 0.7625730267946789,
-      "in_ep": 19.984495403336435,
-      "gain": 19.221922376541755,
-      "net_gain": 19.221922376541755,
+      "in_ep": 20.40898959071868,
+      "gain": 19.646416563924,
+      "net_gain": 19.646416563924,
       "bank_after": 0.5,
-      "cumulative_gain": 19.221922376541755,
+      "cumulative_gain": 19.646416563924,
       "hit_cost": 0,
       "paid": false,
       "worth_considering": true,
@@ -370,11 +370,11 @@
       "availability": 1.0,
       "starts": 1.0,
       "fixtures": [
-        "GW9 FUL (H)",
-        "GW10 MUN (A)",
-        "GW11 SUN (H)",
-        "GW12 IPS (A)",
-        "GW13 EVE (H)"
+        "GW9 BOU (A)",
+        "GW10 TOT (H)",
+        "GW11 CHE (A)",
+        "GW12 COV (H)",
+        "GW13 MCI (A)"
       ]
     },
     {
@@ -388,12 +388,12 @@
       "in_team": "BOU",
       "sell_price": 7.7,
       "buy_price": 6.2,
-      "out_ep": 11.878385543572852,
-      "in_ep": 25.349852743416548,
-      "gain": 13.471467199843696,
-      "net_gain": 13.471467199843696,
+      "out_ep": 11.171118443361344,
+      "in_ep": 25.439510175497098,
+      "gain": 14.268391732135754,
+      "net_gain": 14.268391732135754,
       "bank_after": 2.0,
-      "cumulative_gain": 32.69338957638545,
+      "cumulative_gain": 33.91480829605975,
       "hit_cost": 0,
       "paid": false,
       "worth_considering": true,
@@ -419,12 +419,12 @@
       "in_team": "BHA",
       "sell_price": 3.9,
       "buy_price": 5.1,
-      "out_ep": 6.8190968069548274,
-      "in_ep": 22.32354880326002,
-      "gain": 15.504451996305193,
-      "net_gain": 15.504451996305193,
+      "out_ep": 6.398710524017861,
+      "in_ep": 22.204566994103715,
+      "gain": 15.805856470085853,
+      "net_gain": 15.805856470085853,
       "bank_after": 0.8,
-      "cumulative_gain": 48.19784157269064,
+      "cumulative_gain": 49.7206647661456,
       "hit_cost": 0,
       "paid": false,
       "worth_considering": true,
@@ -449,13 +449,13 @@
       "out_team": "MCI",
       "in_team": "BOU",
       "sell_price": 7.8,
-      "buy_price": 6.3,
-      "out_ep": 15.814390754829011,
-      "in_ep": 27.578430680719144,
-      "gain": 11.764039925890133,
-      "net_gain": 7.764039925890133,
-      "bank_after": 2.3,
-      "cumulative_gain": 55.96188149858077,
+      "buy_price": 6.4,
+      "out_ep": 14.617932029382928,
+      "in_ep": 27.562786062267584,
+      "gain": 12.944854032884656,
+      "net_gain": 8.944854032884656,
+      "bank_after": 2.2,
+      "cumulative_gain": 58.66551879903026,
       "hit_cost": 4,
       "paid": true,
       "worth_considering": false,
@@ -472,21 +472,21 @@
     },
     {
       "rank": 5,
-      "out_id": 544,
-      "in_id": 156,
-      "out": "Xhaka",
-      "in": "Neto",
+      "out_id": 426,
+      "in_id": 427,
+      "out": "B.Fernandes",
+      "in": "Mbeumo",
       "position": "MID",
-      "out_team": "SUN",
-      "in_team": "CHE",
-      "sell_price": 5.4,
-      "buy_price": 6.6,
-      "out_ep": 14.168534666536022,
-      "in_ep": 24.568377905273106,
-      "gain": 10.399843238737084,
-      "net_gain": 6.399843238737084,
-      "bank_after": 1.1,
-      "cumulative_gain": 62.36172473731786,
+      "out_team": "MUN",
+      "in_team": "MUN",
+      "sell_price": 11.7,
+      "buy_price": 7.9,
+      "out_ep": 15.387504584018018,
+      "in_ep": 25.45768557025706,
+      "gain": 10.070180986239041,
+      "net_gain": 6.070180986239041,
+      "bank_after": 6.0,
+      "cumulative_gain": 64.7356997852693,
       "hit_cost": 8,
       "paid": true,
       "worth_considering": false,
@@ -494,14 +494,14 @@
       "availability": 1.0,
       "starts": 1.0,
       "fixtures": [
-        "GW9 MUN (H)",
-        "GW10 SUN (A)",
-        "GW11 LEE (H)",
-        "GW12 NFO (A)",
-        "GW13 CRY (H)"
+        "GW9 CHE (A)",
+        "GW10 AVL (H)",
+        "GW11 LIV (A)",
+        "GW12 BRE (H)",
+        "GW13 NEW (A)"
       ]
     }
   ],
-  "plan_change": "แผนหลักยังเหมือนรายงานครั้งก่อน · EP GW นี้เปลี่ยน +1.8",
+  "plan_change": "แผนหลักเปลี่ยนจาก “ลำดับแรก: Dubravka → Suzuki” หลังดึงข้อมูลและคำนวณ scenario ใหม่",
   "scenarios": []
 }
