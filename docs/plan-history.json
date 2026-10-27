@@ -992,5 +992,19 @@
     ],
     "expected_points": 50.82,
     "headline": "ลำดับแรก: Dubravka → Trafford"
+  },
+  {
+    "built_at": "2026-10-27T19:25:47.293245+00:00",
+    "fetched_at": "2026-10-27T19:25:40.049319+00:00",
+    "gw": 9,
+    "model_version": "0.5.0",
+    "moves": [
+      {
+        "out": "João Pedro",
+        "in": "Evanilson"
+      }
+    ],
+    "expected_points": 50.62,
+    "headline": "ลำดับแรก: João Pedro → Evanilson"
   }
 ]
