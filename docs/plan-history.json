@@ -1006,5 +1006,19 @@
     ],
     "expected_points": 50.62,
     "headline": "ลำดับแรก: João Pedro → Evanilson"
+  },
+  {
+    "built_at": "2026-10-28T08:23:13.072554+00:00",
+    "fetched_at": "2026-10-28T08:23:03.864832+00:00",
+    "gw": 9,
+    "model_version": "0.5.0",
+    "moves": [
+      {
+        "out": "João Pedro",
+        "in": "Evanilson"
+      }
+    ],
+    "expected_points": 50.62,
+    "headline": "ลำดับแรก: João Pedro → Evanilson"
   }
 ]
