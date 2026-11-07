@@ -1286,5 +1286,19 @@
     ],
     "expected_points": 45.39,
     "headline": "ลำดับแรก: Dubravka → Tzolakis"
+  },
+  {
+    "built_at": "2026-11-07T18:43:52.138909+00:00",
+    "fetched_at": "2026-11-07T18:43:43.729301+00:00",
+    "gw": 11,
+    "model_version": "0.5.0",
+    "moves": [
+      {
+        "out": "Dubravka",
+        "in": "Trafford"
+      }
+    ],
+    "expected_points": 49.68,
+    "headline": "ลำดับแรก: Dubravka → Trafford"
   }
 ]
