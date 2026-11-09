@@ -1342,5 +1342,19 @@
     ],
     "expected_points": 56.42,
     "headline": "ลำดับแรก: Dubravka → Verbruggen"
+  },
+  {
+    "built_at": "2026-11-09T23:25:27.766562+00:00",
+    "fetched_at": "2026-11-09T23:25:21.226185+00:00",
+    "gw": 11,
+    "model_version": "0.5.0",
+    "moves": [
+      {
+        "out": "Dubravka",
+        "in": "Trafford"
+      }
+    ],
+    "expected_points": 56.5,
+    "headline": "ลำดับแรก: Dubravka → Trafford"
   }
 ]

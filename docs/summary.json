@@ -2,45 +2,45 @@
   "gw": 11,
   "deadline": "2026-11-21T11:00:00+00:00",
   "deadline_local": "เสาร์ 21 พ.ย. 2569, 18:00 น.",
-  "headline": "ลำดับแรก: Dubravka → Verbruggen",
-  "detail": "เพิ่มสุทธิ +20.8 EP ใน 5 นัด (เกณฑ์ +3.0)",
+  "headline": "ลำดับแรก: Dubravka → Trafford",
+  "detail": "เพิ่มสุทธิ +20.6 EP ใน 5 นัด (เกณฑ์ +3.0)",
   "captain": "Haaland",
   "moves": [
     {
       "out": "Dubravka",
-      "in": "Verbruggen"
+      "in": "Trafford"
     }
   ],
   "alerts": [],
-  "expected_points": 56.42,
+  "expected_points": 56.5,
   "site_url": "https://Numchai2545.github.io/fpl-assistant",
   "candidates": [
     {
       "rank": 1,
-      "name": "Verbruggen",
-      "price": 4.6,
-      "ep": 21.59,
-      "gain": 20.82,
-      "fixtures": [
-        "GW11 HUL (A) [2]",
-        "GW12 NEW (H) [3]",
-        "GW13 BOU (A) [4]",
-        "GW14 NFO (A) [2]",
-        "GW15 EVE (H) [3]"
-      ]
-    },
-    {
-      "rank": 2,
       "name": "Trafford",
       "price": 5.0,
-      "ep": 20.8,
-      "gain": 20.04,
+      "ep": 21.4,
+      "gain": 20.64,
       "fixtures": [
         "GW11 CHE (A) [4]",
         "GW12 COV (H) [2]",
         "GW13 MCI (A) [5]",
         "GW14 IPS (H) [2]",
         "GW15 LIV (A) [4]"
+      ]
+    },
+    {
+      "rank": 2,
+      "name": "Verbruggen",
+      "price": 4.6,
+      "ep": 21.14,
+      "gain": 20.37,
+      "fixtures": [
+        "GW11 HUL (A) [2]",
+        "GW12 NEW (H) [3]",
+        "GW13 BOU (A) [4]",
+        "GW14 NFO (A) [2]",
+        "GW15 EVE (H) [3]"
       ]
     },
     {
@@ -61,8 +61,8 @@
       "rank": 4,
       "name": "Leno",
       "price": 4.5,
-      "ep": 17.84,
-      "gain": 17.08,
+      "ep": 18.29,
+      "gain": 17.53,
       "fixtures": [
         "GW11 MCI (A) [5]",
         "GW12 BOU (H) [3]",
@@ -72,9 +72,9 @@
       ]
     }
   ],
-  "built_at": "จันทร์ 9 พ.ย. 2569, 16:41 น.",
-  "built_at_iso": "2026-11-09T09:41:47.816310+00:00",
-  "fetched_at": "2026-11-09T09:41:37.850670+00:00",
+  "built_at": "อังคาร 10 พ.ย. 2569, 06:25 น.",
+  "built_at_iso": "2026-11-09T23:25:27.766562+00:00",
+  "fetched_at": "2026-11-09T23:25:21.226185+00:00",
   "data_sources": [
     "network"
   ],
@@ -82,262 +82,262 @@
   "decision_sources": [
     {
       "name": "bootstrap",
-      "fetched_at": "2026-11-09T09:41:37.850670+00:00",
+      "fetched_at": "2026-11-09T23:25:21.226185+00:00",
       "source": "network"
     },
     {
       "name": "fixtures",
-      "fetched_at": "2026-11-09T09:41:37.879150+00:00",
+      "fetched_at": "2026-11-09T23:25:21.246315+00:00",
       "source": "network"
     },
     {
       "name": "entry_entry6014213",
-      "fetched_at": "2026-11-09T09:41:38.028423+00:00",
+      "fetched_at": "2026-11-09T23:25:21.362079+00:00",
       "source": "network"
     },
     {
       "name": "entry_history_entry6014213",
-      "fetched_at": "2026-11-09T09:41:38.358861+00:00",
+      "fetched_at": "2026-11-09T23:25:21.449066+00:00",
       "source": "network"
     },
     {
       "name": "entry_transfers_entry6014213",
-      "fetched_at": "2026-11-09T09:41:38.481575+00:00",
+      "fetched_at": "2026-11-09T23:25:21.536444+00:00",
       "source": "network"
     },
     {
       "name": "picks_gw10_entry6014213",
-      "fetched_at": "2026-11-09T09:41:38.609039+00:00",
+      "fetched_at": "2026-11-09T23:25:21.656567+00:00",
       "source": "network"
     },
     {
       "name": "element_1",
-      "fetched_at": "2026-11-09T09:41:38.675467+00:00",
+      "fetched_at": "2026-11-09T23:25:21.702640+00:00",
       "source": "network"
     },
     {
       "name": "element_4",
-      "fetched_at": "2026-11-09T09:41:38.692785+00:00",
+      "fetched_at": "2026-11-09T23:25:21.712937+00:00",
       "source": "network"
     },
     {
       "name": "element_8",
-      "fetched_at": "2026-11-09T09:41:38.710263+00:00",
+      "fetched_at": "2026-11-09T23:25:21.724368+00:00",
       "source": "network"
     },
     {
       "name": "element_13",
-      "fetched_at": "2026-11-09T09:41:38.726893+00:00",
+      "fetched_at": "2026-11-09T23:25:21.734995+00:00",
       "source": "network"
     },
     {
       "name": "element_15",
-      "fetched_at": "2026-11-09T09:41:38.744407+00:00",
+      "fetched_at": "2026-11-09T23:25:21.745991+00:00",
       "source": "network"
     },
     {
       "name": "element_26",
-      "fetched_at": "2026-11-09T09:41:38.761573+00:00",
+      "fetched_at": "2026-11-09T23:25:21.833296+00:00",
       "source": "network"
     },
     {
       "name": "element_31",
-      "fetched_at": "2026-11-09T09:41:38.778669+00:00",
-      "source": "network"
-    },
-    {
-      "name": "element_45",
-      "fetched_at": "2026-11-09T09:41:38.795811+00:00",
+      "fetched_at": "2026-11-09T23:25:21.845624+00:00",
       "source": "network"
     },
     {
       "name": "element_53",
-      "fetched_at": "2026-11-09T09:41:38.812993+00:00",
+      "fetched_at": "2026-11-09T23:25:21.855786+00:00",
       "source": "network"
     },
     {
       "name": "element_60",
-      "fetched_at": "2026-11-09T09:41:38.829698+00:00",
+      "fetched_at": "2026-11-09T23:25:21.867410+00:00",
+      "source": "network"
+    },
+    {
+      "name": "element_61",
+      "fetched_at": "2026-11-09T23:25:21.878019+00:00",
       "source": "network"
     },
     {
       "name": "element_68",
-      "fetched_at": "2026-11-09T09:41:38.846720+00:00",
+      "fetched_at": "2026-11-09T23:25:21.889216+00:00",
       "source": "network"
     },
     {
       "name": "element_79",
-      "fetched_at": "2026-11-09T09:41:38.863737+00:00",
+      "fetched_at": "2026-11-09T23:25:21.901266+00:00",
       "source": "network"
     },
     {
       "name": "element_109",
-      "fetched_at": "2026-11-09T09:41:38.880646+00:00",
+      "fetched_at": "2026-11-09T23:25:21.911552+00:00",
       "source": "network"
     },
     {
       "name": "element_112",
-      "fetched_at": "2026-11-09T09:41:38.897192+00:00",
-      "source": "network"
-    },
-    {
-      "name": "element_114",
-      "fetched_at": "2026-11-09T09:41:38.914057+00:00",
+      "fetched_at": "2026-11-09T23:25:21.925854+00:00",
       "source": "network"
     },
     {
       "name": "element_115",
-      "fetched_at": "2026-11-09T09:41:38.931623+00:00",
+      "fetched_at": "2026-11-09T23:25:21.937112+00:00",
       "source": "network"
     },
     {
       "name": "element_124",
-      "fetched_at": "2026-11-09T09:41:38.948755+00:00",
+      "fetched_at": "2026-11-09T23:25:21.947514+00:00",
       "source": "network"
     },
     {
       "name": "element_127",
-      "fetched_at": "2026-11-09T09:41:38.965751+00:00",
+      "fetched_at": "2026-11-09T23:25:21.957810+00:00",
       "source": "network"
     },
     {
       "name": "element_129",
-      "fetched_at": "2026-11-09T09:41:38.982658+00:00",
+      "fetched_at": "2026-11-09T23:25:21.967938+00:00",
       "source": "network"
     },
     {
       "name": "element_138",
-      "fetched_at": "2026-11-09T09:41:39.000112+00:00",
+      "fetched_at": "2026-11-09T23:25:21.978741+00:00",
       "source": "network"
     },
     {
       "name": "element_156",
-      "fetched_at": "2026-11-09T09:41:39.017126+00:00",
+      "fetched_at": "2026-11-09T23:25:21.989010+00:00",
       "source": "network"
     },
     {
       "name": "element_166",
-      "fetched_at": "2026-11-09T09:41:39.034022+00:00",
+      "fetched_at": "2026-11-09T23:25:22.001317+00:00",
       "source": "network"
     },
     {
       "name": "element_167",
-      "fetched_at": "2026-11-09T09:41:39.052584+00:00",
+      "fetched_at": "2026-11-09T23:25:22.011997+00:00",
       "source": "network"
     },
     {
       "name": "element_173",
-      "fetched_at": "2026-11-09T09:41:39.174963+00:00",
+      "fetched_at": "2026-11-09T23:25:22.022965+00:00",
       "source": "network"
     },
     {
       "name": "element_229",
-      "fetched_at": "2026-11-09T09:41:39.191966+00:00",
+      "fetched_at": "2026-11-09T23:25:22.033905+00:00",
       "source": "network"
     },
     {
       "name": "element_236",
-      "fetched_at": "2026-11-09T09:41:39.209489+00:00",
+      "fetched_at": "2026-11-09T23:25:22.044524+00:00",
       "source": "network"
     },
     {
       "name": "element_249",
-      "fetched_at": "2026-11-09T09:41:39.226525+00:00",
-      "source": "network"
-    },
-    {
-      "name": "element_250",
-      "fetched_at": "2026-11-09T09:41:39.552494+00:00",
+      "fetched_at": "2026-11-09T23:25:22.056844+00:00",
       "source": "network"
     },
     {
       "name": "element_258",
-      "fetched_at": "2026-11-09T09:41:39.569899+00:00",
+      "fetched_at": "2026-11-09T23:25:22.067084+00:00",
+      "source": "network"
+    },
+    {
+      "name": "element_261",
+      "fetched_at": "2026-11-09T23:25:22.080907+00:00",
       "source": "network"
     },
     {
       "name": "element_295",
-      "fetched_at": "2026-11-09T09:41:39.587426+00:00",
+      "fetched_at": "2026-11-09T23:25:22.170369+00:00",
       "source": "network"
     },
     {
       "name": "element_305",
-      "fetched_at": "2026-11-09T09:41:39.604870+00:00",
+      "fetched_at": "2026-11-09T23:25:22.183989+00:00",
       "source": "network"
     },
     {
       "name": "element_332",
-      "fetched_at": "2026-11-09T09:41:39.621554+00:00",
+      "fetched_at": "2026-11-09T23:25:22.194283+00:00",
       "source": "network"
     },
     {
       "name": "element_334",
-      "fetched_at": "2026-11-09T09:41:39.638257+00:00",
+      "fetched_at": "2026-11-09T23:25:22.205063+00:00",
       "source": "network"
     },
     {
       "name": "element_346",
-      "fetched_at": "2026-11-09T09:41:39.655063+00:00",
+      "fetched_at": "2026-11-09T23:25:22.215630+00:00",
       "source": "network"
     },
     {
       "name": "element_366",
-      "fetched_at": "2026-11-09T09:41:39.671515+00:00",
+      "fetched_at": "2026-11-09T23:25:22.226970+00:00",
       "source": "network"
     },
     {
       "name": "element_379",
-      "fetched_at": "2026-11-09T09:41:39.799193+00:00",
+      "fetched_at": "2026-11-09T23:25:22.237207+00:00",
       "source": "network"
     },
     {
       "name": "element_385",
-      "fetched_at": "2026-11-09T09:41:39.816004+00:00",
+      "fetched_at": "2026-11-09T23:25:22.247914+00:00",
       "source": "network"
     },
     {
       "name": "element_399",
-      "fetched_at": "2026-11-09T09:41:39.942413+00:00",
+      "fetched_at": "2026-11-09T23:25:22.258729+00:00",
       "source": "network"
     },
     {
       "name": "element_411",
-      "fetched_at": "2026-11-09T09:41:39.959522+00:00",
+      "fetched_at": "2026-11-09T23:25:22.273340+00:00",
       "source": "network"
     },
     {
       "name": "element_426",
-      "fetched_at": "2026-11-09T09:41:40.081732+00:00",
+      "fetched_at": "2026-11-09T23:25:22.285622+00:00",
       "source": "network"
     },
     {
       "name": "element_496",
-      "fetched_at": "2026-11-09T09:41:40.098928+00:00",
+      "fetched_at": "2026-11-09T23:25:22.296694+00:00",
       "source": "network"
     },
     {
       "name": "element_497",
-      "fetched_at": "2026-11-09T09:41:40.115974+00:00",
+      "fetched_at": "2026-11-09T23:25:22.307352+00:00",
       "source": "network"
     },
     {
       "name": "element_504",
-      "fetched_at": "2026-11-09T09:41:40.133038+00:00",
+      "fetched_at": "2026-11-09T23:25:22.318221+00:00",
+      "source": "network"
+    },
+    {
+      "name": "element_529",
+      "fetched_at": "2026-11-09T23:25:22.406682+00:00",
       "source": "network"
     },
     {
       "name": "element_542",
-      "fetched_at": "2026-11-09T09:41:40.150174+00:00",
+      "fetched_at": "2026-11-09T23:25:22.418011+00:00",
       "source": "network"
     },
     {
       "name": "element_544",
-      "fetched_at": "2026-11-09T09:41:40.167838+00:00",
+      "fetched_at": "2026-11-09T23:25:22.428626+00:00",
       "source": "network"
     },
     {
       "name": "element_566",
-      "fetched_at": "2026-11-09T09:41:40.184916+00:00",
+      "fetched_at": "2026-11-09T23:25:22.438943+00:00",
       "source": "network"
     }
   ],
@@ -347,51 +347,20 @@
     {
       "rank": 1,
       "out_id": 497,
-      "in_id": 109,
+      "in_id": 385,
       "out": "Dubravka",
-      "in": "Verbruggen",
+      "in": "Trafford",
       "position": "GKP",
       "out_team": "TOT",
-      "in_team": "BHA",
-      "sell_price": 4.0,
-      "buy_price": 4.6,
-      "out_ep": 0.7653227411946399,
-      "in_ep": 21.586299807118962,
-      "gain": 20.82097706592432,
-      "net_gain": 20.82097706592432,
-      "bank_after": 1.1,
-      "cumulative_gain": 20.82097706592432,
-      "hit_cost": 0,
-      "paid": false,
-      "worth_considering": true,
-      "matches": 5,
-      "availability": 1.0,
-      "starts": 1.0,
-      "fixtures": [
-        "GW11 HUL (A)",
-        "GW12 NEW (H)",
-        "GW13 BOU (A)",
-        "GW14 NFO (A)",
-        "GW15 EVE (H)"
-      ]
-    },
-    {
-      "rank": 2,
-      "out_id": 173,
-      "in_id": 334,
-      "out": "Thomas",
-      "in": "Muharemović",
-      "position": "DEF",
-      "out_team": "COV",
       "in_team": "LEE",
       "sell_price": 4.0,
-      "buy_price": 5.1,
-      "out_ep": 5.317853249454535,
-      "in_ep": 21.000527742214775,
-      "gain": 15.68267449276024,
-      "net_gain": 15.68267449276024,
-      "bank_after": 0.0,
-      "cumulative_gain": 36.50365155868456,
+      "buy_price": 5.0,
+      "out_ep": 0.7653227411946399,
+      "in_ep": 21.40354493352895,
+      "gain": 20.638222192334307,
+      "net_gain": 20.638222192334307,
+      "bank_after": 0.7,
+      "cumulative_gain": 20.638222192334307,
       "hit_cost": 0,
       "paid": false,
       "worth_considering": true,
@@ -407,34 +376,65 @@
       ]
     },
     {
-      "rank": 3,
+      "rank": 2,
       "out_id": 544,
-      "in_id": 183,
+      "in_id": 542,
       "out": "Xhaka",
-      "in": "Rudoni",
+      "in": "E.Le Fée",
       "position": "MID",
       "out_team": "SUN",
-      "in_team": "COV",
+      "in_team": "SUN",
       "sell_price": 5.3,
-      "buy_price": 4.9,
-      "out_ep": 9.96647877089582,
-      "in_ep": 19.324433540545016,
-      "gain": 9.357954769649195,
-      "net_gain": 9.357954769649195,
-      "bank_after": 0.4,
-      "cumulative_gain": 45.86160632833376,
+      "buy_price": 5.7,
+      "out_ep": 10.02272877089582,
+      "in_ep": 23.811716282694064,
+      "gain": 13.788987511798243,
+      "net_gain": 13.788987511798243,
+      "bank_after": 0.3,
+      "cumulative_gain": 34.42720970413255,
       "hit_cost": 0,
       "paid": false,
       "worth_considering": true,
       "matches": 5,
       "availability": 1.0,
-      "starts": 0.9,
+      "starts": 1.0,
       "fixtures": [
-        "GW11 CRY (H)",
-        "GW12 LEE (A)",
-        "GW13 IPS (H)",
-        "GW14 MUN (A)",
-        "GW15 AVL (H)"
+        "GW11 AVL (A)",
+        "GW12 TOT (H)",
+        "GW13 LIV (A)",
+        "GW14 NEW (A)",
+        "GW15 NFO (H)"
+      ]
+    },
+    {
+      "rank": 3,
+      "out_id": 173,
+      "in_id": 277,
+      "out": "Thomas",
+      "in": "Egan",
+      "position": "DEF",
+      "out_team": "COV",
+      "in_team": "HUL",
+      "sell_price": 4.0,
+      "buy_price": 4.1,
+      "out_ep": 5.317853249454535,
+      "in_ep": 16.786232632510014,
+      "gain": 11.46837938305548,
+      "net_gain": 11.46837938305548,
+      "bank_after": 0.2,
+      "cumulative_gain": 45.89558908718803,
+      "hit_cost": 0,
+      "paid": false,
+      "worth_considering": true,
+      "matches": 5,
+      "availability": 1.0,
+      "starts": 1.0,
+      "fixtures": [
+        "GW11 BHA (H)",
+        "GW12 CRY (A)",
+        "GW13 NFO (H)",
+        "GW14 BOU (A)",
+        "GW15 TOT (H)"
       ]
     },
     {
@@ -449,11 +449,11 @@
       "sell_price": 7.8,
       "buy_price": 6.7,
       "out_ep": 16.174621537504287,
-      "in_ep": 25.259404904109687,
-      "gain": 9.0847833666054,
-      "net_gain": 5.0847833666054,
-      "bank_after": 1.5,
-      "cumulative_gain": 50.94638969493916,
+      "in_ep": 26.084404904109682,
+      "gain": 9.909783366605396,
+      "net_gain": 5.909783366605396,
+      "bank_after": 1.3,
+      "cumulative_gain": 51.805372453793424,
       "hit_cost": 4,
       "paid": true,
       "worth_considering": false,
@@ -471,35 +471,35 @@
     {
       "rank": 5,
       "out_id": 305,
-      "in_id": 31,
+      "in_id": 504,
       "out": "Davis",
-      "in": "Konsa",
+      "in": "Vuskovic",
       "position": "DEF",
       "out_team": "IPS",
-      "in_team": "ARS",
+      "in_team": "BHA",
       "sell_price": 4.0,
-      "buy_price": 4.8,
-      "out_ep": 15.069629041111018,
-      "in_ep": 20.195566260123098,
-      "gain": 5.12593721901208,
-      "net_gain": 1.12593721901208,
-      "bank_after": 0.7,
-      "cumulative_gain": 52.07232691395124,
+      "buy_price": 5.3,
+      "out_ep": 14.994629041111018,
+      "in_ep": 23.363916820048985,
+      "gain": 8.369287778937966,
+      "net_gain": 4.3692877789379665,
+      "bank_after": 0.0,
+      "cumulative_gain": 56.17466023273139,
       "hit_cost": 8,
       "paid": true,
       "worth_considering": false,
       "matches": 5,
       "availability": 1.0,
-      "starts": 0.9095771589652495,
+      "starts": 1.0,
       "fixtures": [
-        "GW11 NEW (A)",
-        "GW12 MCI (H)",
-        "GW13 BRE (A)",
-        "GW14 TOT (A)",
-        "GW15 BOU (H)"
+        "GW11 HUL (A)",
+        "GW12 NEW (H)",
+        "GW13 BOU (A)",
+        "GW14 NFO (A)",
+        "GW15 EVE (H)"
       ]
     }
   ],
-  "plan_change": "แผนหลักยังเหมือนรายงานครั้งก่อน · EP GW นี้เปลี่ยน -0.4",
+  "plan_change": "แผนหลักเปลี่ยนจาก “ลำดับแรก: Dubravka → Verbruggen” หลังดึงข้อมูลและคำนวณ scenario ใหม่",
   "scenarios": []
 }
