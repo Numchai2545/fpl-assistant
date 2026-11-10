@@ -12,7 +12,7 @@
     }
   ],
   "alerts": [],
-  "expected_points": 56.5,
+  "expected_points": 56.33,
   "site_url": "https://Numchai2545.github.io/fpl-assistant",
   "candidates": [
     {
@@ -47,8 +47,8 @@
       "rank": 3,
       "name": "Tzolakis",
       "price": 4.7,
-      "ep": 19.69,
-      "gain": 18.92,
+      "ep": 19.84,
+      "gain": 19.07,
       "fixtures": [
         "GW11 BHA (H) [4]",
         "GW12 CRY (A) [2]",
@@ -72,9 +72,9 @@
       ]
     }
   ],
-  "built_at": "อังคาร 10 พ.ย. 2569, 16:42 น.",
-  "built_at_iso": "2026-11-10T09:42:29.819062+00:00",
-  "fetched_at": "2026-11-10T09:42:21.793469+00:00",
+  "built_at": "พุธ 11 พ.ย. 2569, 03:47 น.",
+  "built_at_iso": "2026-11-10T20:47:49.092207+00:00",
+  "fetched_at": "2026-11-10T20:47:41.996219+00:00",
   "data_sources": [
     "network"
   ],
@@ -82,262 +82,262 @@
   "decision_sources": [
     {
       "name": "bootstrap",
-      "fetched_at": "2026-11-10T09:42:21.793469+00:00",
+      "fetched_at": "2026-11-10T20:47:41.996219+00:00",
       "source": "network"
     },
     {
       "name": "fixtures",
-      "fetched_at": "2026-11-10T09:42:21.817427+00:00",
+      "fetched_at": "2026-11-10T20:47:42.017420+00:00",
       "source": "network"
     },
     {
       "name": "entry_entry6014213",
-      "fetched_at": "2026-11-10T09:42:21.962797+00:00",
+      "fetched_at": "2026-11-10T20:47:42.165277+00:00",
       "source": "network"
     },
     {
       "name": "entry_history_entry6014213",
-      "fetched_at": "2026-11-10T09:42:22.080697+00:00",
+      "fetched_at": "2026-11-10T20:47:42.176044+00:00",
       "source": "network"
     },
     {
       "name": "entry_transfers_entry6014213",
-      "fetched_at": "2026-11-10T09:42:22.093807+00:00",
+      "fetched_at": "2026-11-10T20:47:42.186199+00:00",
       "source": "network"
     },
     {
       "name": "picks_gw10_entry6014213",
-      "fetched_at": "2026-11-10T09:42:22.430635+00:00",
+      "fetched_at": "2026-11-10T20:47:42.278879+00:00",
       "source": "network"
     },
     {
       "name": "element_1",
-      "fetched_at": "2026-11-10T09:42:22.489845+00:00",
+      "fetched_at": "2026-11-10T20:47:42.332950+00:00",
       "source": "network"
     },
     {
       "name": "element_4",
-      "fetched_at": "2026-11-10T09:42:22.503024+00:00",
+      "fetched_at": "2026-11-10T20:47:42.342655+00:00",
       "source": "network"
     },
     {
       "name": "element_8",
-      "fetched_at": "2026-11-10T09:42:22.515958+00:00",
+      "fetched_at": "2026-11-10T20:47:42.351884+00:00",
       "source": "network"
     },
     {
       "name": "element_13",
-      "fetched_at": "2026-11-10T09:42:22.639285+00:00",
+      "fetched_at": "2026-11-10T20:47:42.362560+00:00",
       "source": "network"
     },
     {
       "name": "element_15",
-      "fetched_at": "2026-11-10T09:42:22.652423+00:00",
+      "fetched_at": "2026-11-10T20:47:42.373414+00:00",
       "source": "network"
     },
     {
       "name": "element_26",
-      "fetched_at": "2026-11-10T09:42:22.770059+00:00",
+      "fetched_at": "2026-11-10T20:47:42.388998+00:00",
       "source": "network"
     },
     {
       "name": "element_31",
-      "fetched_at": "2026-11-10T09:42:22.783673+00:00",
+      "fetched_at": "2026-11-10T20:47:42.397890+00:00",
       "source": "network"
     },
     {
       "name": "element_53",
-      "fetched_at": "2026-11-10T09:42:22.797258+00:00",
+      "fetched_at": "2026-11-10T20:47:42.406484+00:00",
       "source": "network"
     },
     {
       "name": "element_60",
-      "fetched_at": "2026-11-10T09:42:22.811025+00:00",
+      "fetched_at": "2026-11-10T20:47:42.417348+00:00",
       "source": "network"
     },
     {
       "name": "element_61",
-      "fetched_at": "2026-11-10T09:42:22.825557+00:00",
+      "fetched_at": "2026-11-10T20:47:42.426084+00:00",
       "source": "network"
     },
     {
       "name": "element_68",
-      "fetched_at": "2026-11-10T09:42:22.838760+00:00",
+      "fetched_at": "2026-11-10T20:47:42.434622+00:00",
       "source": "network"
     },
     {
       "name": "element_79",
-      "fetched_at": "2026-11-10T09:42:22.851915+00:00",
+      "fetched_at": "2026-11-10T20:47:42.446256+00:00",
       "source": "network"
     },
     {
       "name": "element_109",
-      "fetched_at": "2026-11-10T09:42:22.864920+00:00",
+      "fetched_at": "2026-11-10T20:47:42.456984+00:00",
       "source": "network"
     },
     {
       "name": "element_112",
-      "fetched_at": "2026-11-10T09:42:22.877942+00:00",
+      "fetched_at": "2026-11-10T20:47:42.478140+00:00",
       "source": "network"
     },
     {
       "name": "element_115",
-      "fetched_at": "2026-11-10T09:42:22.891320+00:00",
+      "fetched_at": "2026-11-10T20:47:42.488363+00:00",
       "source": "network"
     },
     {
       "name": "element_124",
-      "fetched_at": "2026-11-10T09:42:22.904613+00:00",
+      "fetched_at": "2026-11-10T20:47:42.498572+00:00",
       "source": "network"
     },
     {
       "name": "element_127",
-      "fetched_at": "2026-11-10T09:42:22.921018+00:00",
+      "fetched_at": "2026-11-10T20:47:42.508829+00:00",
       "source": "network"
     },
     {
       "name": "element_129",
-      "fetched_at": "2026-11-10T09:42:22.934501+00:00",
+      "fetched_at": "2026-11-10T20:47:42.518016+00:00",
       "source": "network"
     },
     {
       "name": "element_138",
-      "fetched_at": "2026-11-10T09:42:22.947514+00:00",
+      "fetched_at": "2026-11-10T20:47:42.528988+00:00",
       "source": "network"
     },
     {
       "name": "element_156",
-      "fetched_at": "2026-11-10T09:42:22.961180+00:00",
+      "fetched_at": "2026-11-10T20:47:42.538601+00:00",
       "source": "network"
     },
     {
       "name": "element_166",
-      "fetched_at": "2026-11-10T09:42:22.974318+00:00",
+      "fetched_at": "2026-11-10T20:47:42.547840+00:00",
       "source": "network"
     },
     {
       "name": "element_167",
-      "fetched_at": "2026-11-10T09:42:22.987318+00:00",
+      "fetched_at": "2026-11-10T20:47:42.557429+00:00",
       "source": "network"
     },
     {
       "name": "element_173",
-      "fetched_at": "2026-11-10T09:42:23.106343+00:00",
+      "fetched_at": "2026-11-10T20:47:42.570410+00:00",
+      "source": "network"
+    },
+    {
+      "name": "element_183",
+      "fetched_at": "2026-11-10T20:47:42.580446+00:00",
       "source": "network"
     },
     {
       "name": "element_229",
-      "fetched_at": "2026-11-10T09:42:23.120080+00:00",
-      "source": "network"
-    },
-    {
-      "name": "element_236",
-      "fetched_at": "2026-11-10T09:42:23.133181+00:00",
+      "fetched_at": "2026-11-10T20:47:42.591428+00:00",
       "source": "network"
     },
     {
       "name": "element_249",
-      "fetched_at": "2026-11-10T09:42:23.258521+00:00",
+      "fetched_at": "2026-11-10T20:47:42.607625+00:00",
       "source": "network"
     },
     {
       "name": "element_258",
-      "fetched_at": "2026-11-10T09:42:23.271504+00:00",
+      "fetched_at": "2026-11-10T20:47:42.618185+00:00",
       "source": "network"
     },
     {
       "name": "element_261",
-      "fetched_at": "2026-11-10T09:42:23.285287+00:00",
+      "fetched_at": "2026-11-10T20:47:42.627410+00:00",
       "source": "network"
     },
     {
       "name": "element_295",
-      "fetched_at": "2026-11-10T09:42:23.607541+00:00",
+      "fetched_at": "2026-11-10T20:47:42.740747+00:00",
       "source": "network"
     },
     {
       "name": "element_305",
-      "fetched_at": "2026-11-10T09:42:23.620784+00:00",
-      "source": "network"
-    },
-    {
-      "name": "element_332",
-      "fetched_at": "2026-11-10T09:42:23.633846+00:00",
+      "fetched_at": "2026-11-10T20:47:42.750178+00:00",
       "source": "network"
     },
     {
       "name": "element_334",
-      "fetched_at": "2026-11-10T09:42:23.646807+00:00",
+      "fetched_at": "2026-11-10T20:47:42.759881+00:00",
       "source": "network"
     },
     {
       "name": "element_346",
-      "fetched_at": "2026-11-10T09:42:23.660442+00:00",
+      "fetched_at": "2026-11-10T20:47:42.769493+00:00",
       "source": "network"
     },
     {
       "name": "element_366",
-      "fetched_at": "2026-11-10T09:42:23.674252+00:00",
+      "fetched_at": "2026-11-10T20:47:42.778777+00:00",
       "source": "network"
     },
     {
       "name": "element_379",
-      "fetched_at": "2026-11-10T09:42:23.792336+00:00",
+      "fetched_at": "2026-11-10T20:47:42.791285+00:00",
       "source": "network"
     },
     {
       "name": "element_385",
-      "fetched_at": "2026-11-10T09:42:23.806378+00:00",
+      "fetched_at": "2026-11-10T20:47:42.799942+00:00",
       "source": "network"
     },
     {
       "name": "element_399",
-      "fetched_at": "2026-11-10T09:42:23.820156+00:00",
+      "fetched_at": "2026-11-10T20:47:42.809680+00:00",
       "source": "network"
     },
     {
       "name": "element_411",
-      "fetched_at": "2026-11-10T09:42:23.833073+00:00",
+      "fetched_at": "2026-11-10T20:47:42.819639+00:00",
       "source": "network"
     },
     {
       "name": "element_426",
-      "fetched_at": "2026-11-10T09:42:23.846059+00:00",
+      "fetched_at": "2026-11-10T20:47:42.828940+00:00",
       "source": "network"
     },
     {
       "name": "element_496",
-      "fetched_at": "2026-11-10T09:42:23.859490+00:00",
+      "fetched_at": "2026-11-10T20:47:42.840529+00:00",
       "source": "network"
     },
     {
       "name": "element_497",
-      "fetched_at": "2026-11-10T09:42:23.872816+00:00",
+      "fetched_at": "2026-11-10T20:47:42.849956+00:00",
       "source": "network"
     },
     {
       "name": "element_504",
-      "fetched_at": "2026-11-10T09:42:23.886362+00:00",
+      "fetched_at": "2026-11-10T20:47:42.859143+00:00",
       "source": "network"
     },
     {
       "name": "element_529",
-      "fetched_at": "2026-11-10T09:42:23.899359+00:00",
+      "fetched_at": "2026-11-10T20:47:42.868790+00:00",
       "source": "network"
     },
     {
       "name": "element_542",
-      "fetched_at": "2026-11-10T09:42:23.912430+00:00",
+      "fetched_at": "2026-11-10T20:47:42.877562+00:00",
       "source": "network"
     },
     {
       "name": "element_544",
-      "fetched_at": "2026-11-10T09:42:24.029994+00:00",
+      "fetched_at": "2026-11-10T20:47:42.887319+00:00",
       "source": "network"
     },
     {
       "name": "element_566",
-      "fetched_at": "2026-11-10T09:42:24.043674+00:00",
+      "fetched_at": "2026-11-10T20:47:42.898900+00:00",
+      "source": "network"
+    },
+    {
+      "name": "element_579",
+      "fetched_at": "2026-11-10T20:47:42.908371+00:00",
       "source": "network"
     }
   ],
@@ -418,11 +418,11 @@
       "sell_price": 4.0,
       "buy_price": 4.1,
       "out_ep": 5.317853249454535,
-      "in_ep": 16.786232632510014,
-      "gain": 11.46837938305548,
-      "net_gain": 11.46837938305548,
+      "in_ep": 17.086232632510015,
+      "gain": 11.76837938305548,
+      "net_gain": 11.76837938305548,
       "bank_after": 0.2,
-      "cumulative_gain": 45.89558908718803,
+      "cumulative_gain": 46.19558908718803,
       "hit_cost": 0,
       "paid": false,
       "worth_considering": true,
@@ -448,12 +448,12 @@
       "in_team": "BOU",
       "sell_price": 7.8,
       "buy_price": 6.7,
-      "out_ep": 16.174621537504287,
+      "out_ep": 15.233575504734361,
       "in_ep": 26.084404904109682,
-      "gain": 9.909783366605396,
-      "net_gain": 5.909783366605396,
+      "gain": 10.850829399375321,
+      "net_gain": 6.850829399375321,
       "bank_after": 1.3,
-      "cumulative_gain": 51.805372453793424,
+      "cumulative_gain": 53.046418486563354,
       "hit_cost": 4,
       "paid": true,
       "worth_considering": false,
@@ -484,7 +484,7 @@
       "gain": 8.369287778937966,
       "net_gain": 4.3692877789379665,
       "bank_after": 0.0,
-      "cumulative_gain": 56.17466023273139,
+      "cumulative_gain": 57.41570626550132,
       "hit_cost": 8,
       "paid": true,
       "worth_considering": false,
@@ -500,6 +500,6 @@
       ]
     }
   ],
-  "plan_change": "แผนหลักยังเหมือนรายงานครั้งก่อน · EP GW นี้เปลี่ยน +0.0",
+  "plan_change": "แผนหลักยังเหมือนรายงานครั้งก่อน · EP GW นี้เปลี่ยน -0.2",
   "scenarios": []
 }
