@@ -3,7 +3,7 @@
   "deadline": "2026-11-21T11:00:00+00:00",
   "deadline_local": "เสาร์ 21 พ.ย. 2569, 18:00 น.",
   "headline": "ลำดับแรก: Dubravka → Trafford",
-  "detail": "เพิ่มสุทธิ +20.6 EP ใน 5 นัด (เกณฑ์ +3.0)",
+  "detail": "เพิ่มสุทธิ +21.6 EP ใน 5 นัด (เกณฑ์ +3.0)",
   "captain": "Haaland",
   "moves": [
     {
@@ -19,8 +19,8 @@
       "rank": 1,
       "name": "Trafford",
       "price": 5.0,
-      "ep": 21.4,
-      "gain": 20.64,
+      "ep": 22.38,
+      "gain": 21.61,
       "fixtures": [
         "GW11 CHE (A) [4]",
         "GW12 COV (H) [2]",
@@ -33,8 +33,8 @@
       "rank": 2,
       "name": "Verbruggen",
       "price": 4.7,
-      "ep": 21.14,
-      "gain": 20.37,
+      "ep": 21.21,
+      "gain": 20.45,
       "fixtures": [
         "GW11 HUL (A) [2]",
         "GW12 NEW (H) [3]",
@@ -72,9 +72,9 @@
       ]
     }
   ],
-  "built_at": "อังคาร 17 พ.ย. 2569, 17:38 น.",
-  "built_at_iso": "2026-11-17T10:38:27.204006+00:00",
-  "fetched_at": "2026-11-17T10:38:21.699100+00:00",
+  "built_at": "พุธ 18 พ.ย. 2569, 05:16 น.",
+  "built_at_iso": "2026-11-17T22:16:52.443782+00:00",
+  "fetched_at": "2026-11-17T22:16:43.816632+00:00",
   "data_sources": [
     "network"
   ],
@@ -82,262 +82,262 @@
   "decision_sources": [
     {
       "name": "bootstrap",
-      "fetched_at": "2026-11-17T10:38:21.699100+00:00",
+      "fetched_at": "2026-11-17T22:16:43.816632+00:00",
       "source": "network"
     },
     {
       "name": "fixtures",
-      "fetched_at": "2026-11-17T10:38:21.712794+00:00",
+      "fetched_at": "2026-11-17T22:16:43.836552+00:00",
       "source": "network"
     },
     {
       "name": "entry_entry6014213",
-      "fetched_at": "2026-11-17T10:38:21.830059+00:00",
+      "fetched_at": "2026-11-17T22:16:44.016035+00:00",
       "source": "network"
     },
     {
       "name": "entry_history_entry6014213",
-      "fetched_at": "2026-11-17T10:38:21.910444+00:00",
+      "fetched_at": "2026-11-17T22:16:44.025315+00:00",
       "source": "network"
     },
     {
       "name": "entry_transfers_entry6014213",
-      "fetched_at": "2026-11-17T10:38:21.992446+00:00",
+      "fetched_at": "2026-11-17T22:16:44.166848+00:00",
       "source": "network"
     },
     {
       "name": "picks_gw10_entry6014213",
-      "fetched_at": "2026-11-17T10:38:21.997850+00:00",
+      "fetched_at": "2026-11-17T22:16:44.324572+00:00",
       "source": "network"
     },
     {
       "name": "element_1",
-      "fetched_at": "2026-11-17T10:38:22.037995+00:00",
+      "fetched_at": "2026-11-17T22:16:44.384383+00:00",
       "source": "network"
     },
     {
       "name": "element_4",
-      "fetched_at": "2026-11-17T10:38:22.042425+00:00",
-      "source": "network"
-    },
-    {
-      "name": "element_8",
-      "fetched_at": "2026-11-17T10:38:22.046674+00:00",
-      "source": "network"
-    },
-    {
-      "name": "element_13",
-      "fetched_at": "2026-11-17T10:38:22.051163+00:00",
+      "fetched_at": "2026-11-17T22:16:44.393429+00:00",
       "source": "network"
     },
     {
       "name": "element_15",
-      "fetched_at": "2026-11-17T10:38:22.056010+00:00",
+      "fetched_at": "2026-11-17T22:16:44.403219+00:00",
+      "source": "network"
+    },
+    {
+      "name": "element_26",
+      "fetched_at": "2026-11-17T22:16:44.412594+00:00",
       "source": "network"
     },
     {
       "name": "element_31",
-      "fetched_at": "2026-11-17T10:38:22.060328+00:00",
+      "fetched_at": "2026-11-17T22:16:44.420812+00:00",
       "source": "network"
     },
     {
       "name": "element_45",
-      "fetched_at": "2026-11-17T10:38:22.064033+00:00",
+      "fetched_at": "2026-11-17T22:16:44.430173+00:00",
       "source": "network"
     },
     {
       "name": "element_52",
-      "fetched_at": "2026-11-17T10:38:22.069180+00:00",
+      "fetched_at": "2026-11-17T22:16:44.438449+00:00",
       "source": "network"
     },
     {
       "name": "element_60",
-      "fetched_at": "2026-11-17T10:38:22.073367+00:00",
-      "source": "network"
-    },
-    {
-      "name": "element_61",
-      "fetched_at": "2026-11-17T10:38:22.078061+00:00",
+      "fetched_at": "2026-11-17T22:16:44.446790+00:00",
       "source": "network"
     },
     {
       "name": "element_68",
-      "fetched_at": "2026-11-17T10:38:22.082071+00:00",
+      "fetched_at": "2026-11-17T22:16:44.457402+00:00",
       "source": "network"
     },
     {
       "name": "element_79",
-      "fetched_at": "2026-11-17T10:38:22.086584+00:00",
+      "fetched_at": "2026-11-17T22:16:44.467658+00:00",
       "source": "network"
     },
     {
       "name": "element_109",
-      "fetched_at": "2026-11-17T10:38:22.090892+00:00",
+      "fetched_at": "2026-11-17T22:16:44.476820+00:00",
       "source": "network"
     },
     {
       "name": "element_112",
-      "fetched_at": "2026-11-17T10:38:22.095486+00:00",
+      "fetched_at": "2026-11-17T22:16:44.485580+00:00",
       "source": "network"
     },
     {
       "name": "element_115",
-      "fetched_at": "2026-11-17T10:38:22.099706+00:00",
+      "fetched_at": "2026-11-17T22:16:44.495820+00:00",
       "source": "network"
     },
     {
       "name": "element_124",
-      "fetched_at": "2026-11-17T10:38:22.182413+00:00",
+      "fetched_at": "2026-11-17T22:16:44.504438+00:00",
       "source": "network"
     },
     {
       "name": "element_127",
-      "fetched_at": "2026-11-17T10:38:22.188045+00:00",
+      "fetched_at": "2026-11-17T22:16:44.513416+00:00",
       "source": "network"
     },
     {
       "name": "element_129",
-      "fetched_at": "2026-11-17T10:38:22.191780+00:00",
-      "source": "network"
-    },
-    {
-      "name": "element_138",
-      "fetched_at": "2026-11-17T10:38:22.196032+00:00",
+      "fetched_at": "2026-11-17T22:16:44.522537+00:00",
       "source": "network"
     },
     {
       "name": "element_166",
-      "fetched_at": "2026-11-17T10:38:22.199761+00:00",
+      "fetched_at": "2026-11-17T22:16:44.532318+00:00",
       "source": "network"
     },
     {
       "name": "element_167",
-      "fetched_at": "2026-11-17T10:38:22.203699+00:00",
+      "fetched_at": "2026-11-17T22:16:44.542039+00:00",
       "source": "network"
     },
     {
       "name": "element_173",
-      "fetched_at": "2026-11-17T10:38:22.207991+00:00",
+      "fetched_at": "2026-11-17T22:16:44.550288+00:00",
       "source": "network"
     },
     {
       "name": "element_229",
-      "fetched_at": "2026-11-17T10:38:22.211970+00:00",
+      "fetched_at": "2026-11-17T22:16:44.559888+00:00",
+      "source": "network"
+    },
+    {
+      "name": "element_236",
+      "fetched_at": "2026-11-17T22:16:44.568055+00:00",
       "source": "network"
     },
     {
       "name": "element_240",
-      "fetched_at": "2026-11-17T10:38:22.216021+00:00",
+      "fetched_at": "2026-11-17T22:16:44.577845+00:00",
       "source": "network"
     },
     {
       "name": "element_249",
-      "fetched_at": "2026-11-17T10:38:22.219766+00:00",
+      "fetched_at": "2026-11-17T22:16:44.587541+00:00",
       "source": "network"
     },
     {
       "name": "element_258",
-      "fetched_at": "2026-11-17T10:38:22.223926+00:00",
+      "fetched_at": "2026-11-17T22:16:44.596998+00:00",
       "source": "network"
     },
     {
       "name": "element_295",
-      "fetched_at": "2026-11-17T10:38:22.228133+00:00",
+      "fetched_at": "2026-11-17T22:16:44.737833+00:00",
       "source": "network"
     },
     {
       "name": "element_305",
-      "fetched_at": "2026-11-17T10:38:22.232723+00:00",
+      "fetched_at": "2026-11-17T22:16:44.747305+00:00",
+      "source": "network"
+    },
+    {
+      "name": "element_332",
+      "fetched_at": "2026-11-17T22:16:44.755800+00:00",
       "source": "network"
     },
     {
       "name": "element_334",
-      "fetched_at": "2026-11-17T10:38:22.236381+00:00",
-      "source": "network"
-    },
-    {
-      "name": "element_346",
-      "fetched_at": "2026-11-17T10:38:22.240153+00:00",
+      "fetched_at": "2026-11-17T22:16:44.764788+00:00",
       "source": "network"
     },
     {
       "name": "element_366",
-      "fetched_at": "2026-11-17T10:38:22.244517+00:00",
+      "fetched_at": "2026-11-17T22:16:44.775197+00:00",
       "source": "network"
     },
     {
       "name": "element_379",
-      "fetched_at": "2026-11-17T10:38:22.248817+00:00",
+      "fetched_at": "2026-11-17T22:16:44.787504+00:00",
       "source": "network"
     },
     {
       "name": "element_385",
-      "fetched_at": "2026-11-17T10:38:22.253759+00:00",
+      "fetched_at": "2026-11-17T22:16:44.795658+00:00",
       "source": "network"
     },
     {
       "name": "element_399",
-      "fetched_at": "2026-11-17T10:38:22.259205+00:00",
+      "fetched_at": "2026-11-17T22:16:44.805085+00:00",
+      "source": "network"
+    },
+    {
+      "name": "element_401",
+      "fetched_at": "2026-11-17T22:16:44.815058+00:00",
       "source": "network"
     },
     {
       "name": "element_411",
-      "fetched_at": "2026-11-17T10:38:22.263432+00:00",
+      "fetched_at": "2026-11-17T22:16:44.824431+00:00",
       "source": "network"
     },
     {
       "name": "element_426",
-      "fetched_at": "2026-11-17T10:38:22.267519+00:00",
+      "fetched_at": "2026-11-17T22:16:44.833502+00:00",
       "source": "network"
     },
     {
       "name": "element_465",
-      "fetched_at": "2026-11-17T10:38:22.271386+00:00",
+      "fetched_at": "2026-11-17T22:16:44.841605+00:00",
       "source": "network"
     },
     {
       "name": "element_496",
-      "fetched_at": "2026-11-17T10:38:22.275391+00:00",
+      "fetched_at": "2026-11-17T22:16:44.852256+00:00",
       "source": "network"
     },
     {
       "name": "element_497",
-      "fetched_at": "2026-11-17T10:38:22.279849+00:00",
+      "fetched_at": "2026-11-17T22:16:44.861489+00:00",
       "source": "network"
     },
     {
       "name": "element_504",
-      "fetched_at": "2026-11-17T10:38:22.284114+00:00",
+      "fetched_at": "2026-11-17T22:16:44.870131+00:00",
       "source": "network"
     },
     {
       "name": "element_529",
-      "fetched_at": "2026-11-17T10:38:22.288200+00:00",
+      "fetched_at": "2026-11-17T22:16:44.879565+00:00",
+      "source": "network"
+    },
+    {
+      "name": "element_539",
+      "fetched_at": "2026-11-17T22:16:44.887651+00:00",
       "source": "network"
     },
     {
       "name": "element_542",
-      "fetched_at": "2026-11-17T10:38:22.292049+00:00",
+      "fetched_at": "2026-11-17T22:16:44.897048+00:00",
       "source": "network"
     },
     {
       "name": "element_544",
-      "fetched_at": "2026-11-17T10:38:22.295899+00:00",
+      "fetched_at": "2026-11-17T22:16:44.906481+00:00",
       "source": "network"
     },
     {
       "name": "element_566",
-      "fetched_at": "2026-11-17T10:38:22.300983+00:00",
+      "fetched_at": "2026-11-17T22:16:44.915079+00:00",
       "source": "network"
     },
     {
       "name": "element_579",
-      "fetched_at": "2026-11-17T10:38:22.304899+00:00",
+      "fetched_at": "2026-11-17T22:16:44.924385+00:00",
       "source": "network"
     },
     {
       "name": "element_591",
-      "fetched_at": "2026-11-17T10:38:22.308811+00:00",
+      "fetched_at": "2026-11-17T22:16:44.933461+00:00",
       "source": "network"
     }
   ],
@@ -356,11 +356,11 @@
       "sell_price": 4.0,
       "buy_price": 5.0,
       "out_ep": 0.7653227411946399,
-      "in_ep": 21.40354493352895,
-      "gain": 20.638222192334307,
-      "net_gain": 20.638222192334307,
+      "in_ep": 22.37854493352895,
+      "gain": 21.61322219233431,
+      "net_gain": 21.61322219233431,
       "bank_after": 0.7,
-      "cumulative_gain": 20.638222192334307,
+      "cumulative_gain": 21.61322219233431,
       "hit_cost": 0,
       "paid": false,
       "worth_considering": true,
@@ -386,12 +386,12 @@
       "in_team": "SUN",
       "sell_price": 5.3,
       "buy_price": 5.7,
-      "out_ep": 10.02272877089582,
-      "in_ep": 24.308000114260217,
-      "gain": 14.285271343364396,
-      "net_gain": 14.285271343364396,
+      "out_ep": 10.135228770895822,
+      "in_ep": 24.908000114260215,
+      "gain": 14.772771343364393,
+      "net_gain": 14.772771343364393,
       "bank_after": 0.3,
-      "cumulative_gain": 34.923493535698704,
+      "cumulative_gain": 36.3859935356987,
       "hit_cost": 0,
       "paid": false,
       "worth_considering": true,
@@ -422,7 +422,7 @@
       "gain": 11.544333230982271,
       "net_gain": 11.544333230982271,
       "bank_after": 0.2,
-      "cumulative_gain": 46.46782676668097,
+      "cumulative_gain": 47.93032676668098,
       "hit_cost": 0,
       "paid": false,
       "worth_considering": true,
@@ -449,11 +449,11 @@
       "sell_price": 7.8,
       "buy_price": 6.7,
       "out_ep": 15.735466722211655,
-      "in_ep": 26.084404904109682,
-      "gain": 10.348938181898028,
-      "net_gain": 6.348938181898028,
+      "in_ep": 25.184404904109684,
+      "gain": 9.44893818189803,
+      "net_gain": 5.448938181898029,
       "bank_after": 1.3,
-      "cumulative_gain": 52.816764948579,
+      "cumulative_gain": 53.37926494857901,
       "hit_cost": 4,
       "paid": true,
       "worth_considering": false,
@@ -480,11 +480,11 @@
       "sell_price": 4.0,
       "buy_price": 5.3,
       "out_ep": 15.144629041111019,
-      "in_ep": 23.363916820048985,
-      "gain": 8.219287778937966,
-      "net_gain": 4.219287778937966,
+      "in_ep": 22.463916820048983,
+      "gain": 7.319287778937964,
+      "net_gain": 3.319287778937964,
       "bank_after": 0.0,
-      "cumulative_gain": 57.03605272751697,
+      "cumulative_gain": 56.69855272751697,
       "hit_cost": 8,
       "paid": true,
       "worth_considering": false,
