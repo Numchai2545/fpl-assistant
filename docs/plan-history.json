@@ -1552,5 +1552,19 @@
     ],
     "expected_points": 56.16,
     "headline": "ลำดับแรก: Dubravka → Trafford"
+  },
+  {
+    "built_at": "2026-11-17T10:38:27.204006+00:00",
+    "fetched_at": "2026-11-17T10:38:21.699100+00:00",
+    "gw": 11,
+    "model_version": "0.5.0",
+    "moves": [
+      {
+        "out": "Dubravka",
+        "in": "Trafford"
+      }
+    ],
+    "expected_points": 56.16,
+    "headline": "ลำดับแรก: Dubravka → Trafford"
   }
 ]
