@@ -1,23 +1,5 @@
 [
   {
-    "built_at": "2026-09-19T16:20:59.119051+00:00",
-    "fetched_at": "2026-09-19T16:20:57.865193+00:00",
-    "gw": 6,
-    "model_version": "0.3.0",
-    "moves": [
-      {
-        "out": "Maguire",
-        "in": "Tarkowski"
-      },
-      {
-        "out": "Cherki",
-        "in": "Schade"
-      }
-    ],
-    "expected_points": 55.81,
-    "headline": "พิจารณาย้าย 2 ตัว · กัปตัน Groß"
-  },
-  {
     "built_at": "2026-09-19T16:23:15.562451+00:00",
     "fetched_at": "2026-09-19T16:20:57.862401+00:00",
     "gw": 6,
@@ -1580,6 +1562,20 @@
   {
     "built_at": "2026-11-18T21:53:54.799632+00:00",
     "fetched_at": "2026-11-18T21:53:45.160445+00:00",
+    "gw": 11,
+    "model_version": "0.5.0",
+    "moves": [
+      {
+        "out": "Dubravka",
+        "in": "Trafford"
+      }
+    ],
+    "expected_points": 56.48,
+    "headline": "ลำดับแรก: Dubravka → Trafford"
+  },
+  {
+    "built_at": "2026-11-19T10:14:02.079195+00:00",
+    "fetched_at": "2026-11-19T10:13:56.556687+00:00",
     "gw": 11,
     "model_version": "0.5.0",
     "moves": [
