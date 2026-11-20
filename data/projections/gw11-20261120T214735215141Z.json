@@ -1,0 +1,377 @@
+{
+  "schema_version": 2,
+  "model_version": "0.5.0",
+  "gw": 11,
+  "config_hash": "e5b5a6d42a3cea31d8b72ca8e21ec791f9a10efc73e38ff3dcea925626c0e8b6",
+  "season": "2026",
+  "provenance": {
+    "bootstrap": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:28.668859+00:00"
+    },
+    "fixtures": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:28.687371+00:00"
+    },
+    "entry_entry6014213": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:28.814198+00:00"
+    },
+    "entry_history_entry6014213": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:28.822606+00:00"
+    },
+    "entry_transfers_entry6014213": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:28.913084+00:00"
+    },
+    "picks_gw10_entry6014213": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:28.923396+00:00"
+    },
+    "element_1": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:28.965668+00:00"
+    },
+    "element_4": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:28.973080+00:00"
+    },
+    "element_15": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:28.981569+00:00"
+    },
+    "element_26": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:28.990168+00:00"
+    },
+    "element_31": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:28.997667+00:00"
+    },
+    "element_45": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:29.005114+00:00"
+    },
+    "element_52": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:29.012560+00:00"
+    },
+    "element_60": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:29.024847+00:00"
+    },
+    "element_68": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:29.033488+00:00"
+    },
+    "element_79": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:29.041544+00:00"
+    },
+    "element_109": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:29.050314+00:00"
+    },
+    "element_112": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:29.058454+00:00"
+    },
+    "element_115": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:29.067409+00:00"
+    },
+    "element_124": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:29.075443+00:00"
+    },
+    "element_127": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:29.082971+00:00"
+    },
+    "element_129": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:29.090239+00:00"
+    },
+    "element_166": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:29.097411+00:00"
+    },
+    "element_167": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:29.105489+00:00"
+    },
+    "element_173": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:29.113207+00:00"
+    },
+    "element_229": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:29.132766+00:00"
+    },
+    "element_236": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:29.140234+00:00"
+    },
+    "element_240": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:29.147738+00:00"
+    },
+    "element_249": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:29.155507+00:00"
+    },
+    "element_258": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:29.163910+00:00"
+    },
+    "element_295": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:29.174405+00:00"
+    },
+    "element_305": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:29.183169+00:00"
+    },
+    "element_332": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:29.191989+00:00"
+    },
+    "element_334": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:29.201341+00:00"
+    },
+    "element_366": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:29.209898+00:00"
+    },
+    "element_379": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:29.219203+00:00"
+    },
+    "element_385": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:29.227205+00:00"
+    },
+    "element_399": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:29.235813+00:00"
+    },
+    "element_411": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:29.245069+00:00"
+    },
+    "element_426": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:29.254749+00:00"
+    },
+    "element_465": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:29.276813+00:00"
+    },
+    "element_492": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:29.284506+00:00"
+    },
+    "element_496": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:29.292100+00:00"
+    },
+    "element_497": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:29.304082+00:00"
+    },
+    "element_504": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:29.311741+00:00"
+    },
+    "element_529": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:29.319186+00:00"
+    },
+    "element_539": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:29.329920+00:00"
+    },
+    "element_542": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:29.337444+00:00"
+    },
+    "element_544": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:29.346314+00:00"
+    },
+    "element_566": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:29.354012+00:00"
+    },
+    "element_579": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:29.361388+00:00"
+    },
+    "element_591": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:29.369564+00:00"
+    },
+    "live_gw10": {
+      "source": "network",
+      "fetched_at": "2026-11-20T21:47:34.260531+00:00"
+    }
+  },
+  "built_at": "2026-11-20T21:47:35.215141+00:00",
+  "deadline": "2026-11-21T11:00:00+00:00",
+  "players": [
+    {
+      "player_id": 15,
+      "name": "Ødegaard",
+      "position": "MID",
+      "model_ep": 4.3478,
+      "fpl_ep_next": 5.7,
+      "availability_band": "fit"
+    },
+    {
+      "player_id": 79,
+      "name": "Evanilson",
+      "position": "FWD",
+      "model_ep": 5.5867,
+      "fpl_ep_next": 8.0,
+      "availability_band": "fit"
+    },
+    {
+      "player_id": 112,
+      "name": "Van Hecke",
+      "position": "DEF",
+      "model_ep": 5.1458,
+      "fpl_ep_next": 8.7,
+      "availability_band": "fit"
+    },
+    {
+      "player_id": 115,
+      "name": "De Cuyper",
+      "position": "DEF",
+      "model_ep": 3.9001,
+      "fpl_ep_next": 5.3,
+      "availability_band": "fit"
+    },
+    {
+      "player_id": 124,
+      "name": "Groß",
+      "position": "MID",
+      "model_ep": 4.5236,
+      "fpl_ep_next": 4.0,
+      "availability_band": "fit"
+    },
+    {
+      "player_id": 173,
+      "name": "Thomas",
+      "position": "DEF",
+      "model_ep": 1.6274,
+      "fpl_ep_next": 0.2,
+      "availability_band": "flagged"
+    },
+    {
+      "player_id": 229,
+      "name": "Tarkowski",
+      "position": "DEF",
+      "model_ep": 3.2557,
+      "fpl_ep_next": 3.3,
+      "availability_band": "fit"
+    },
+    {
+      "player_id": 249,
+      "name": "Barry",
+      "position": "FWD",
+      "model_ep": 5.4698,
+      "fpl_ep_next": 9.0,
+      "availability_band": "fit"
+    },
+    {
+      "player_id": 305,
+      "name": "Davis",
+      "position": "DEF",
+      "model_ep": 2.6493,
+      "fpl_ep_next": 0.7,
+      "availability_band": "fit"
+    },
+    {
+      "player_id": 399,
+      "name": "Cherki",
+      "position": "MID",
+      "model_ep": 3.3273,
+      "fpl_ep_next": 3.3,
+      "availability_band": "fit"
+    },
+    {
+      "player_id": 411,
+      "name": "Haaland",
+      "position": "FWD",
+      "model_ep": 6.1721,
+      "fpl_ep_next": 4.0,
+      "availability_band": "fit"
+    },
+    {
+      "player_id": 426,
+      "name": "B.Fernandes",
+      "position": "MID",
+      "model_ep": 3.8781,
+      "fpl_ep_next": 4.0,
+      "availability_band": "fit"
+    },
+    {
+      "player_id": 496,
+      "name": "Kinsky",
+      "position": "GKP",
+      "model_ep": 3.8893,
+      "fpl_ep_next": 5.7,
+      "availability_band": "fit"
+    },
+    {
+      "player_id": 497,
+      "name": "Dubravka",
+      "position": "GKP",
+      "model_ep": 0.15,
+      "fpl_ep_next": 0.0,
+      "availability_band": "fit"
+    },
+    {
+      "player_id": 544,
+      "name": "Xhaka",
+      "position": "MID",
+      "model_ep": 0.0,
+      "fpl_ep_next": 0.0,
+      "availability_band": "flagged"
+    },
+    {
+      "player_id": 68,
+      "name": "Tavernier",
+      "position": "MID",
+      "model_ep": 5.2941,
+      "fpl_ep_next": 5.3,
+      "availability_band": "fit"
+    },
+    {
+      "player_id": 542,
+      "name": "E.Le Fée",
+      "position": "MID",
+      "model_ep": 4.7306,
+      "fpl_ep_next": 7.3,
+      "availability_band": "fit"
+    },
+    {
+      "player_id": 236,
+      "name": "Dewsbury-Hall",
+      "position": "MID",
+      "model_ep": 4.3495,
+      "fpl_ep_next": 5.0,
+      "availability_band": "fit"
+    },
+    {
+      "player_id": 591,
+      "name": "Enciso",
+      "position": "MID",
+      "model_ep": 3.9558,
+      "fpl_ep_next": 6.3,
+      "availability_band": "fit"
+    }
+  ]
+}
