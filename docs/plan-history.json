@@ -1,23 +1,5 @@
 [
   {
-    "built_at": "2026-09-20T07:43:45.690426+00:00",
-    "fetched_at": "2026-09-20T07:43:44.181338+00:00",
-    "gw": 6,
-    "model_version": "0.3.0",
-    "moves": [
-      {
-        "out": "Gabriel",
-        "in": "Hall"
-      },
-      {
-        "out": "Cherki",
-        "in": "Saka"
-      }
-    ],
-    "expected_points": 57.42,
-    "headline": "พิจารณาย้าย 2 ตัว · กัปตัน Saka"
-  },
-  {
     "built_at": "2026-09-20T17:27:29.724422+00:00",
     "fetched_at": "2026-09-20T17:27:28.670964+00:00",
     "gw": 6,
@@ -1564,6 +1546,20 @@
   {
     "built_at": "2026-11-20T21:47:34.260725+00:00",
     "fetched_at": "2026-11-20T21:47:28.668859+00:00",
+    "gw": 11,
+    "model_version": "0.5.0",
+    "moves": [
+      {
+        "out": "Xhaka",
+        "in": "Tavernier"
+      }
+    ],
+    "expected_points": 56.39,
+    "headline": "ลำดับแรก: Xhaka → Tavernier"
+  },
+  {
+    "built_at": "2026-11-21T09:42:01.583455+00:00",
+    "fetched_at": "2026-11-21T09:41:55.992136+00:00",
     "gw": 11,
     "model_version": "0.5.0",
     "moves": [
