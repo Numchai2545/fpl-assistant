@@ -74,9 +74,9 @@
       ]
     }
   ],
-  "built_at": "พุธ 25 พ.ย. 2569, 18:12 น.",
-  "built_at_iso": "2026-11-25T11:12:29.944783+00:00",
-  "fetched_at": "2026-11-25T11:12:20.675623+00:00",
+  "built_at": "พฤหัสบดี 26 พ.ย. 2569, 06:04 น.",
+  "built_at_iso": "2026-11-25T23:04:05.336819+00:00",
+  "fetched_at": "2026-11-25T23:03:57.031742+00:00",
   "data_sources": [
     "network"
   ],
@@ -84,262 +84,262 @@
   "decision_sources": [
     {
       "name": "bootstrap",
-      "fetched_at": "2026-11-25T11:12:20.675623+00:00",
+      "fetched_at": "2026-11-25T23:03:57.031742+00:00",
       "source": "network"
     },
     {
       "name": "fixtures",
-      "fetched_at": "2026-11-25T11:12:20.698295+00:00",
+      "fetched_at": "2026-11-25T23:03:57.048627+00:00",
       "source": "network"
     },
     {
       "name": "entry_entry6014213",
-      "fetched_at": "2026-11-25T11:12:20.875129+00:00",
+      "fetched_at": "2026-11-25T23:03:57.219386+00:00",
       "source": "network"
     },
     {
       "name": "entry_history_entry6014213",
-      "fetched_at": "2026-11-25T11:12:21.020836+00:00",
+      "fetched_at": "2026-11-25T23:03:57.310909+00:00",
       "source": "network"
     },
     {
       "name": "entry_transfers_entry6014213",
-      "fetched_at": "2026-11-25T11:12:21.167412+00:00",
+      "fetched_at": "2026-11-25T23:03:57.412787+00:00",
       "source": "network"
     },
     {
       "name": "picks_gw11_entry6014213",
-      "fetched_at": "2026-11-25T11:12:21.313773+00:00",
+      "fetched_at": "2026-11-25T23:03:57.512133+00:00",
       "source": "network"
     },
     {
       "name": "element_4",
-      "fetched_at": "2026-11-25T11:12:21.374825+00:00",
+      "fetched_at": "2026-11-25T23:03:57.565099+00:00",
       "source": "network"
     },
     {
       "name": "element_15",
-      "fetched_at": "2026-11-25T11:12:21.385791+00:00",
+      "fetched_at": "2026-11-25T23:03:57.570188+00:00",
       "source": "network"
     },
     {
       "name": "element_16",
-      "fetched_at": "2026-11-25T11:12:21.396506+00:00",
+      "fetched_at": "2026-11-25T23:03:57.576419+00:00",
       "source": "network"
     },
     {
       "name": "element_26",
-      "fetched_at": "2026-11-25T11:12:21.407467+00:00",
+      "fetched_at": "2026-11-25T23:03:57.581316+00:00",
       "source": "network"
     },
     {
       "name": "element_31",
-      "fetched_at": "2026-11-25T11:12:21.418157+00:00",
+      "fetched_at": "2026-11-25T23:03:57.591454+00:00",
       "source": "network"
     },
     {
       "name": "element_52",
-      "fetched_at": "2026-11-25T11:12:21.428837+00:00",
+      "fetched_at": "2026-11-25T23:03:57.597389+00:00",
       "source": "network"
     },
     {
       "name": "element_60",
-      "fetched_at": "2026-11-25T11:12:21.439380+00:00",
+      "fetched_at": "2026-11-25T23:03:57.604469+00:00",
       "source": "network"
     },
     {
       "name": "element_70",
-      "fetched_at": "2026-11-25T11:12:21.449844+00:00",
+      "fetched_at": "2026-11-25T23:03:57.609599+00:00",
       "source": "network"
     },
     {
       "name": "element_79",
-      "fetched_at": "2026-11-25T11:12:21.460301+00:00",
+      "fetched_at": "2026-11-25T23:03:57.614822+00:00",
       "source": "network"
     },
     {
       "name": "element_86",
-      "fetched_at": "2026-11-25T11:12:21.470852+00:00",
+      "fetched_at": "2026-11-25T23:03:57.620124+00:00",
+      "source": "network"
+    },
+    {
+      "name": "element_87",
+      "fetched_at": "2026-11-25T23:03:57.626158+00:00",
       "source": "network"
     },
     {
       "name": "element_98",
-      "fetched_at": "2026-11-25T11:12:21.481732+00:00",
+      "fetched_at": "2026-11-25T23:03:57.631196+00:00",
       "source": "network"
     },
     {
       "name": "element_109",
-      "fetched_at": "2026-11-25T11:12:21.492142+00:00",
+      "fetched_at": "2026-11-25T23:03:57.636053+00:00",
       "source": "network"
     },
     {
       "name": "element_112",
-      "fetched_at": "2026-11-25T11:12:21.502891+00:00",
-      "source": "network"
-    },
-    {
-      "name": "element_114",
-      "fetched_at": "2026-11-25T11:12:21.649998+00:00",
+      "fetched_at": "2026-11-25T23:03:57.642410+00:00",
       "source": "network"
     },
     {
       "name": "element_115",
-      "fetched_at": "2026-11-25T11:12:21.660787+00:00",
+      "fetched_at": "2026-11-25T23:03:57.647338+00:00",
       "source": "network"
     },
     {
       "name": "element_124",
-      "fetched_at": "2026-11-25T11:12:21.671604+00:00",
+      "fetched_at": "2026-11-25T23:03:57.656566+00:00",
       "source": "network"
     },
     {
       "name": "element_129",
-      "fetched_at": "2026-11-25T11:12:21.682907+00:00",
+      "fetched_at": "2026-11-25T23:03:57.661197+00:00",
       "source": "network"
     },
     {
       "name": "element_166",
-      "fetched_at": "2026-11-25T11:12:21.694458+00:00",
+      "fetched_at": "2026-11-25T23:03:57.665231+00:00",
       "source": "network"
     },
     {
       "name": "element_167",
-      "fetched_at": "2026-11-25T11:12:21.840609+00:00",
+      "fetched_at": "2026-11-25T23:03:57.669576+00:00",
       "source": "network"
     },
     {
       "name": "element_173",
-      "fetched_at": "2026-11-25T11:12:21.851521+00:00",
+      "fetched_at": "2026-11-25T23:03:57.675529+00:00",
       "source": "network"
     },
     {
       "name": "element_183",
-      "fetched_at": "2026-11-25T11:12:21.862155+00:00",
+      "fetched_at": "2026-11-25T23:03:57.681056+00:00",
       "source": "network"
     },
     {
       "name": "element_229",
-      "fetched_at": "2026-11-25T11:12:21.872759+00:00",
+      "fetched_at": "2026-11-25T23:03:57.687448+00:00",
       "source": "network"
     },
     {
       "name": "element_249",
-      "fetched_at": "2026-11-25T11:12:21.883231+00:00",
+      "fetched_at": "2026-11-25T23:03:57.692150+00:00",
       "source": "network"
     },
     {
       "name": "element_271",
-      "fetched_at": "2026-11-25T11:12:21.893851+00:00",
+      "fetched_at": "2026-11-25T23:03:57.696359+00:00",
       "source": "network"
     },
     {
       "name": "element_295",
-      "fetched_at": "2026-11-25T11:12:21.904514+00:00",
+      "fetched_at": "2026-11-25T23:03:57.702658+00:00",
       "source": "network"
     },
     {
       "name": "element_305",
-      "fetched_at": "2026-11-25T11:12:21.915111+00:00",
+      "fetched_at": "2026-11-25T23:03:57.707040+00:00",
       "source": "network"
     },
     {
       "name": "element_332",
-      "fetched_at": "2026-11-25T11:12:22.061939+00:00",
+      "fetched_at": "2026-11-25T23:03:57.714086+00:00",
       "source": "network"
     },
     {
       "name": "element_334",
-      "fetched_at": "2026-11-25T11:12:22.073216+00:00",
+      "fetched_at": "2026-11-25T23:03:57.719670+00:00",
       "source": "network"
     },
     {
       "name": "element_336",
-      "fetched_at": "2026-11-25T11:12:22.084103+00:00",
+      "fetched_at": "2026-11-25T23:03:57.724482+00:00",
       "source": "network"
     },
     {
       "name": "element_346",
-      "fetched_at": "2026-11-25T11:12:22.095016+00:00",
+      "fetched_at": "2026-11-25T23:03:57.728419+00:00",
       "source": "network"
     },
     {
       "name": "element_366",
-      "fetched_at": "2026-11-25T11:12:22.105759+00:00",
+      "fetched_at": "2026-11-25T23:03:57.733195+00:00",
       "source": "network"
     },
     {
       "name": "element_379",
-      "fetched_at": "2026-11-25T11:12:22.116756+00:00",
+      "fetched_at": "2026-11-25T23:03:57.738264+00:00",
       "source": "network"
     },
     {
       "name": "element_385",
-      "fetched_at": "2026-11-25T11:12:22.127590+00:00",
+      "fetched_at": "2026-11-25T23:03:57.742155+00:00",
       "source": "network"
     },
     {
       "name": "element_399",
-      "fetched_at": "2026-11-25T11:12:22.138220+00:00",
+      "fetched_at": "2026-11-25T23:03:57.748190+00:00",
       "source": "network"
     },
     {
       "name": "element_411",
-      "fetched_at": "2026-11-25T11:12:22.148899+00:00",
+      "fetched_at": "2026-11-25T23:03:57.752689+00:00",
       "source": "network"
     },
     {
       "name": "element_426",
-      "fetched_at": "2026-11-25T11:12:22.159634+00:00",
+      "fetched_at": "2026-11-25T23:03:57.758705+00:00",
       "source": "network"
     },
     {
       "name": "element_496",
-      "fetched_at": "2026-11-25T11:12:22.170521+00:00",
+      "fetched_at": "2026-11-25T23:03:57.763733+00:00",
       "source": "network"
     },
     {
       "name": "element_497",
-      "fetched_at": "2026-11-25T11:12:22.181609+00:00",
+      "fetched_at": "2026-11-25T23:03:57.770420+00:00",
       "source": "network"
     },
     {
       "name": "element_504",
-      "fetched_at": "2026-11-25T11:12:22.192472+00:00",
+      "fetched_at": "2026-11-25T23:03:57.775508+00:00",
       "source": "network"
     },
     {
       "name": "element_529",
-      "fetched_at": "2026-11-25T11:12:22.203464+00:00",
+      "fetched_at": "2026-11-25T23:03:57.780988+00:00",
       "source": "network"
     },
     {
       "name": "element_533",
-      "fetched_at": "2026-11-25T11:12:22.350091+00:00",
+      "fetched_at": "2026-11-25T23:03:57.785645+00:00",
       "source": "network"
     },
     {
       "name": "element_542",
-      "fetched_at": "2026-11-25T11:12:22.361026+00:00",
+      "fetched_at": "2026-11-25T23:03:57.789542+00:00",
       "source": "network"
     },
     {
       "name": "element_544",
-      "fetched_at": "2026-11-25T11:12:22.371878+00:00",
+      "fetched_at": "2026-11-25T23:03:57.794246+00:00",
       "source": "network"
     },
     {
       "name": "element_566",
-      "fetched_at": "2026-11-25T11:12:22.382701+00:00",
+      "fetched_at": "2026-11-25T23:03:57.798452+00:00",
       "source": "network"
     },
     {
       "name": "element_572",
-      "fetched_at": "2026-11-25T11:12:22.393302+00:00",
+      "fetched_at": "2026-11-25T23:03:57.804576+00:00",
       "source": "network"
     },
     {
       "name": "element_579",
-      "fetched_at": "2026-11-25T11:12:22.403934+00:00",
+      "fetched_at": "2026-11-25T23:03:57.810278+00:00",
       "source": "network"
     }
   ],
