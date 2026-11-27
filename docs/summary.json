@@ -74,9 +74,9 @@
       ]
     }
   ],
-  "built_at": "ศุกร์ 27 พ.ย. 2569, 05:57 น.",
-  "built_at_iso": "2026-11-26T22:57:23.066668+00:00",
-  "fetched_at": "2026-11-26T22:57:17.435715+00:00",
+  "built_at": "ศุกร์ 27 พ.ย. 2569, 17:47 น.",
+  "built_at_iso": "2026-11-27T10:47:46.905750+00:00",
+  "fetched_at": "2026-11-27T10:47:40.943344+00:00",
   "data_sources": [
     "network"
   ],
@@ -84,262 +84,262 @@
   "decision_sources": [
     {
       "name": "bootstrap",
-      "fetched_at": "2026-11-26T22:57:17.435715+00:00",
+      "fetched_at": "2026-11-27T10:47:40.943344+00:00",
       "source": "network"
     },
     {
       "name": "fixtures",
-      "fetched_at": "2026-11-26T22:57:17.453310+00:00",
+      "fetched_at": "2026-11-27T10:47:40.963562+00:00",
       "source": "network"
     },
     {
       "name": "entry_entry6014213",
-      "fetched_at": "2026-11-26T22:57:17.610962+00:00",
+      "fetched_at": "2026-11-27T10:47:41.139550+00:00",
       "source": "network"
     },
     {
       "name": "entry_history_entry6014213",
-      "fetched_at": "2026-11-26T22:57:17.620563+00:00",
+      "fetched_at": "2026-11-27T10:47:41.285853+00:00",
       "source": "network"
     },
     {
       "name": "entry_transfers_entry6014213",
-      "fetched_at": "2026-11-26T22:57:17.630980+00:00",
+      "fetched_at": "2026-11-27T10:47:41.296531+00:00",
       "source": "network"
     },
     {
       "name": "picks_gw11_entry6014213",
-      "fetched_at": "2026-11-26T22:57:17.722555+00:00",
+      "fetched_at": "2026-11-27T10:47:41.442776+00:00",
       "source": "network"
     },
     {
       "name": "element_4",
-      "fetched_at": "2026-11-26T22:57:17.765932+00:00",
+      "fetched_at": "2026-11-27T10:47:41.490253+00:00",
       "source": "network"
     },
     {
       "name": "element_15",
-      "fetched_at": "2026-11-26T22:57:17.776054+00:00",
+      "fetched_at": "2026-11-27T10:47:41.500801+00:00",
       "source": "network"
     },
     {
       "name": "element_16",
-      "fetched_at": "2026-11-26T22:57:17.860487+00:00",
+      "fetched_at": "2026-11-27T10:47:41.511321+00:00",
       "source": "network"
     },
     {
       "name": "element_26",
-      "fetched_at": "2026-11-26T22:57:17.869441+00:00",
+      "fetched_at": "2026-11-27T10:47:41.522108+00:00",
       "source": "network"
     },
     {
       "name": "element_31",
-      "fetched_at": "2026-11-26T22:57:17.877757+00:00",
+      "fetched_at": "2026-11-27T10:47:41.533049+00:00",
       "source": "network"
     },
     {
       "name": "element_52",
-      "fetched_at": "2026-11-26T22:57:17.885648+00:00",
+      "fetched_at": "2026-11-27T10:47:41.544036+00:00",
       "source": "network"
     },
     {
       "name": "element_60",
-      "fetched_at": "2026-11-26T22:57:17.893749+00:00",
+      "fetched_at": "2026-11-27T10:47:41.554897+00:00",
       "source": "network"
     },
     {
       "name": "element_70",
-      "fetched_at": "2026-11-26T22:57:17.902310+00:00",
+      "fetched_at": "2026-11-27T10:47:41.565846+00:00",
       "source": "network"
     },
     {
       "name": "element_79",
-      "fetched_at": "2026-11-26T22:57:17.910692+00:00",
+      "fetched_at": "2026-11-27T10:47:41.576649+00:00",
       "source": "network"
     },
     {
       "name": "element_86",
-      "fetched_at": "2026-11-26T22:57:17.918475+00:00",
+      "fetched_at": "2026-11-27T10:47:41.587305+00:00",
       "source": "network"
     },
     {
       "name": "element_87",
-      "fetched_at": "2026-11-26T22:57:17.926807+00:00",
+      "fetched_at": "2026-11-27T10:47:41.598074+00:00",
       "source": "network"
     },
     {
       "name": "element_98",
-      "fetched_at": "2026-11-26T22:57:17.934830+00:00",
+      "fetched_at": "2026-11-27T10:47:41.608833+00:00",
       "source": "network"
     },
     {
       "name": "element_109",
-      "fetched_at": "2026-11-26T22:57:17.942711+00:00",
+      "fetched_at": "2026-11-27T10:47:41.619627+00:00",
       "source": "network"
     },
     {
       "name": "element_112",
-      "fetched_at": "2026-11-26T22:57:17.950925+00:00",
+      "fetched_at": "2026-11-27T10:47:41.630471+00:00",
       "source": "network"
     },
     {
       "name": "element_115",
-      "fetched_at": "2026-11-26T22:57:17.959162+00:00",
+      "fetched_at": "2026-11-27T10:47:41.641348+00:00",
       "source": "network"
     },
     {
       "name": "element_124",
-      "fetched_at": "2026-11-26T22:57:17.968554+00:00",
+      "fetched_at": "2026-11-27T10:47:41.652193+00:00",
       "source": "network"
     },
     {
       "name": "element_129",
-      "fetched_at": "2026-11-26T22:57:17.976138+00:00",
+      "fetched_at": "2026-11-27T10:47:41.662955+00:00",
       "source": "network"
     },
     {
       "name": "element_166",
-      "fetched_at": "2026-11-26T22:57:17.984569+00:00",
+      "fetched_at": "2026-11-27T10:47:41.673886+00:00",
       "source": "network"
     },
     {
       "name": "element_167",
-      "fetched_at": "2026-11-26T22:57:17.992211+00:00",
+      "fetched_at": "2026-11-27T10:47:41.684873+00:00",
       "source": "network"
     },
     {
       "name": "element_173",
-      "fetched_at": "2026-11-26T22:57:18.000370+00:00",
+      "fetched_at": "2026-11-27T10:47:41.695971+00:00",
       "source": "network"
     },
     {
       "name": "element_183",
-      "fetched_at": "2026-11-26T22:57:18.008363+00:00",
+      "fetched_at": "2026-11-27T10:47:41.706895+00:00",
       "source": "network"
     },
     {
       "name": "element_229",
-      "fetched_at": "2026-11-26T22:57:18.016308+00:00",
+      "fetched_at": "2026-11-27T10:47:41.717866+00:00",
       "source": "network"
     },
     {
       "name": "element_249",
-      "fetched_at": "2026-11-26T22:57:18.023811+00:00",
+      "fetched_at": "2026-11-27T10:47:41.728734+00:00",
       "source": "network"
     },
     {
       "name": "element_271",
-      "fetched_at": "2026-11-26T22:57:18.032987+00:00",
+      "fetched_at": "2026-11-27T10:47:41.739609+00:00",
       "source": "network"
     },
     {
       "name": "element_295",
-      "fetched_at": "2026-11-26T22:57:18.041475+00:00",
+      "fetched_at": "2026-11-27T10:47:41.750440+00:00",
       "source": "network"
     },
     {
       "name": "element_305",
-      "fetched_at": "2026-11-26T22:57:18.051647+00:00",
+      "fetched_at": "2026-11-27T10:47:41.761302+00:00",
       "source": "network"
     },
     {
       "name": "element_332",
-      "fetched_at": "2026-11-26T22:57:18.059302+00:00",
+      "fetched_at": "2026-11-27T10:47:41.772273+00:00",
       "source": "network"
     },
     {
       "name": "element_334",
-      "fetched_at": "2026-11-26T22:57:18.066743+00:00",
+      "fetched_at": "2026-11-27T10:47:41.782954+00:00",
       "source": "network"
     },
     {
       "name": "element_336",
-      "fetched_at": "2026-11-26T22:57:18.075383+00:00",
+      "fetched_at": "2026-11-27T10:47:41.793972+00:00",
       "source": "network"
     },
     {
       "name": "element_346",
-      "fetched_at": "2026-11-26T22:57:18.084110+00:00",
+      "fetched_at": "2026-11-27T10:47:41.805014+00:00",
       "source": "network"
     },
     {
       "name": "element_366",
-      "fetched_at": "2026-11-26T22:57:18.093749+00:00",
+      "fetched_at": "2026-11-27T10:47:41.816428+00:00",
       "source": "network"
     },
     {
       "name": "element_379",
-      "fetched_at": "2026-11-26T22:57:18.103492+00:00",
+      "fetched_at": "2026-11-27T10:47:41.827376+00:00",
       "source": "network"
     },
     {
       "name": "element_385",
-      "fetched_at": "2026-11-26T22:57:18.110835+00:00",
+      "fetched_at": "2026-11-27T10:47:41.838156+00:00",
       "source": "network"
     },
     {
       "name": "element_399",
-      "fetched_at": "2026-11-26T22:57:18.119477+00:00",
+      "fetched_at": "2026-11-27T10:47:41.848900+00:00",
       "source": "network"
     },
     {
       "name": "element_411",
-      "fetched_at": "2026-11-26T22:57:18.129796+00:00",
+      "fetched_at": "2026-11-27T10:47:41.860033+00:00",
       "source": "network"
     },
     {
       "name": "element_426",
-      "fetched_at": "2026-11-26T22:57:18.138116+00:00",
+      "fetched_at": "2026-11-27T10:47:41.870738+00:00",
       "source": "network"
     },
     {
       "name": "element_496",
-      "fetched_at": "2026-11-26T22:57:18.149265+00:00",
+      "fetched_at": "2026-11-27T10:47:41.881261+00:00",
       "source": "network"
     },
     {
       "name": "element_497",
-      "fetched_at": "2026-11-26T22:57:18.157293+00:00",
+      "fetched_at": "2026-11-27T10:47:41.891817+00:00",
       "source": "network"
     },
     {
       "name": "element_504",
-      "fetched_at": "2026-11-26T22:57:18.165199+00:00",
+      "fetched_at": "2026-11-27T10:47:41.902342+00:00",
       "source": "network"
     },
     {
       "name": "element_529",
-      "fetched_at": "2026-11-26T22:57:18.173416+00:00",
+      "fetched_at": "2026-11-27T10:47:41.912718+00:00",
       "source": "network"
     },
     {
       "name": "element_533",
-      "fetched_at": "2026-11-26T22:57:18.181228+00:00",
+      "fetched_at": "2026-11-27T10:47:41.923432+00:00",
       "source": "network"
     },
     {
       "name": "element_542",
-      "fetched_at": "2026-11-26T22:57:18.189067+00:00",
+      "fetched_at": "2026-11-27T10:47:41.933697+00:00",
       "source": "network"
     },
     {
       "name": "element_544",
-      "fetched_at": "2026-11-26T22:57:18.197591+00:00",
+      "fetched_at": "2026-11-27T10:47:41.944251+00:00",
       "source": "network"
     },
     {
       "name": "element_566",
-      "fetched_at": "2026-11-26T22:57:18.205737+00:00",
+      "fetched_at": "2026-11-27T10:47:41.954589+00:00",
       "source": "network"
     },
     {
       "name": "element_572",
-      "fetched_at": "2026-11-26T22:57:18.215028+00:00",
+      "fetched_at": "2026-11-27T10:47:41.965524+00:00",
       "source": "network"
     },
     {
       "name": "element_579",
-      "fetched_at": "2026-11-26T22:57:18.301340+00:00",
+      "fetched_at": "2026-11-27T10:47:41.975935+00:00",
       "source": "network"
     }
   ],
@@ -449,12 +449,12 @@
       "out_team": "MCI",
       "in_team": "LIV",
       "sell_price": 7.7,
-      "buy_price": 7.4,
+      "buy_price": 7.5,
       "out_ep": 13.808878011421342,
       "in_ep": 26.800002326929334,
       "gain": 12.991124315507992,
       "net_gain": 12.991124315507992,
-      "bank_after": 0.4,
+      "bank_after": 0.3,
       "cumulative_gain": 77.65390902069353,
       "hit_cost": 0,
       "paid": false,
@@ -485,7 +485,7 @@
       "in_ep": 16.203140628959893,
       "gain": 5.358820227431227,
       "net_gain": 1.3588202274312273,
-      "bank_after": 0.4,
+      "bank_after": 0.3,
       "cumulative_gain": 79.01272924812476,
       "hit_cost": 4,
       "paid": true,
