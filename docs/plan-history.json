@@ -1,23 +1,5 @@
 [
   {
-    "built_at": "2026-10-07T08:35:55.255334+00:00",
-    "fetched_at": "2026-10-07T08:35:53.793040+00:00",
-    "gw": 6,
-    "model_version": "0.3.0",
-    "moves": [
-      {
-        "out": "Xhaka",
-        "in": "Schade"
-      },
-      {
-        "out": "João Pedro",
-        "in": "Kostoulas"
-      }
-    ],
-    "expected_points": 66.17,
-    "headline": "พิจารณาย้าย 2 ตัว · กัปตัน Haaland"
-  },
-  {
     "built_at": "2026-10-07T19:57:53.579533+00:00",
     "fetched_at": "2026-10-07T19:57:52.164276+00:00",
     "gw": 6,
@@ -1521,6 +1503,20 @@
       }
     ],
     "expected_points": 55.26,
+    "headline": "ลำดับแรก: Xhaka → Tavernier"
+  },
+  {
+    "built_at": "2026-11-27T22:40:01.606782+00:00",
+    "fetched_at": "2026-11-27T22:39:52.847618+00:00",
+    "gw": 13,
+    "model_version": "0.5.0",
+    "moves": [
+      {
+        "out": "Xhaka",
+        "in": "Tavernier"
+      }
+    ],
+    "expected_points": 41.78,
     "headline": "ลำดับแรก: Xhaka → Tavernier"
   }
 ]
